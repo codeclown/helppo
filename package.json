@@ -1,13 +1,15 @@
 {
   "name": "helppo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "GPL-3.0-only",
+  "repository": "codeclown/helppo",
   "engines": {
     "node": ">=10"
   },
   "main": "dist/server/helppo.js",
   "files": [
     "dist/*",
+    "docs/*",
     "LICENSE",
     "LICENSE-3RD-PARTIES"
   ],
