@@ -30,7 +30,7 @@ const listen = (app, port, maxPort) =>
       })
       .on("error", (error) => {
         if (error.message.includes("EADDRINUSE") && port < maxPort - 1) {
-          return listen(app, port + 1, maxPort);
+          return listen(app, port + 1, maxPort).then((port) => resolve(port));
         }
         reject(error);
       });
