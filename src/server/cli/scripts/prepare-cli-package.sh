@@ -12,7 +12,6 @@ entry_file="dist/server/cli/cli.js"
 bundle_file="$out_dir/cli.js"
 package_json_file="$out_dir/package.json"
 readme_file="$out_dir/README.md"
-readme_banner_file="docs/screenshots/cli_readme_banner.png"
 
 echo "[--] Preparing $out_dir"
 rm -rf $out_dir
@@ -29,9 +28,6 @@ fi
 
 echo "[--] Copying LICENSE"
 cp LICENSE $out_dir/LICENSE
-
-echo "[--] Copying $readme_banner_file"
-cp $readme_banner_file $out_dir/readme_banner.png
 
 echo "[--] Parsing current helppo version"
 helppo_version=$(cat package.json | grep '"version":' | sed -E 's/^ *"version": "([^"]+)",?$/\1/')
@@ -79,7 +75,7 @@ echo '{
 
 echo "[--] Creating $readme_file"
 echo "" > $readme_file
-echo '![Screenshot of Helppo CLI](./readme_banner.png)
+echo '![Screenshot of Helppo CLI](docs/screenshots/cli_readme_banner.png)
 
 # helppo-cli
 

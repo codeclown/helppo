@@ -9,7 +9,6 @@
   "main": "dist/server/helppo.js",
   "files": [
     "dist/*",
-    "docs/*",
     "LICENSE",
     "LICENSE-3RD-PARTIES"
   ],

@@ -7,8 +7,7 @@
 - [Table of Contents](#table-of-contents)
 - [Prerequisites](#prerequisites)
 - [Publish `helppo` to NPM](#publish-helppo-to-npm)
-  - [Build](#build)
-  - [Run all tests](#run-all-tests)
+  - [Build and run all tests](#build-and-run-all-tests)
   - [Publish the package](#publish-the-package)
 - [Publish `helppo-cli` to NPM](#publish-helppo-cli-to-npm)
   - [Prepare package files](#prepare-package-files)
@@ -22,13 +21,7 @@ The following commands are ran in the repository root, unless otherwise noted.
 
 ## Publish `helppo` to NPM
 
-### Build
-
-```bash
-yarn build
-```
-
-### Run all tests
+### Build and run all tests
 
 ```bash
 yarn ci
