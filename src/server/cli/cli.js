@@ -202,20 +202,18 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
   console.log(`  http://localhost:${port}`);
 }
 
-if (require.main === module) {
-  main().catch((error) => {
+main().catch((error) => {
+  console.error("");
+  if (error.pretty) {
+    console.error(error.message);
+  } else {
+    console.error(
+      `${colors.red}ERR${colors.reset} Helppo exited with an unexpected error. Stack trace:\n${error.stack}`
+    );
     console.error("");
-    if (error.pretty) {
-      console.error(error.message);
-    } else {
-      console.error(
-        `${colors.red}ERR${colors.reset} Helppo exited with an unexpected error. Stack trace:\n${error.stack}`
-      );
-      console.error("");
-      console.error("If you think this is a bug, please file a bug report at:");
-      console.error("  https://github.com/codeclown/helppo/issues");
-    }
-    console.error("");
-    process.exit(1);
-  });
-}
+    console.error("If you think this is a bug, please file a bug report at:");
+    console.error("  https://github.com/codeclown/helppo/issues");
+  }
+  console.error("");
+  process.exit(1);
+});

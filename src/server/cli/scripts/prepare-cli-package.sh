@@ -43,6 +43,10 @@ echo $mysql_line
 pg_line=$(cat package.json | grep '"pg":')
 echo $pg_line
 
+echo "[--] Parsing other dependencies"
+date_fns_line=$(cat package.json | grep '"date-fns":')
+echo $date_fns_line
+
 echo "[--] Parsing other package.json lines"
 engine_line=$(cat package.json | grep '"node":')
 
@@ -52,6 +56,7 @@ echo '{
   "name": "helppo-cli",
   "version": "'$helppo_version'",
   "license": "GPL-3.0-only",
+  "repository": "codeclown/helppo",
   "engines": {
    '$engine_line'
   },
@@ -67,13 +72,14 @@ echo '{
   "dependencies": {
    '$mysql_line'
    '$pg_line'
+   '$date_fns_line'
     "helppo": "'$helppo_version'"
   }
 }' | tee $package_json_file
 
 echo "[--] Creating $readme_file"
 echo "" > $readme_file
-echo '![Screenshot of Helppo CLI](readme_banner.png)
+echo '![Screenshot of Helppo CLI](./readme_banner.png)
 
 # helppo-cli
 

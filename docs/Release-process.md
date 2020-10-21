@@ -36,16 +36,10 @@ yarn ci
 
 ### Publish the package
 
-Bump version:
-
-```bash
-yarn version # will prompt for new version number
-```
-
 Publish to NPM:
 
 ```bash
-yarn publish
+yarn publish # will prompt for new version number
 ```
 
 Push updated tags:

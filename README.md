@@ -5,6 +5,9 @@
 Instant database management interface in your browser
 </p>
 <p align="center">
+<a href="https://github.com/codeclown/helppo"><img src="https://img.shields.io/badge/github-helppo-blue" alt="Helppo on GitHub"></a>
+</p>
+<p align="center">
 <a href="#what-is-it">What is it</a>   
 <a href="#screenshots">Screenshots</a>   
 <a href="#subscribe-to-helppo-news">Mailing list</a>   
