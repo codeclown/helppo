@@ -1,0 +1,8 @@
+.QueryRunMessage {
+  font-weight: var(--font-weight-bold);
+  color: var(--gray-600);
+}
+
+.QueryRunMessage--danger {
+  color: var(--color-red-600);
+}

@@ -1,0 +1,32 @@
+version: "3.1"
+services:
+  mysql:
+    container_name: helppo_mysql
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: test_db
+    ports:
+      - 7810:3306
+  postgres:
+    container_name: helppo_postgres
+    image: postgres:12.3
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: test_db
+    ports:
+      - 7811:5432
+  # Used by the dev server
+  dev_mysql:
+    container_name: helppo_dev_mysql
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: dev_db
+    ports:
+      - 7812:3306
+    volumes:
+      - ./src/server/devServer/devServerSeed.sql:/docker-entrypoint-initdb.d/devServerSeed.sql

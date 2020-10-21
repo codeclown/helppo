@@ -1,0 +1,5 @@
+.TotalResults {
+  color: var(--gray-600);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}

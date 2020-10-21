@@ -1,0 +1,33 @@
+.BlockLinkList {
+  margin-left: calc(-1 * var(--spacing-default));
+  margin-top: calc(-1 * var(--spacing-default));
+  padding-bottom: var(--spacing-default);
+  max-width: 700px;
+}
+
+.BlockLinkList::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.BlockLinkList__item {
+  float: left;
+  width: 200px;
+  border: 1px solid var(--gray-400);
+  padding: var(--spacing-default);
+  margin-left: var(--spacing-default);
+  margin-top: var(--spacing-default);
+  line-height: 1.1;
+}
+
+.BlockLinkList__item:hover {
+  border-color: var(--gray-600);
+}
+
+.BlockLinkList__item-title {
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

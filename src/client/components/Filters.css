@@ -1,0 +1,50 @@
+.Filters .toolbar {
+  display: flex;
+  margin: 0 calc(var(--spacing-slim) / -2);
+}
+
+.Filters .toolbar-button {
+  color: var(--gray-600);
+  font-weight: var(--font-weight-bold);
+  margin: 0 calc(var(--spacing-slim) / 2);
+}
+
+.Filters .toolbar-button:hover {
+  text-decoration: underline;
+}
+
+.Filters .toolbar-button--right {
+  margin-left: auto;
+}
+
+.Filters .filter-boxes {
+  margin-top: var(--spacing-slim);
+}
+
+.Filters .filter-box {
+  background-color: var(--gray-200);
+  border: 1px solid var(--gray-400);
+  border-top-width: 0;
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-slim);
+}
+
+.Filters .filter-box:first-child {
+  border-top-width: 1px;
+  border-top-left-radius: var(--border-radius-default);
+  border-top-right-radius: var(--border-radius-default);
+}
+
+.Filters .filter-box:last-child {
+  border-bottom-left-radius: var(--border-radius-default);
+  border-bottom-right-radius: var(--border-radius-default);
+}
+
+.Filters .filter-box > *:not(:first-child) {
+  margin-left: var(--spacing-slim);
+}
+
+.Filters .filter-box .toolbar-button {
+  margin-left: auto;
+}

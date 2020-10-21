@@ -1,0 +1,55 @@
+name: CI
+
+on: [push, pull_request]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - run: docker-compose up -d
+
+      - run: yarn --frozen-lockfile
+
+      - run: "while ! docker-compose logs mysql | grep -q 'mysqld: ready for connections.'; do sleep 2; done"
+      - run: "while ! docker-compose logs postgres | grep -q 'database system is ready to accept connections'; do sleep 2; done"
+
+      - run: yarn ci
+      - run: yarn build
+        env:
+          CI: true
+
+  # helppo-cli should exit with a non-zero on any NodeJS version that is
+  # currently in Maintenance.
+  # Note: no other tests are executed here
+  # Reference: https://nodejs.org/en/about/releases/
+  cli-check:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: yarn --frozen-lockfile
+      - run: yarn build
+      - run: node dist/server/cli/cli.js

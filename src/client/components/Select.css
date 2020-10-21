@@ -1,0 +1,11 @@
+.Select {
+  display: inline-block;
+  border-radius: var(--border-radius-default);
+  padding: var(--spacing-slim) var(--spacing-default);
+  background-color: #fff;
+  border: 1px solid var(--gray-400);
+}
+
+.Select--slim {
+  padding: var(--spacing-tiny) var(--spacing-slim);
+}

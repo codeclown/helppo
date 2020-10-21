@@ -1,0 +1,13 @@
+.HeadingBlock {
+  padding: var(--spacing-default);
+  background-color: var(--gray-200);
+  line-height: 1.1;
+}
+
+h1.HeadingBlock {
+  font-size: 18px;
+}
+
+h2.HeadingBlock {
+  font-weight: var(--font-weight-bold);
+}

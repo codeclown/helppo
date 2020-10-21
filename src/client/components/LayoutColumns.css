@@ -1,0 +1,12 @@
+.LayoutColumns {
+  display: flex;
+  width: 100%;
+}
+
+.LayoutColumns--justifyEvenly {
+  justify-content: space-between;
+}
+
+.LayoutColumns--centerVertically {
+  align-items: center;
+}

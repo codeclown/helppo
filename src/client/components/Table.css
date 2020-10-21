@@ -1,0 +1,81 @@
+.Table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.Table-wrapper + .Table-wrapper {
+  margin-top: var(--spacing-default);
+}
+
+.Table {
+  width: 100%;
+  border-spacing: 0;
+}
+
+.Table:not(.Table--marginTop) {
+  /* No top-border, align margin with text */
+  margin-top: calc(-1 * var(--spacing-slim));
+}
+
+.Table th,
+.Table td {
+  text-align: left;
+  padding: var(--spacing-slim);
+  white-space: nowrap;
+}
+
+.Table th {
+  border-bottom: 2px solid var(--gray-300);
+  font-weight: var(--font-weight-bold);
+  vertical-align: middle;
+}
+
+.Table td {
+  border-bottom: 1px solid var(--gray-300);
+  vertical-align: top;
+}
+
+.Table th:first-child,
+.Table td:first-child {
+  padding-left: var(--spacing-default);
+}
+
+.Table--leftColumnIsTh td:first-child {
+  font-weight: var(--font-weight-bold);
+}
+
+.Table__checkbox {
+  vertical-align: middle;
+}
+
+.Table__link {
+  background-color: var(--gray-200);
+  margin: calc(-1 * var(--spacing-tiny)) 0;
+  padding: var(--spacing-tiny) var(--spacing-slim);
+  border-radius: var(--border-radius-slim);
+  transition: var(--transition-default);
+}
+
+.Table__link + .Table__link {
+  margin-left: var(--spacing-tiny);
+}
+
+.Table__link:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.Table__link:not(:disabled):hover {
+  background-color: var(--gray-300);
+  color: var(--gray-900);
+  transition: var(--transition-hover);
+}
+
+.Table__link:not(:disabled):active {
+  background-color: var(--gray-400);
+  color: var(--gray-700);
+}
+
+.Table td.blank-slate {
+  color: var(--gray-600);
+}

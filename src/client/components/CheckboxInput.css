@@ -1,0 +1,50 @@
+.CheckboxInput {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  line-height: 100%;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.CheckboxInput input {
+  width: 2px;
+  height: 2px;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.CheckboxInput .input {
+  width: 16px;
+  height: 16px;
+  margin-right: var(--spacing-tiny);
+  border: 1px solid var(--gray-400);
+  border-radius: var(--border-radius-default);
+}
+
+.CheckboxInput--radio .input,
+.CheckboxInput--radio input:checked + .input::after {
+  border-radius: 100%;
+}
+
+.CheckboxInput:hover .input {
+  border-color: var(--gray-500);
+}
+
+.CheckboxInput input:focus + .input {
+  border-color: var(--color-blue-600);
+}
+
+.CheckboxInput input:checked + .input::after {
+  content: "";
+  display: block;
+  margin-left: 2px;
+  margin-top: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--border-radius-slim);
+  background-color: var(--gray-600);
+}

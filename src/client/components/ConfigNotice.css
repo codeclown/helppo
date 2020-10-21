@@ -1,0 +1,7 @@
+.ConfigNotice {
+  margin: 48px auto;
+  width: 90%;
+  max-width: 352px;
+  border: 1px solid var(--gray-400);
+  border-radius: var(--border-radius-default);
+}

@@ -1,0 +1,19 @@
+version: "3.1"
+services:
+  redmine:
+    image: redmine
+    restart: always
+    ports:
+      - 7910:3000
+    environment:
+      REDMINE_DB_POSTGRES: db
+      REDMINE_DB_USERNAME: postgres
+      REDMINE_DB_PASSWORD: example
+      REDMINE_SECRET_KEY_BASE: supersecretkey
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - 7911:5432

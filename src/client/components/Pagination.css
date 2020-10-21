@@ -1,0 +1,19 @@
+.Pagination {
+  display: flex;
+  color: var(--gray-600);
+}
+
+.Pagination button {
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--border-radius-default);
+  line-height: 100%;
+  padding: var(--spacing-tiny) var(--spacing-slim);
+
+  /* Horizontally, account for the fact that buttons don't collapse margin */
+  margin: calc(-1 * var(--spacing-tiny)) calc(var(--spacing-tiny) / 2);
+}
+
+.Pagination button.active {
+  border: 1px solid var(--gray-400);
+  color: var(--gray-800);
+}

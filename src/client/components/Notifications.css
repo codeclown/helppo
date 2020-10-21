@@ -1,0 +1,48 @@
+.Notifications {
+  position: fixed;
+  right: var(--spacing-default);
+  bottom: var(--spacing-default);
+}
+
+.Notifications-notification {
+  max-width: 200px;
+  padding: var(--spacing-slim) var(--spacing-default);
+  margin-top: var(--spacing-slim);
+  cursor: pointer;
+}
+
+.Notifications-notification--default {
+  background: var(--gray-800);
+  color: var(--gray-100);
+}
+
+.Notifications-notification--success {
+  background: var(--color-green-700);
+  color: var(--color-green-100);
+}
+
+.Notifications-notification--danger {
+  background: var(--color-red-700);
+  color: var(--color-red-100);
+}
+
+.Notifications-notification-transition-enter {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.Notifications-notification-transition-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all ease-in-out 0.3s;
+}
+
+.Notifications-notification-transition-exit {
+  opacity: 1;
+}
+
+.Notifications-notification-transition-exit-active {
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all ease-in-out 0.3s;
+}

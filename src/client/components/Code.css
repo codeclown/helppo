@@ -1,0 +1,12 @@
+.Code {
+  font-family: var(--font-family-monospace);
+  font-size: 85%;
+  color: var(--gray-500);
+}
+
+.Code--hasBackground {
+  background-color: var(--gray-200);
+  border-radius: var(--border-radius-slim);
+  margin: -1px 0;
+  padding: 1px var(--spacing-slim);
+}

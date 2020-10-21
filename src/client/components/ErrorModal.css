@@ -1,0 +1,18 @@
+.ErrorModal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(207, 216, 226, 0.7);
+  overflow-y: auto;
+}
+
+.ErrorModal .modal {
+  margin: 48px auto;
+  width: 90%;
+  max-width: 528px;
+  border: 1px solid var(--gray-600);
+  border-radius: var(--border-radius-default);
+  background-color: #fff;
+}

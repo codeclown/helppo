@@ -1,0 +1,4 @@
+.RowEditLabel__unsavedAsterisk {
+  color: var(--color-red-500);
+  font-weight: var(--font-weight-bold);
+}

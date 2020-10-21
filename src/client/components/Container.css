@@ -1,0 +1,8 @@
+.Container {
+  margin: var(--spacing-default);
+}
+
+.Container--verticalSlim {
+  margin-top: var(--spacing-slim);
+  margin-bottom: var(--spacing-slim);
+}

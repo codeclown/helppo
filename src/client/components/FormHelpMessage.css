@@ -1,0 +1,9 @@
+.FormHelpMessage {
+  margin-top: var(--spacing-slim);
+  font-size: 90%;
+  color: var(--gray-600);
+}
+
+.FormHelpMessage--danger {
+  color: var(--color-red-800);
+}

@@ -1,0 +1,24 @@
+.TableCellTools {
+  display: inline-flex;
+  padding-left: var(--spacing-slim);
+  align-items: center;
+  vertical-align: middle;
+}
+
+.TableCellTools__item {
+  padding: var(--spacing-tiny);
+  display: flex;
+}
+
+.TableCellTools__item--clickable:hover {
+  opacity: 0.5;
+}
+
+.TableCellTools__item--show-on-hover {
+  visibility: hidden;
+}
+
+th:hover .TableCellTools__item--show-on-hover,
+td:hover .TableCellTools__item--show-on-hover {
+  visibility: visible;
+}

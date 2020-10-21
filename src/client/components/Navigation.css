@@ -1,0 +1,101 @@
+.Navigation {
+  display: flex;
+  align-items: center;
+  background-color: var(--gray-700);
+  color: var(--gray-300);
+  font-weight: var(--font-weight-bold);
+  min-height: 36px;
+}
+
+.Navigation-link {
+  padding: var(--spacing-slim) var(--spacing-default);
+  border-right: 1px solid var(--gray-600);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.Navigation-link--clickable:not(.active):hover {
+  color: var(--gray-100);
+}
+
+.Navigation-link.active {
+  background-color: var(--gray-600);
+  color: var(--gray-100);
+}
+
+.Navigation-link--clickable.active:hover {
+  filter: brightness(110%);
+}
+
+.Navigation-link-icon {
+  margin-right: var(--spacing-slim);
+  margin-top: -1px;
+}
+
+.Navigation-dropdown--open .Navigation-link-icon {
+  filter: invert(1);
+}
+
+.Navigation-dropdown {
+  display: flex;
+  position: relative;
+}
+
+.Navigation-dropdown .Navigation-link {
+  padding: var(--spacing-slim) var(--spacing-default);
+  border-right: 1px solid var(--gray-600);
+}
+
+.Navigation-dropdown--open .Navigation-link {
+  background: var(--gray-100);
+  color: var(--gray-800);
+  cursor: default;
+  border-right-color: var(--gray-100);
+}
+
+.Navigation-dropdown-container {
+  display: none;
+  position: absolute;
+  left: -1px;
+  top: 100%;
+  width: 240px;
+  max-height: 400px;
+  overflow-y: auto;
+  border-left: 1px solid var(--gray-600);
+  border-right: 1px solid var(--gray-600);
+  border-bottom: 1px solid var(--gray-600);
+  background: var(--gray-100);
+  color: var(--gray-800);
+}
+
+.Navigation-dropdown-link {
+  display: block;
+  line-height: 1;
+  padding: var(--spacing-slim) var(--spacing-default);
+}
+
+.Navigation-dropdown-link:not(.active):hover {
+  background: var(--gray-200);
+}
+
+.Navigation-dropdown-link.active {
+  box-shadow: inset 3px 0 var(--gray-700);
+  background: var(--gray-300);
+}
+
+.Navigation-dropdown-link.active:hover {
+  background: var(--gray-400);
+}
+
+.Navigation-dropdown--open .Navigation-dropdown-container {
+  display: block;
+  z-index: var(--z-index-dropdown);
+}
+
+.Navigation-dropdown-separator {
+  width: 90%;
+  height: 2px;
+  background-color: var(--gray-400);
+  margin: var(--spacing-tiny) auto;
+}

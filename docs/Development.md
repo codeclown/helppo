@@ -1,0 +1,164 @@
+# Development
+
+## Table of Contents
+
+<!-- hohhoijaa -->
+
+- [Table of Contents](#table-of-contents)
+- [Read this first!](#read-this-first)
+- [Set up a local development environment](#set-up-a-local-development-environment)
+  - [Starting databases via docker](#starting-databases-via-docker)
+- [Local development server](#local-development-server)
+  - [Prerequisites](#prerequisites)
+  - [Seed data](#seed-data)
+  - [Start the watch-mode](#start-the-watch-mode)
+    - [Start the dev server against a different database](#start-the-dev-server-against-a-different-database)
+    - [Example open source projects for testing](#example-open-source-projects-for-testing)
+- [Run tests](#run-tests)
+  - [Prerequisites](#prerequisites-1)
+  - [Run tests](#run-tests-1)
+  - [Lint](#lint)
+- [Managing documentation](#managing-documentation)
+- [Release process](#release-process)
+
+<!-- /hohhoijaa -->
+
+## Read this first!
+
+The following paragraphs answer questions you might have when getting started.
+
+**JavaScript** files are contained inside `src/`. They are linted via eslint (run `yarn lint:js`). Only standard ES syntax is allowed. Upon build-time the files are compiled via babel into `build/` to ensure compatibility with `require`.
+
+**Tests** are contained inside `src/` adjacent to the source files (e.g. `App.js` and `App.spec.js`). Some tests use **snapshots**, which are stored in `<repository_root>/__snapshots__`.
+
+**CSS** files are contained inside `src/` adjacent to the source files (e.g. `Navigation.js` and `Navigation.css`). Upon build-time they are concatenated into one large CSS file. They are also linted (run `yarn lint:css`). There is also `base.css` which defines global styles and CSS variables.
+
+**Documentation** files are contained inside `docs/`. Contributing to documentation is encouraged.
+
+**Dependencies** for the client bundle are listed under `devDependencies`. Only server-side dependencies are needed under `dependencies`.
+
+**Do I need X?** You need _git_ for version control, _yarn_ for running stuff and _Docker_ for running tests. That should be it.
+
+## Set up a local development environment
+
+Pull the repository:
+
+```bash
+git clone git@github.com:codeclown/helppo.git
+cd helppo/
+```
+
+Install dependencies for all packages:
+
+```bash
+yarn
+```
+
+### Starting databases via docker
+
+For running the dev server and tests, it is most convenient to start the required database engines via Docker.
+
+Start docker containers, etc. via the command:
+
+```bash
+docker-compose up -d
+```
+
+The various databases are bound to port range 7810-7819, so it's very unlikely they would collide with any other port you have in use.
+
+If you're unfamiliar with docker, the above command can be cleaned up (all created resources will be removed) via docker-compose:
+
+```bash
+docker-compose down
+```
+
+## Local development server
+
+The quickest way to get started with development is to start the dev server which is included in this repository (located at `src/server/testServer`).
+
+### Prerequisites
+
+See [Starting databases via docker](#starting-databases-via-docker).
+
+### Seed data
+
+The dev server database is seeded with some tables and content, for faster development.
+
+The seed data file can be found at `src/server/devServer/devServerSeed.sql`.
+
+If you need to reset the database to the original seed data, just recreate the database via `docker-compose down && docker-compose up -d`.
+
+### Start the watch-mode
+
+Running the following command will start the dev server which restarts when you make changes to any file:
+
+```shell
+$ yarn dev
+...
+Helppo is running. View it in your browser:
+  http://localhost:3000
+```
+
+#### Start the dev server against a different database
+
+If you want to start the dev server against another database, simply supply the connection string:
+
+```shell
+$ yarn dev postgres://postgres:example@localhost:5100/postgres
+```
+
+Under the hood it's using [helppo-cli](CLI.md).
+
+#### Example open source projects for testing
+
+See [`src/server/devServer/example-projects/README.md`](./src/server/devServer/example-projects/README.md) for some sample docker-compose files that can be used to spin up open source projects for testing purposes.
+
+## Run tests
+
+Test files can be found adjacent to the files they test. They are prefixed with `.spec.js`.
+
+### Prerequisites
+
+See [Starting databases via docker](#starting-databases-via-docker).
+
+### Run tests
+
+The following command runs all tests:
+
+```bash
+yarn test
+```
+
+Limit the tests to run via usual mocha grepping:
+
+```bash
+yarn test -g "full schema"
+```
+
+Many tests rely on snapshots. If you want to update a conflicting snapshot, run:
+
+```bash
+yarn test:update
+```
+
+### Lint
+
+The following command lints the codebase.
+
+```bash
+yarn lint
+```
+
+## Managing documentation
+
+Public documentation is located at [`docs/`](./).
+
+All markdown files contain a Table of Contents which is updated automatically using the `hohhoijaa` script. Update them automatically by running:
+
+```bash
+yarn docs:build
+```
+
+## Release process
+
+See [Release process](Release-process.md).

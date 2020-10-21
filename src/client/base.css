@@ -1,0 +1,87 @@
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: inherit;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: inherit;
+  font-style: inherit;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+/* stylelint-disable custom-property-empty-line-before */
+:root {
+  --font-family-sans-serif: -apple-system, blinkmacsystemfont, "Segoe UI",
+    "Roboto", "Helvetica Neue", arial, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-family-monospace: sfmono-regular, menlo, monaco, consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  --font-weight-regular: 400;
+  --font-weight-bold: 500;
+
+  --spacing-tiny: 4px;
+  --spacing-slim: 8px;
+  --spacing-default: 16px;
+
+  --border-radius-slim: 2px;
+  --border-radius-default: 3px;
+
+  --transition-default: none;
+  --transition-hover: all ease-in-out 0.1s;
+
+  /* The only reason this should be needed is because CSS opacity is used in some places, and it affects the stacking order */
+  --z-index-dropdown: 100;
+
+  /* Shout out to https://tailwindcss.com/docs/customizing-colors/#default-color-palette */
+  --gray-100: #f7fafc;
+  --gray-200: #edf2f7;
+  --gray-300: #e2e8f0;
+  --gray-400: #cbd5e0;
+  --gray-500: #a0aec0;
+  --gray-600: #718096;
+  --gray-700: #4a5568;
+  --gray-800: #2d3748;
+  --gray-900: #1a202c;
+  --color-green-100: #f0fff4;
+  --color-green-200: #c6f6d5;
+  --color-green-300: #9ae6b4;
+  --color-green-400: #68d391;
+  --color-green-500: #48bb78;
+  --color-green-600: #38a169;
+  --color-green-700: #2f855a;
+  --color-green-800: #276749;
+  --color-green-900: #22543d;
+  --color-blue-600: #3182ce;
+  --color-red-100: #fff5f5;
+  --color-red-200: #fed7d7;
+  --color-red-300: #feb2b2;
+  --color-red-400: #fc8181;
+  --color-red-500: #f56565;
+  --color-red-600: #e53e3e;
+  --color-red-700: #c53030;
+  --color-red-800: #9b2c2c;
+  --color-red-900: #742a2a;
+}
+/* stylelint-enable custom-property-empty-line-before */
+
+body {
+  font: 0.8125rem/1.6 var(--font-family-sans-serif);
+  font-weight: var(--font-weight-regular);
+  color: var(--gray-800);
+  background-color: #fff;
+}

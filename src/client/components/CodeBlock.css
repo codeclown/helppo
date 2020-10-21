@@ -1,0 +1,37 @@
+.CodeBlock {
+  position: relative;
+  padding: var(--spacing-default);
+  font-family: var(--font-family-monospace);
+  background-color: var(--gray-200);
+  font-size: 85%;
+  white-space: pre;
+  overflow: auto;
+  display: block;
+  width: 100%;
+}
+
+.CodeBlock--wrapLines {
+  white-space: pre-wrap;
+}
+
+.CodeBlock__copyBadge {
+  position: absolute;
+  right: var(--spacing-default);
+  top: 0;
+  background-color: var(--gray-400);
+  color: var(--gray-700);
+  line-height: 100%;
+  padding: var(--spacing-tiny) var(--spacing-slim);
+  border-bottom-left-radius: var(--border-radius-default);
+  border-bottom-right-radius: var(--border-radius-default);
+}
+
+.CodeBlock__copyBadge:hover {
+  filter: brightness(105%);
+  color: var(--gray-900);
+}
+
+.CodeBlock__copyBadge:active {
+  background-color: var(--gray-500);
+  color: var(--gray-600);
+}

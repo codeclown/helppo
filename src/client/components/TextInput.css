@@ -1,0 +1,42 @@
+.TextInput {
+  display: inline-block;
+  border-radius: var(--border-radius-default);
+  padding: var(--spacing-slim) var(--spacing-slim);
+  background-color: #fff;
+  border: 1px solid var(--gray-400);
+  line-height: 100%;
+  width: 304px;
+  font-family: var(--font-family-monospace);
+  font-size: 85%;
+}
+
+.TextInput:disabled {
+  cursor: default;
+  background-color: var(--gray-200);
+}
+
+.TextInput:focus {
+  border-color: var(--color-blue-600);
+  outline: none;
+}
+
+.TextInput--slim {
+  padding: var(--spacing-tiny) var(--spacing-slim);
+}
+
+.TextInput--multiLine {
+  line-height: initial;
+  resize: vertical;
+  width: 100%;
+  min-height: 120px;
+}
+
+.TextInput--textAlignCenter {
+  text-align: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.TextInput--danger {
+  border-color: var(--color-red-700);
+}
