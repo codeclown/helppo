@@ -1,4 +1,4 @@
-import format from "date-fns/format";
+import { formatDate, formatTime } from "./dateFormatting";
 
 // The mapping of possible column types
 // ---
@@ -74,12 +74,12 @@ const dateUtils = (formatForDb) => ({
 
 const date = {
   builtInReactComponentName: "ColumnTypeDate",
-  ...dateUtils((date) => format(date, "yyyy-MM-dd")),
+  ...dateUtils((date) => formatDate(date)),
 };
 
 const datetime = {
   builtInReactComponentName: "ColumnTypeDateTime",
-  ...dateUtils((date) => format(date, "yyyy-MM-dd HH:mm:ss")),
+  ...dateUtils((date) => `${formatDate(date)} ${formatTime(date)}`),
 };
 
 const boolean = {
