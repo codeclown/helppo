@@ -154,15 +154,23 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
       Driver = helppo.drivers.MysqlDriver;
     }
 
+    const connectionStringErrorMessage =
+      "Please check your connection string. Currently supported formats:\n\n  - postgres://[user]:[password]@[host]:[port]/[database]\n  - mysql://[user]:[password]@[host]:[port]/[database]";
+
     if (!resolver) {
-      const error = new Error(
-        "Please check your connection string. Currently supported formats:\n\n  - foo\n  - bar"
-      );
+      const error = new Error(connectionStringErrorMessage);
       error.pretty = true;
       throw error;
     }
 
-    const config = await resolver.parseConnectionString(args.connectionString);
+    let config;
+    try {
+      config = await resolver.parseConnectionString(args.connectionString);
+    } catch (exception) {
+      const error = new Error(connectionStringErrorMessage);
+      error.pretty = true;
+      throw error;
+    }
 
     let safeguard = 100;
     while (safeguard--) {
