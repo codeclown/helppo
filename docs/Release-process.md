@@ -64,6 +64,5 @@ Only continue to this step once you have verified that the previous step produce
 Cd to the directory and publish the package (no need to run `yarn version`, because version was already parsed from main `helppo` package):
 
 ```bash
-cd src/server/cli/dist
-yarn publish
+yarn --cwd src/server/cli/dist publish
 ```
