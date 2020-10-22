@@ -10,6 +10,12 @@ import { formatDate, formatTime } from "./dateFormatting";
 // Turn value returned from database into a JSON-compatible format.
 // Default behaviour is to return value as-is
 const databaseValueToJsonifiable = (value) => {
+  if (typeof value === "object" && value !== null) {
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) {
+    return JSON.stringify(value);
+  }
   if (Buffer.isBuffer(value)) {
     return value.toString("utf8");
   }

@@ -11,6 +11,9 @@ const assetRouter = () => {
   app.get("/client.js", (req, res) =>
     res.sendFile(path.join(clientDir, "client.js"))
   );
+  app.get("/client.js.map", (req, res) =>
+    res.sendFile(path.join(clientDir, "client.js.map"))
+  );
   app.use("/static", express.static(path.join(clientDir, "static")));
   return app;
 };

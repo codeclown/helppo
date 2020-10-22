@@ -11,6 +11,7 @@ class ErrorBoundary extends Component {
       sourcemapped: null,
       errorInfo: null,
     };
+    this.mapStackTracePromise = null;
   }
 
   static getDerivedStateFromError(error) {
@@ -18,14 +19,21 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    mapStackTrace(error.stack, (mappedStack) => {
-      if (error === this.state.error) {
-        this.setState({
-          sourcemapped: `${this.state.error.message}\n${mappedStack.join(
-            "\n"
-          )}`,
-        });
-      }
+    if (this.mapStackTracePromise) {
+      return;
+    }
+    this.mapStackTracePromise = new Promise((resolve) => {
+      mapStackTrace(error.stack, (mappedStack) => {
+        if (error === this.state.error) {
+          this.setState({
+            sourcemapped: `${this.state.error.message}\n${mappedStack.join(
+              "\n"
+            )}`,
+          });
+          this.mapStackTracePromise = null;
+          resolve();
+        }
+      });
     });
     this.setState({ componentInfo: errorInfo });
   }

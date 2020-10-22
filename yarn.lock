@@ -4188,7 +4188,7 @@ minimalistic-crypto-utils@^1.0.0, minimalistic-crypto-utils@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/minimalistic-crypto-utils/-/minimalistic-crypto-utils-1.0.1.tgz#f6c00c1c0b082246e5c4d99dfb8c7c083b2b582a"
 
-minimatch@3.0.4, minimatch@^3.0.2, minimatch@^3.0.4:
+minimatch@3.0.4, minimatch@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
   dependencies:
@@ -5792,7 +5792,7 @@ source-map-resolve@^0.5.0:
     source-map-url "^0.4.0"
     urix "^0.1.0"
 
-source-map-support@^0.5.16, source-map-support@~0.5.10, source-map-support@~0.5.12:
+source-map-support@^0.5.16, source-map-support@~0.5.12:
   version "0.5.19"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.19.tgz#a98b62f86dcaf4f67399648c085291ab9e8fed61"
   dependencies:
@@ -6253,14 +6253,6 @@ term-size@^2.1.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/term-size/-/term-size-2.2.0.tgz#1f16adedfe9bdc18800e1776821734086fcc6753"
 
-terser@^3.7.5:
-  version "3.17.0"
-  resolved "https://registry.yarnpkg.com/terser/-/terser-3.17.0.tgz#f88ffbeda0deb5637f9d24b0da66f4e15ab10cb2"
-  dependencies:
-    commander "^2.19.0"
-    source-map "~0.6.1"
-    source-map-support "~0.5.10"
-
 terser@^4.6.7:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/terser/-/terser-4.7.0.tgz#15852cf1a08e3256a80428e865a2fa893ffba006"
@@ -6438,16 +6430,6 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
-
-uglifyify@^5.0.2:
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/uglifyify/-/uglifyify-5.0.2.tgz#7d0269885e09faa963208a9ec6721afcaf45fc50"
-  dependencies:
-    convert-source-map "~1.1.0"
-    minimatch "^3.0.2"
-    terser "^3.7.5"
-    through "~2.3.4"
-    xtend "^4.0.1"
 
 umd@^3.0.0:
   version "3.0.3"

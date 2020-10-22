@@ -63,14 +63,13 @@
     "supertest": "^4.0.2",
     "svgo": "^1.3.2",
     "terser": "^4.6.7",
-    "uglifyify": "^5.0.2",
     "watchify": "^3.11.1",
     "yea": "^1.3.0"
   },
   "scripts": {
     "cli-package:prepare": "bash src/server/cli/scripts/prepare-cli-package.sh",
     "build:css": "mkdir -p dist/client && cat src/client/base.css src/client/components/*.css > dist/client/client.css",
-    "build:js": "mkdir -p dist/client && browserify src/client/client.js -p [ browserify-plugin-license-notice --out LICENSE-3RD-PARTIES ] -t [ babelify --configFile ./.babelrc.js ] -g [ envify --NODE_ENV production ] -g uglifyify -o dist/client/client.js && terser dist/client/client.js --compress --mangle -o dist/client/client.js",
+    "build:js": "mkdir -p dist/client && browserify src/client/client.js --debug -p [ browserify-plugin-license-notice --out LICENSE-3RD-PARTIES ] -t [ babelify --configFile ./.babelrc.js ] -g [ envify --NODE_ENV production ] -o dist/client/client.js && terser dist/client/client.js --compress --mangle -o dist/client/client.js --source-map \"filename='dist/client/client.js.map'\" --source-map \"content=inline\" --source-map \"url=client.js.map\" --comments=false",
     "build:static": "mkdir -p dist/client/static && svgo src/static/*.svg && cp src/static/* dist/client/static",
     "build:server": "mkdir -p dist/server && rm -rf dist/server/* && babel src/server -d dist/server --config-file ./.babelrc.js",
     "build:docs": "hohhoijaa {.,docs,packages/**}/*.md",

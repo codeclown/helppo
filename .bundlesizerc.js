@@ -2,7 +2,7 @@ module.exports = {
   files: [
     {
       path: "./dist/client/client.js",
-      maxSize: "88 kB",
+      maxSize: "95 kB",
     },
     {
       path: "./dist/client/client.css",
