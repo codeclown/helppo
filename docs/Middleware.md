@@ -47,11 +47,6 @@ For more information, continue reading.
 - [Authentication](#authentication)
   - [Example: Basic Auth](#example-basic-auth)
   - [Example: Passport.js](#example-passportjs)
-- [Usage with query builders or ORMs](#usage-with-query-builders-or-orms)
-  - [Example: `knex`](#example-knex)
-  - [Example: `Bookshelf.js`](#example-bookshelfjs)
-  - [Example: `Sequelize`](#example-sequelize)
-  - [Example: `Objection.js`](#example-objectionjs)
 - [Documentation](#documentation)
 - [License](#license)
 

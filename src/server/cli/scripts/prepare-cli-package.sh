@@ -78,7 +78,7 @@ echo '![Screenshot of Helppo CLI](docs/screenshots/cli_readme_banner.png)
 
 ## Usage
 
-[Refer to the main package documentation](https://github.com/codeclown/helppo/docs/CLI.md).
+[Refer to the main package documentation](https://github.com/codeclown/helppo/blob/v'$helppo_version'/docs/CLI.md).
 
 ## License
 
