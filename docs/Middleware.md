@@ -160,44 +160,6 @@ If you use [`Passport.js`](https://www.npmjs.com/package/passport) in your appli
 app.use("/admin", passport.authenticate("local"), helppo(config));
 ```
 
-## Usage with query builders or ORMs
-
-If you are using any of the following libraries, you may easily reuse their connection.
-
-> Note that `helppo` accepts just a database connection and builds its own queries and relations. It does not support inferring information like this from the query builder or ORM you are using.
-
-### Example: `knex`
-
-```js
-const db = knex(...);
-const config = {
-  driver: new helppo.drivers.MysqlDriver(db.client)
-};
-```
-
-### Example: `Bookshelf.js`
-
-```js
-const config = {
-  driver: new helppo.drivers.MysqlDriver(Model.knex.client),
-};
-```
-
-### Example: `Sequelize`
-
-```js
-const db = new Sequelize(...);
-// TODO
-```
-
-### Example: `Objection.js`
-
-```js
-const config = {
-  driver: new helppo.drivers.MysqlDriver(Model.knex().client),
-};
-```
-
 ## Documentation
 
 Full documentation can be found at [`docs/README.md`](./README.md).

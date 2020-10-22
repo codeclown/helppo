@@ -77,7 +77,7 @@ For full license terms, see [LICENSE](./LICENSE).
 
 ### From v1.0 onwards
 
-I plan on adding or changing to a commercial license from v1.0 onwards, if it seems sensible at that point (considering project traction, feature backlog, etc.). Versions that were released under GPL will of course remain available under GPL indefinitely.
+I plan on adding or changing to a commercial license from v1.0 onwards, if it seems sensible at that point (considering project traction, feature backlog, etc.). Versions that were released under GPL will of course remain available under GPL indefinitely. To keep up with the topic, subscribe to the [mailing list](https://sunny-originator-7326.ck.page/bfe1f2d292).
 
 ## Contributing
 
