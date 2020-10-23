@@ -125,7 +125,9 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
     return;
   }
 
-  const helppo = require(args.dev ? "../helppo" : "helppo").default;
+  const { default: helppo, PgDriver, MysqlDriver } = require(args.dev
+    ? "../helppo"
+    : "helppo");
 
   const availableDatabaseLibraries = getAvailableDatabaseLibraries();
 
@@ -141,7 +143,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
         throw error;
       }
       resolver = pgResolver;
-      Driver = helppo.drivers.PgDriver;
+      Driver = PgDriver;
     }
 
     if (args.connectionString.startsWith("mysql://")) {
@@ -151,7 +153,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
         throw error;
       }
       resolver = mysqlResolver;
-      Driver = helppo.drivers.MysqlDriver;
+      Driver = MysqlDriver;
     }
 
     const connectionStringErrorMessage =

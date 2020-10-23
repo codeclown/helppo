@@ -1,14 +1,13 @@
 import { expect } from "chai";
-import helppo from "./helppo";
+import helppo, { MysqlDriver, PgDriver } from "./helppo";
 
 describe("helppo", () => {
-  it("is a funtion", () => {
+  it("is a function", () => {
     expect(helppo).to.be.a("function");
   });
 
   it("exports drivers", () => {
-    expect(helppo.drivers).to.be.an("object");
-    expect(helppo.drivers.MysqlDriver).not.to.equal(undefined);
-    expect(helppo.drivers.PgDriver).not.to.equal(undefined);
+    expect(MysqlDriver).not.to.equal(undefined);
+    expect(PgDriver).not.to.equal(undefined);
   });
 });

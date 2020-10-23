@@ -4,10 +4,12 @@ import makeRouter from "./router";
 import builtInColumnTypes from "./builtInColumnTypes";
 import builtInFilterTypes from "./builtInFilterTypes";
 import readLicenseNotice from "./readLicenseNotice";
-import MysqlDriver from "./drivers/MysqlDriver";
-import PgDriver from "./drivers/PgDriver";
 
-const helppo = (config) => {
+export { default as MysqlDriver } from "./drivers/MysqlDriver";
+
+export { default as PgDriver } from "./drivers/PgDriver";
+
+export default function helppo(config) {
   const licenseNotice = readLicenseNotice();
   config = Object.assign({}, config, {
     licenseNotice,
@@ -19,10 +21,4 @@ const helppo = (config) => {
   const driverApi = makeDriverApi(config);
   const router = makeRouter(config, assetRouter, driverApi);
   return router;
-};
-
-helppo.drivers = {};
-helppo.drivers.MysqlDriver = MysqlDriver;
-helppo.drivers.PgDriver = PgDriver;
-
-export default helppo;
+}

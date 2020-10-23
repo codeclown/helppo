@@ -36,7 +36,7 @@ Example:
 
 ```js
 {
-  driver: new helppo.drivers.MysqlDriver(mysqlConnection);
+  driver: new MysqlDriver(mysqlConnection);
 }
 ```
 

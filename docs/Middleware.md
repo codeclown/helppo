@@ -23,6 +23,10 @@ $ yarn add helppo
 Mount it in your Express.js application:
 
 ```js
+import helppo from "helppo";
+// or
+const helppo = require("helppo").default;
+
 const config = {
   driver: ...,
   schema: ...,
@@ -61,20 +65,22 @@ Helppo works with your existing database connection. You don't pass database cre
 Example for Postgres:
 
 ```js
-const { Client } = require('pg');
+import { PgDriver } from 'helppo';
+import { Client } from 'pg';
 const connection = new Client(...);
 app.use("/admin", helppo({
-  driver: new helppo.drivers.PgDriver(connection),
+  driver: new PgDriver(connection),
 }));
 ```
 
 Example for MySQL:
 
 ```js
-const mysql = require('mysql');
+import { MysqlDriver } from 'helppo';
+import mysql from 'mysql';
 const connection = mysql.createConnection(...);
 app.use("/admin", helppo({
-  driver: new helppo.drivers.MysqlDriver(connection),
+  driver: new MysqlDriver(connection),
 }));
 ```
 

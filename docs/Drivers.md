@@ -17,10 +17,10 @@
 
 These are the ones available currently:
 
-| database engine | npm database library                                  | driver                       |
-| --------------- | ----------------------------------------------------- | ---------------------------- |
-| MySQL           | [`mysql`](https://www.npmjs.com/package/mysql) on npm | `helppo.drivers.MysqlDriver` |
-| PostgreSQL      | [`pg`](https://www.npmjs.com/package/pg) on npm       | `helppo.drivers.PgDriver`    |
+| database engine | npm database library                                  | driver                                 |
+| --------------- | ----------------------------------------------------- | -------------------------------------- |
+| MySQL           | [`mysql`](https://www.npmjs.com/package/mysql) on npm | `import { MysqlDriver } from "helppo"` |
+| PostgreSQL      | [`pg`](https://www.npmjs.com/package/pg) on npm       | `import { PgDriver } from "helppo"`    |
 
 ### How to use
 
