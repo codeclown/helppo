@@ -1,7 +1,7 @@
 import makeAssetRouter from "./assetRouter";
 import makeDriverApi from "./driverApi";
 import makeRouter from "./router";
-import builtInColumnTypes from "./builtInColumnTypes";
+import * as builtInColumnTypes from "./builtInColumnTypes";
 import builtInFilterTypes from "./builtInFilterTypes";
 import readLicenseNotice from "./readLicenseNotice";
 

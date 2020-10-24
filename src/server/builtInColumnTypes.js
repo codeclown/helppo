@@ -10,14 +10,14 @@ import { formatDate, formatTime } from "./dateFormatting";
 // Turn value returned from database into a JSON-compatible format.
 // Default behaviour is to return value as-is
 const databaseValueToJsonifiable = (value) => {
-  if (typeof value === "object" && value !== null) {
-    return JSON.stringify(value);
+  if (Buffer.isBuffer(value)) {
+    return value.toString("utf8");
   }
   if (Array.isArray(value)) {
     return JSON.stringify(value);
   }
-  if (Buffer.isBuffer(value)) {
-    return value.toString("utf8");
+  if (typeof value === "object" && value !== null) {
+    return JSON.stringify(value);
   }
   return value;
 };
@@ -30,19 +30,19 @@ const parsedJsonValueToDatabaseValue = (value) => value;
 
 // See also `builtInColumnTypeComponents` in App.js
 
-const integer = {
+export const integer = {
   builtInReactComponentName: "ColumnTypeInteger",
   databaseValueToJsonifiable,
   parsedJsonValueToDatabaseValue,
 };
 
-const string = {
+export const string = {
   builtInReactComponentName: "ColumnTypeString",
   databaseValueToJsonifiable,
   parsedJsonValueToDatabaseValue,
 };
 
-const text = {
+export const text = {
   builtInReactComponentName: "ColumnTypeText",
   databaseValueToJsonifiable,
   parsedJsonValueToDatabaseValue,
@@ -78,29 +78,26 @@ const dateUtils = (formatForDb) => ({
   },
 });
 
-const date = {
+export const date = {
   builtInReactComponentName: "ColumnTypeDate",
   ...dateUtils((date) => formatDate(date)),
 };
 
-const datetime = {
+export const datetime = {
   builtInReactComponentName: "ColumnTypeDateTime",
   ...dateUtils((date) => `${formatDate(date)} ${formatTime(date)}`),
 };
 
-const boolean = {
+export const boolean = {
   builtInReactComponentName: "ColumnTypeBoolean",
-  databaseValueToJsonifiable,
+  databaseValueToJsonifiable: (value) => {
+    if (value === 1) {
+      return true;
+    }
+    if (value === 0) {
+      return false;
+    }
+    return databaseValueToJsonifiable(value);
+  },
   parsedJsonValueToDatabaseValue,
 };
-
-const builtInColumnTypes = {
-  integer,
-  string,
-  text,
-  date,
-  datetime,
-  boolean,
-};
-
-export default builtInColumnTypes;
