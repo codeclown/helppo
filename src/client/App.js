@@ -1,6 +1,5 @@
 import { Component, createElement as h, Fragment } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
-import { navIconTable, navIconDots } from "./images";
 import BrowseTable from "./pages/BrowseTable";
 import EditRow from "./pages/EditRow";
 import Welcome from "./pages/Welcome";
@@ -237,6 +236,7 @@ class App extends Component {
       key: routeProps.location.key,
       api: this.props.api,
       urls: this.props.urls,
+      images: this.props.images,
       columnTypeComponents: this.state.columnTypeComponents,
       filterTypes: this.state.filterTypes,
       catchApiError: this.catchApiError,
@@ -273,6 +273,7 @@ class App extends Component {
       key: routeProps.location.key,
       api: this.props.api,
       urls: this.props.urls,
+      images: this.props.images,
       columnTypeComponents: this.state.columnTypeComponents,
       catchApiError: this.catchApiError,
       showNotification: this.showNotification,
@@ -337,7 +338,7 @@ class App extends Component {
         h(Navigation, {
           linkGroups: [
             {
-              icon: navIconTable,
+              icon: this.props.images.navIconTable,
               dropdownTitle:
                 this.state.schema.tables.length > 5 ? "Tables" : null,
               links: this.state.schema.tables.map((table) => ({
@@ -346,7 +347,7 @@ class App extends Component {
               })),
             },
             {
-              icon: navIconDots,
+              icon: this.props.images.navIconDots,
               dropdownTitle: "Other",
               links: [
                 { text: "Query", url: this.props.urls.queryUrl() },

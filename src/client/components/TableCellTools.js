@@ -1,15 +1,6 @@
 import { createElement as h } from "react";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
-import {
-  magnifier,
-  collapseLeft,
-  collapseRight,
-  primaryKey,
-  sortAsc,
-  sortDesc,
-  columnInfo,
-} from "../images";
 
 const TableCellToolsItem = ({ href, imageUrl, title, showOnHover }) => {
   const icon = h("img", { src: imageUrl });
@@ -44,6 +35,7 @@ const TableCellToolsItem = ({ href, imageUrl, title, showOnHover }) => {
 };
 
 const TableCellTools = ({
+  images,
   addAsFilterUrl,
   collapseColumnUrl,
   uncollapseColumnUrl,
@@ -62,57 +54,57 @@ const TableCellTools = ({
     isPrimaryKey &&
       h(TableCellToolsItem, {
         title: "Primary Key",
-        imageUrl: primaryKey,
+        imageUrl: images.primaryKey,
       }),
     columnComment &&
       h(TableCellToolsItem, {
         title: columnComment,
-        imageUrl: columnInfo,
+        imageUrl: images.columnInfo,
       }),
     sortedAsc &&
       h(TableCellToolsItem, {
         title: "Sorted by this column in ascending order",
-        imageUrl: sortAsc,
+        imageUrl: images.sortAsc,
       }),
     sortedDesc &&
       h(TableCellToolsItem, {
         title: "Sorted by this column in descending order",
-        imageUrl: sortDesc,
+        imageUrl: images.sortDesc,
       }),
     sortAscUrl &&
       h(TableCellToolsItem, {
         showOnHover: true,
         href: sortAscUrl,
         title: "Sort by this column in ascending order",
-        imageUrl: sortAsc,
+        imageUrl: images.sortAsc,
       }),
     sortDescUrl &&
       h(TableCellToolsItem, {
         showOnHover: true,
         href: sortDescUrl,
         title: "Sort by this column in descending order",
-        imageUrl: sortDesc,
+        imageUrl: images.sortDesc,
       }),
     addAsFilterUrl &&
       h(TableCellToolsItem, {
         showOnHover: true,
         href: addAsFilterUrl,
         title: "Add this value as a filter",
-        imageUrl: magnifier,
+        imageUrl: images.magnifier,
       }),
     collapseColumnUrl &&
       h(TableCellToolsItem, {
         showOnHover: true,
         href: collapseColumnUrl,
         title: "Collapse this column",
-        imageUrl: collapseLeft,
+        imageUrl: images.collapseLeft,
       }),
     uncollapseColumnUrl &&
       h(TableCellToolsItem, {
         showOnHover: true,
         href: uncollapseColumnUrl,
         title: "Uncollapse this column",
-        imageUrl: collapseRight,
+        imageUrl: images.collapseRight,
       })
   );
 };

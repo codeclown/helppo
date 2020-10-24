@@ -199,6 +199,7 @@ class EditRow extends Component {
       h(ColumnTypeComponent, {
         editable: true,
         value,
+        images: this.props.images,
         onChange: (newValue) => this.updateRowProperty(column.name, newValue),
         inputProps: {
           autoFocus: this.state.autoFocusColumn === column.name,
@@ -284,7 +285,7 @@ class EditRow extends Component {
       `${titleBegin} row in `,
       h(
         Link,
-        { to: browseTableUrl(this.props.table.name) },
+        { to: this.props.urls.browseTableUrl(this.props.table.name) },
         niceifyName(this.props.table.name)
       )
     );

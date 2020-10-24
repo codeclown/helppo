@@ -204,6 +204,7 @@ class BrowseTable extends Component {
           limitText(niceName, 2)
         ),
         h(TableCellTools, {
+          images: this.props.images,
           isPrimaryKey,
           uncollapseColumnUrl: this.props.urls.browseTableUrl(
             this.props.table.name,
@@ -228,6 +229,7 @@ class BrowseTable extends Component {
       null,
       h("span", null, niceName),
       h(TableCellTools, {
+        images: this.props.images,
         isPrimaryKey,
         columnComment: column.comment,
         collapseColumnUrl: this.props.urls.browseTableUrl(
@@ -310,6 +312,7 @@ class BrowseTable extends Component {
     return h(ColumnTypeComponent, {
       editable: false,
       value,
+      images: this.props.images,
     });
   }
 
@@ -334,6 +337,7 @@ class BrowseTable extends Component {
       null,
       this.renderColumnValue(column, value, ColumnTypeComponent),
       h(TableCellTools, {
+        images: this.props.images,
         addAsFilterUrl:
           value !== null &&
           this.state.columnTypesForAddAsFilter.includes(column.type) &&
