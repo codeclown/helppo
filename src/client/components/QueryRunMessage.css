@@ -6,3 +6,7 @@
 .QueryRunMessage--danger {
   color: var(--color-red-600);
 }
+
+.QueryRunMessage > .Button {
+  margin-left: var(--spacing-default);
+}

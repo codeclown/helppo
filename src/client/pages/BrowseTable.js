@@ -1,16 +1,9 @@
-import {
-  Component,
-  createElement as h,
-  Fragment,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Component, createElement as h, Fragment } from "react";
 import { Redirect } from "react-router-dom";
-import ClipboardJS from "clipboard";
 import Button, { ButtonStyles } from "../components/Button";
 import Code from "../components/Code";
 import Container from "../components/Container";
+import CopyToClipboardButton from "../components/CopyToClipboardButton";
 import Filters from "../components/Filters";
 import LayoutColumns from "../components/LayoutColumns";
 import Table, { TableLink } from "../components/Table";
@@ -28,35 +21,6 @@ import limitText from "../utils/limitText";
 import niceifyName from "../utils/niceifyName";
 import range from "../utils/range";
 import naiveCsvStringify from "../utils/naiveCsvStringify";
-
-const CopyToClipboardButton = ({ onCopy, children }) => {
-  const buttonRef = useRef(null);
-  const [clipboard, setClipboard] = useState(null);
-  useEffect(() => {
-    if (buttonRef.current) {
-      setClipboard(
-        new ClipboardJS(buttonRef.current, {
-          container: buttonRef.current,
-          text: onCopy,
-        })
-      );
-      return () => {
-        if (clipboard) {
-          clipboard.destroy();
-        }
-      };
-    }
-  }, [buttonRef.current]);
-  return h(
-    Button,
-    {
-      ref: buttonRef,
-      style: ButtonStyles.GHOST,
-      onClick: () => {},
-    },
-    children
-  );
-};
 
 class BrowseTable extends Component {
   constructor(props) {
@@ -456,6 +420,7 @@ class BrowseTable extends Component {
             h(
               CopyToClipboardButton,
               {
+                style: ButtonStyles.GHOST,
                 onCopy: () => {
                   const column = this.props.table.columns.find(
                     (column) => column.name === this.props.table.primaryKey
@@ -481,6 +446,7 @@ class BrowseTable extends Component {
             h(
               CopyToClipboardButton,
               {
+                style: ButtonStyles.GHOST,
                 onCopy: () => {
                   return naiveCsvStringify([
                     this.props.table.columns.map((column) => column.name),

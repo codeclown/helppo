@@ -5,6 +5,8 @@ import Table from "../components/Table";
 import QueryRunMessage from "../components/QueryRunMessage";
 import Code from "../components/Code";
 import Button, { ButtonStyles } from "../components/Button";
+import CopyToClipboardButton from "../components/CopyToClipboardButton";
+import naiveCsvStringify from "../utils/naiveCsvStringify";
 
 const Query = ({ initialSql, replaceSqlInUrl, api, catchApiError }) => {
   const [sql, setSql] = useState(initialSql);
@@ -89,7 +91,22 @@ const Query = ({ initialSql, replaceSqlInUrl, api, catchApiError }) => {
                     `${requestTime}ms`,
                   ]
                     .filter((text) => text !== "")
-                    .join(" – ")
+                    .join(" – "),
+                  result.returnedRowsAmount > 0 &&
+                    h(
+                      CopyToClipboardButton,
+                      {
+                        style: ButtonStyles.GHOST,
+                        slim: true,
+                        onCopy: () => {
+                          return naiveCsvStringify([
+                            result.columnNames,
+                            ...result.rows,
+                          ]);
+                        },
+                      },
+                      `Copy results (csv)`
+                    )
                 )
           ),
           result.returnedRowsAmount > 0 &&
