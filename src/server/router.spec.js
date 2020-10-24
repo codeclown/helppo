@@ -2,7 +2,6 @@ import express from "express";
 import supertest from "supertest";
 import { expect } from "chai";
 import router from "./router";
-import matchSnapshot from "snap-shot-it";
 
 const dummyAssetRouter = express();
 dummyAssetRouter.use((req, res) =>
@@ -21,7 +20,16 @@ describe("router", () => {
     expect(response.headers["content-type"]).to.equal(
       "text/html; charset=utf-8"
     );
-    matchSnapshot(response.text);
+    expect(response.text).to.contain(
+      '<link rel="icon" type="image/png" href="/assets/static/favicon.png">'
+    );
+    expect(response.text).to.contain(
+      '<link rel="stylesheet" href="/assets/client.css">'
+    );
+    expect(response.text).to.contain('window.mountpath = "";');
+    expect(response.text).to.contain(
+      '<script src="/assets/client.js"></script>'
+    );
   });
 
   it("renders index.html with correct mountpath", async () => {
@@ -32,7 +40,16 @@ describe("router", () => {
     expect(response.headers["content-type"]).to.equal(
       "text/html; charset=utf-8"
     );
-    matchSnapshot(response.text);
+    expect(response.text).to.contain(
+      '<link rel="icon" type="image/png" href="/admin/assets/static/favicon.png">'
+    );
+    expect(response.text).to.contain(
+      '<link rel="stylesheet" href="/admin/assets/client.css">'
+    );
+    expect(response.text).to.contain('window.mountpath = "/admin";');
+    expect(response.text).to.contain(
+      '<script src="/admin/assets/client.js"></script>'
+    );
   });
 
   it("renders index.html for any path", async () => {
@@ -43,7 +60,7 @@ describe("router", () => {
     expect(response.headers["content-type"]).to.equal(
       "text/html; charset=utf-8"
     );
-    matchSnapshot(response.text);
+    expect(response.text).to.contain('window.mountpath = "";');
   });
 
   it("renders error message if helppo was not mounted", async () => {
@@ -53,7 +70,9 @@ describe("router", () => {
     expect(response.headers["content-type"]).to.equal(
       "text/html; charset=utf-8"
     );
-    matchSnapshot(response.text);
+    expect(response.text).to.contain(
+      'errorMessage.textContent = "Please mount helppo to an existing express router first"'
+    );
   });
 
   it("throws if same instance is mounted twice", async () => {
@@ -95,7 +114,9 @@ describe("router", () => {
     expect(response.headers["content-type"]).to.equal(
       "text/html; charset=utf-8"
     );
-    matchSnapshot(response.text);
+    expect(response.text).to.contain(
+      'errorMessage.textContent = "Database connection has been interrupted"'
+    );
   });
 
   it("renders error message if driver reports connection closed with message", async () => {
@@ -112,6 +133,8 @@ describe("router", () => {
     expect(response.headers["content-type"]).to.equal(
       "text/html; charset=utf-8"
     );
-    matchSnapshot(response.text);
+    expect(response.text).to.contain(
+      'errorMessage.textContent = "Database connection has been interrupted (error: foobar message)"'
+    );
   });
 });

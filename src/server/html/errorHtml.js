@@ -21,16 +21,16 @@ export default function errorHtml(error) {
             font-size: 24px;
             margin-bottom: 10px;
           }
-          #message {
+          #errorMessage {
             font-size: 16px;
           }
         </style>
       </head>
       <body>
         <p id="title">Server Error</p>
-        <p id="message"></p>
+        <p id="errorMessage"></p>
         <script>
-          message.textContent = ${JSON.stringify(error.message)};
+          errorMessage.textContent = ${JSON.stringify(error.message)};
         </script>
       </body>
     </html>
