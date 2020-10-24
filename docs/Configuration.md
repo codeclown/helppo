@@ -100,11 +100,11 @@ Required properties for `schema`:
 
 Required properties for tables:
 
-| key          | required | type   | description                                                                                |
-| ------------ | -------- | ------ | ------------------------------------------------------------------------------------------ |
-| `name`       | Yes      | string | Name of the table as it exists in the database                                             |
-| `primaryKey` | Yes      | string | Name of the primary key column. At the moment only tables with primary keys are supported. |
-| `columns`    | Yes      | array  | Array of column configurations, see [Column configuration](#column-configuration)          |
+| key          | required | type   | description                                                                                                               |
+| ------------ | -------- | ------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `name`       | Yes      | string | Name of the table as it exists in the database                                                                            |
+| `primaryKey` | No       | string | Name of the primary key column. If a table does not have a primary key, some features may be disabled (e.g. row editing). |
+| `columns`    | Yes      | array  | Array of column configurations, see [Column configuration](#column-configuration)                                         |
 
 ### Column configuration
 
