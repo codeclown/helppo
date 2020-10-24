@@ -51,7 +51,7 @@ describe("router", () => {
     const request = supertest(app);
     const response = await request.get("/foobar123/test");
     expect(response.headers["content-type"]).to.equal(
-      "text/plain; charset=utf-8"
+      "text/html; charset=utf-8"
     );
     matchSnapshot(response.text);
   });
@@ -93,7 +93,7 @@ describe("router", () => {
     const request = supertest(app);
     const response = await request.get("/foobar123/test");
     expect(response.headers["content-type"]).to.equal(
-      "text/plain; charset=utf-8"
+      "text/html; charset=utf-8"
     );
     matchSnapshot(response.text);
   });
@@ -110,7 +110,7 @@ describe("router", () => {
     const request = supertest(app);
     const response = await request.get("/foobar123/test");
     expect(response.headers["content-type"]).to.equal(
-      "text/plain; charset=utf-8"
+      "text/html; charset=utf-8"
     );
     matchSnapshot(response.text);
   });

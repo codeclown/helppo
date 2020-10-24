@@ -1,5 +1,6 @@
 import express from "express";
-import indexHtml from "./index.html";
+import indexHtml from "./html/indexHtml";
+import errorHtml from "./html/errorHtml";
 
 function stripTrailingSlash(mountpath) {
   return mountpath.replace(/\/*$/, "");
@@ -7,6 +8,10 @@ function stripTrailingSlash(mountpath) {
 
 const router = (config, assetRouter, driverApi) => {
   const app = express();
+
+  app.use("/assets", assetRouter);
+
+  app.use("/api", driverApi);
 
   let mountpath = null;
   app.on("mount", () => {
@@ -25,32 +30,34 @@ const router = (config, assetRouter, driverApi) => {
     });
     app.use((req, res, next) => {
       if (driverHasClosed) {
-        return res
-          .set("content-type", "text/plain")
-          .send(
-            `Error: database connection has been interrupted${
+        return next(
+          new Error(
+            `Database connection has been interrupted${
               driverHasClosed instanceof Error
                 ? ` (error: ${driverHasClosed.message})`
                 : ""
             }`
-          );
+          )
+        );
       }
       next();
     });
   }
 
-  app.use("/assets", assetRouter);
-
-  app.use("/api", driverApi);
-
-  app.get("*", (req, res) => {
+  app.get("*", (req, res, next) => {
     if (mountpath === null) {
-      return res
-        .set("content-type", "text/plain")
-        .send("Error: please mount helppo to an existing express router first");
+      return next(
+        new Error("Please mount helppo to an existing express router first")
+      );
     }
     const html = indexHtml(mountpath);
     res.set("content-type", "text/html").send(html);
+  });
+
+  // eslint-disable-next-line no-unused-vars
+  app.use((error, req, res, next) => {
+    const html = errorHtml(error);
+    return res.set("content-type", "text/html").send(html);
   });
 
   return app;
