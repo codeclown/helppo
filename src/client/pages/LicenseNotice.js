@@ -1,13 +1,12 @@
 import { createElement as h, useEffect, useState } from "react";
 import CodeBlock from "../components/CodeBlock";
 import Container from "../components/Container";
-import { getLicenseNotice } from "../api";
 
-const LicenseNotice = ({ catchApiError }) => {
+const LicenseNotice = ({ api, catchApiError }) => {
   const [licenseNotice, setLicenseNotice] = useState(null);
 
   useEffect(() => {
-    catchApiError(getLicenseNotice()).then((notice) => {
+    catchApiError(api.getLicenseNotice()).then((notice) => {
       setLicenseNotice(notice);
     });
   }, []);

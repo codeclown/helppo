@@ -1,6 +1,5 @@
 import { Component, createElement as h, Fragment } from "react";
 import { Redirect, Link } from "react-router-dom";
-import { editRowUrl, browseTableUrl } from "../urls";
 import Button, { ButtonStyles } from "../components/Button";
 import CheckboxInput from "../components/CheckboxInput";
 import Code from "../components/Code";
@@ -249,11 +248,15 @@ class EditRow extends Component {
       const rowId = this.state.redirectToNewlyCreatedRow[
         this.props.table.primaryKey
       ];
-      return h(Redirect, { to: editRowUrl(this.props.table, rowId) });
+      return h(Redirect, {
+        to: this.props.urls.editRowUrl(this.props.table, rowId),
+      });
     }
 
     if (this.state.redirectToBrowseAfterDeletion) {
-      return h(Redirect, { to: browseTableUrl(this.props.table.name) });
+      return h(Redirect, {
+        to: this.props.urls.browseTableUrl(this.props.table.name),
+      });
     }
 
     if (this.state.status === STATUS.LOADING) {

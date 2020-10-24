@@ -8,7 +8,6 @@ import {
 } from "react";
 import { Redirect } from "react-router-dom";
 import ClipboardJS from "clipboard";
-import { browseTableUrl, editRowUrl } from "../urls";
 import Button, { ButtonStyles } from "../components/Button";
 import Code from "../components/Code";
 import Container from "../components/Container";
@@ -206,7 +205,7 @@ class BrowseTable extends Component {
         ),
         h(TableCellTools, {
           isPrimaryKey,
-          uncollapseColumnUrl: browseTableUrl(
+          uncollapseColumnUrl: this.props.urls.browseTableUrl(
             this.props.table.name,
             this.state.browseOptions,
             {
@@ -231,7 +230,7 @@ class BrowseTable extends Component {
       h(TableCellTools, {
         isPrimaryKey,
         columnComment: column.comment,
-        collapseColumnUrl: browseTableUrl(
+        collapseColumnUrl: this.props.urls.browseTableUrl(
           this.props.table.name,
           this.state.browseOptions,
           {
@@ -244,7 +243,7 @@ class BrowseTable extends Component {
         sortedAsc,
         sortAscUrl: sortedAsc
           ? null
-          : browseTableUrl(
+          : this.props.urls.browseTableUrl(
               this.props.table.name,
               {
                 ...this.state.browseOptions,
@@ -256,7 +255,7 @@ class BrowseTable extends Component {
         sortedDesc,
         sortDescUrl: sortedDesc
           ? null
-          : browseTableUrl(
+          : this.props.urls.browseTableUrl(
               this.props.table.name,
               {
                 ...this.state.browseOptions,
@@ -281,7 +280,7 @@ class BrowseTable extends Component {
     if (column.name === this.props.table.primaryKey) {
       return h(
         TableLink,
-        { to: editRowUrl(this.props.table, value) },
+        { to: this.props.urls.editRowUrl(this.props.table, value) },
         ColumnTypeComponent.valueAsText(value)
       );
     }
@@ -290,7 +289,7 @@ class BrowseTable extends Component {
       return h(
         TableLink,
         {
-          to: browseTableUrl(
+          to: this.props.urls.browseTableUrl(
             column.referencesTable,
             {
               filters: [
@@ -338,7 +337,7 @@ class BrowseTable extends Component {
         addAsFilterUrl:
           value !== null &&
           this.state.columnTypesForAddAsFilter.includes(column.type) &&
-          browseTableUrl(
+          this.props.urls.browseTableUrl(
             this.props.table.name,
             {
               filters: [
@@ -368,7 +367,7 @@ class BrowseTable extends Component {
         TableLink,
         {
           key: relation.table.name,
-          to: browseTableUrl(relation.table.name, { filters }),
+          to: this.props.urls.browseTableUrl(relation.table.name, { filters }),
         },
         niceifyName(relation.table.name)
       );
@@ -402,7 +401,7 @@ class BrowseTable extends Component {
   render() {
     if (this.state.updatedBrowseOptions) {
       return h(Redirect, {
-        to: browseTableUrl(
+        to: this.props.urls.browseTableUrl(
           this.props.table.name,
           this.state.updatedBrowseOptions,
           this.state.presentationOptions
@@ -412,7 +411,7 @@ class BrowseTable extends Component {
 
     if (this.state.updatedPresentationOptions) {
       return h(Redirect, {
-        to: browseTableUrl(
+        to: this.props.urls.browseTableUrl(
           this.props.table.name,
           this.state.browseOptions,
           this.state.updatedPresentationOptions
@@ -434,7 +433,7 @@ class BrowseTable extends Component {
           Button,
           {
             style: ButtonStyles.SUCCESS,
-            to: editRowUrl(this.props.table),
+            to: this.props.urls.editRowUrl(this.props.table),
           },
           "Create"
         ),
