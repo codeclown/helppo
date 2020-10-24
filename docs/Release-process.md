@@ -35,10 +35,10 @@ Publish to NPM:
 yarn publish # will prompt for new version number
 ```
 
-Push updated tags:
+Push w/ tags:
 
 ```bash
-git push --tags
+git push --follow-tags
 ```
 
 ## Publish `helppo-cli` to NPM

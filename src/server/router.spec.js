@@ -51,7 +51,7 @@ describe("router", () => {
     const request = supertest(app);
     const response = await request.get("/foobar123/test");
     expect(response.headers["content-type"]).to.equal(
-      "text/html; charset=utf-8"
+      "text/plain; charset=utf-8"
     );
     matchSnapshot(response.text);
   });
@@ -79,5 +79,39 @@ describe("router", () => {
     const request = supertest(app);
     const response = await request.get("/api/foobar");
     expect(response.text).to.equal("/foobar from dummyDriverApi");
+  });
+
+  it("renders error message if driver reports connection closed", async () => {
+    let callback;
+    const driver = {
+      __internalOnClose: (_callback) => {
+        callback = _callback;
+      },
+    };
+    const app = router({ driver }, dummyAssetRouter, dummyDriverApi);
+    callback();
+    const request = supertest(app);
+    const response = await request.get("/foobar123/test");
+    expect(response.headers["content-type"]).to.equal(
+      "text/plain; charset=utf-8"
+    );
+    matchSnapshot(response.text);
+  });
+
+  it("renders error message if driver reports connection closed with message", async () => {
+    let callback;
+    const driver = {
+      __internalOnClose: (_callback) => {
+        callback = _callback;
+      },
+    };
+    const app = router({ driver }, dummyAssetRouter, dummyDriverApi);
+    callback(new Error("foobar message"));
+    const request = supertest(app);
+    const response = await request.get("/foobar123/test");
+    expect(response.headers["content-type"]).to.equal(
+      "text/plain; charset=utf-8"
+    );
+    matchSnapshot(response.text);
   });
 });

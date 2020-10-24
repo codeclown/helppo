@@ -18,15 +18,36 @@ const router = (config, assetRouter, driverApi) => {
     mountpath = `${stripTrailingSlash(app.mountpath)}`;
   });
 
+  if (config.driver && typeof config.driver.__internalOnClose === "function") {
+    let driverHasClosed = false;
+    config.driver.__internalOnClose(function onDriverClose(error) {
+      driverHasClosed = error || true;
+    });
+    app.use((req, res, next) => {
+      if (driverHasClosed) {
+        return res
+          .set("content-type", "text/plain")
+          .send(
+            `Error: database connection has been interrupted${
+              driverHasClosed instanceof Error
+                ? ` (error: ${driverHasClosed.message})`
+                : ""
+            }`
+          );
+      }
+      next();
+    });
+  }
+
   app.use("/assets", assetRouter);
 
   app.use("/api", driverApi);
 
   app.get("*", (req, res) => {
     if (mountpath === null) {
-      return res.send(
-        "Error: please mount helppo to an existing express router first"
-      );
+      return res
+        .set("content-type", "text/plain")
+        .send("Error: please mount helppo to an existing express router first");
     }
     const html = indexHtml(mountpath);
     res.set("content-type", "text/html").send(html);

@@ -70,3 +70,11 @@ exports['router renders index.html for any path 1'] = `
 exports['router renders error message if helppo was not mounted 1'] = `
 Error: please mount helppo to an existing express router first
 `
+
+exports['router renders error message if driver reports connection closed 1'] = `
+Error: database connection has been interrupted
+`
+
+exports['router renders error message if driver reports connection closed with message 1'] = `
+Error: database connection has been interrupted (error: foobar message)
+`
