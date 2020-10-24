@@ -17,11 +17,18 @@ Instant database management interface in your browser
 <img src="docs/screenshots/readme_intro.gif" alt="Gif of helppo on the command line" />
 </p>
 
+## Quickstart
+
+```bash
+npm install -g helppo-cli
+helppo-cli postgres://... # or mysql://...
+```
+
 ## What is it
 
 > Note: Helppo is still in early development.
 
-Helppo is a **CLI tool** to _instantly_ (`npx helppo-cli <connection_string>`) spin up a graphical in-browser CRUD interface from a database connection string. Currently supported databases are Postgres and MySQL.
+Helppo is a **CLI tool** to _instantly_ (`helppo-cli <connection_string>`) spin up a graphical in-browser CRUD interface from a database connection string. Currently supported databases are Postgres and MySQL.
 
 Helppo is also an **Express.js middleware**. In fact, the command-line interface is simply a wrapper around it. You can mount Helppo in your own Express-project.
 
@@ -29,7 +36,7 @@ See the documentation for each flavour:
 
 - [**Command-Line Interface**](./docs/CLI.md)   [![helppo-cli on npm](https://img.shields.io/badge/npm-helppo--cli-blue)](https://www.npmjs.com/package/helppo-cli)
   <br>
-  Instantly start a Helppo-instance from a connection string: `npx helppo-cli <connection_string>`
+  Instantly start a Helppo-instance from a connection string: `helppo-cli <connection_string>`
 
 - [Express.js middleware](./docs/Middleware.md)   [![helppo on npm](https://img.shields.io/badge/npm-helppo-blue)](https://www.npmjs.com/package/helppo)<br>
   Mount a Helppo-instance in your own NodeJS application: `app.use(helppo())`
