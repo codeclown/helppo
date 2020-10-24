@@ -72,6 +72,10 @@ echo "[--] Creating $readme_file"
 echo "" > $readme_file
 echo '![Screenshot of Helppo CLI](docs/screenshots/cli_readme_banner.png)
 
+<a href="https://www.npmjs.com/package/helppo-cli"><img src="https://img.shields.io/badge/npm-helppo--cli-blue" alt="helppo-cli on npm"></a>
+<a href="https://www.npmjs.com/package/helppo"><img src="https://img.shields.io/badge/npm-helppo-blue" alt="helppo on npm"></a>
+<a href="https://github.com/codeclown/helppo"><img src="https://img.shields.io/badge/github-codeclown%2Fhelppo-lightgrey" alt="Helppo on GitHub"></a>
+
 # helppo-cli
 
 > A command line utility to start a [Helppo](https://github.com/codeclown/helppo) instance from a connection string

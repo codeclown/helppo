@@ -5,7 +5,9 @@
 Instant database management interface in your browser
 </p>
 <p align="center">
-<a href="https://github.com/codeclown/helppo"><img src="https://img.shields.io/badge/github-helppo-blue" alt="Helppo on GitHub"></a>
+<a href="https://www.npmjs.com/package/helppo-cli"><img src="https://img.shields.io/badge/npm-helppo--cli-blue" alt="helppo-cli on npm"></a>
+<a href="https://www.npmjs.com/package/helppo"><img src="https://img.shields.io/badge/npm-helppo-blue" alt="helppo on npm"></a>
+<a href="https://github.com/codeclown/helppo"><img src="https://img.shields.io/badge/github-codeclown%2Fhelppo-lightgrey" alt="Helppo on GitHub"></a>
 </p>
 <p align="center">
 <a href="#what-is-it">What is it</a>   
@@ -34,11 +36,10 @@ Helppo is also an **Express.js middleware**. In fact, the command-line interface
 
 See the documentation for each flavour:
 
-- [**Command-Line Interface**](./docs/CLI.md)   [![helppo-cli on npm](https://img.shields.io/badge/npm-helppo--cli-blue)](https://www.npmjs.com/package/helppo-cli)
-  <br>
+- [**Command-Line Interface**](./docs/CLI.md)<br>
   Instantly start a Helppo-instance from a connection string: `helppo-cli <connection_string>`
 
-- [Express.js middleware](./docs/Middleware.md)   [![helppo on npm](https://img.shields.io/badge/npm-helppo-blue)](https://www.npmjs.com/package/helppo)<br>
+- [Express.js middleware](./docs/Middleware.md)<br>
   Mount a Helppo-instance in your own NodeJS application: `app.use(helppo())`
 
 Also see [`docs/README.md`](./docs/README.md) for the remaining documentation.
