@@ -6,8 +6,12 @@
 
 - [Table of Contents](#table-of-contents)
 - [Prerequisites](#prerequisites)
+- [Prepare and merge changes to master](#prepare-and-merge-changes-to-master)
+  - [Update Changelog](#update-changelog)
+  - [(Optional) Build and run all tests](#optional-build-and-run-all-tests)
+  - [Make a PR](#make-a-pr)
+  - [Switch to master and pull](#switch-to-master-and-pull)
 - [Publish `helppo` to NPM](#publish-helppo-to-npm)
-  - [Build and run all tests](#build-and-run-all-tests)
   - [Publish the package](#publish-the-package)
 - [Publish `helppo-cli` to NPM](#publish-helppo-cli-to-npm)
   - [Prepare package files](#prepare-package-files)
@@ -19,13 +23,36 @@
 
 The following commands are ran in the repository root, unless otherwise noted.
 
-## Publish `helppo` to NPM
+## Prepare and merge changes to master
 
-### Build and run all tests
+Working in a version branch (e.g. `vX.X.X-branch`), unless otherwise noted.
+
+### Update Changelog
+
+In [`Changelog.md`](./Changelog.md), add a new section for this version and move everything from "Unreleased" to it.
+
+Make a commit with the changes before continuing.
+
+### (Optional) Build and run all tests
+
+… if you want to check locally that they pass.
 
 ```bash
 yarn ci
 ```
+
+### Make a PR
+
+… if not already made. Merge the PR after CI passes.
+
+### Switch to master and pull
+
+```bash
+git checkout master
+git pull
+```
+
+## Publish `helppo` to NPM
 
 ### Publish the package
 
@@ -33,12 +60,6 @@ Publish to NPM:
 
 ```bash
 yarn publish # will prompt for new version number
-```
-
-Push w/ tags:
-
-```bash
-git push --follow-tags
 ```
 
 ## Publish `helppo-cli` to NPM
