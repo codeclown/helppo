@@ -92,3 +92,11 @@ Cd to the directory and publish the package (no need to run `yarn version`, beca
 ```bash
 yarn --cwd src/server/cli/dist publish
 ```
+
+## Push changes to repository
+
+Don't forget to push w/ tags.
+
+```bash
+git push --follow-tags
+```
