@@ -1,4 +1,4 @@
-import { Component, createElement as h, Fragment } from "react";
+import { Component, createElement as h, createRef, Fragment } from "react";
 import { Redirect } from "react-router-dom";
 import Button, { ButtonStyles } from "../components/Button";
 import Code from "../components/Code";
@@ -30,7 +30,7 @@ class BrowseTable extends Component {
       rows: null,
       browseOptions: Object.assign(
         {
-          perPage: 10,
+          perPage: 20,
           currentPage: 1,
           filters: [],
         },
@@ -52,6 +52,8 @@ class BrowseTable extends Component {
         (filterType) => filterType.key === "equals"
       ).columnTypes,
     };
+
+    this.containerRef = createRef();
 
     this.updateBrowseOptions = this.updateBrowseOptions.bind(this);
     this.getRows = this.getRows.bind(this);
@@ -296,25 +298,36 @@ class BrowseTable extends Component {
       );
     }
 
+    const availableFilterTypes = column.secret
+      ? []
+      : this.props.filterTypes.filter((filterType) => {
+          return filterType.columnTypes.includes(column.type);
+        });
+
+    const filterUrls = availableFilterTypes.map((filterType) => {
+      return {
+        name: filterType.name,
+        url: this.props.urls.browseTableUrl(
+          this.props.table.name,
+          {
+            filters: [
+              ...this.state.browseOptions.filters,
+              { type: filterType.key, columnName: column.name, value },
+            ],
+          },
+          this.state.presentationOptions
+        ),
+      };
+    });
+
     return h(
       Fragment,
       null,
       this.renderColumnValue(column, value, ColumnTypeComponent),
       h(TableCellTools, {
         images: this.props.images,
-        addAsFilterUrl:
-          value !== null &&
-          this.state.columnTypesForAddAsFilter.includes(column.type) &&
-          this.props.urls.browseTableUrl(
-            this.props.table.name,
-            {
-              filters: [
-                ...this.state.browseOptions.filters,
-                { type: "equals", columnName: column.name, value },
-              ],
-            },
-            this.state.presentationOptions
-          ),
+        filterUrls,
+        dropdownContainer: this.containerRef.current,
       })
     );
   }
@@ -391,7 +404,7 @@ class BrowseTable extends Component {
 
     return h(
       "div",
-      null,
+      { ref: this.containerRef },
       h(PageTitle, null, title),
       h(HeadingBlock, { level: 2 }, title),
       h(
@@ -562,7 +575,7 @@ class BrowseTable extends Component {
             " ",
             h(Select, {
               slim: true,
-              options: [10, 100, 500, 2000].map((value) => ({
+              options: [20, 100, 500, 2000].map((value) => ({
                 value,
                 text: `Per page: ${value}`,
               })),

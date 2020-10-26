@@ -90,7 +90,7 @@ const driverApi = (config) => {
       browseOptions = {};
     }
     if (typeof browseOptions.perPage !== "number") {
-      browseOptions.perPage = 10;
+      browseOptions.perPage = 20;
     }
     if (typeof browseOptions.currentPage !== "number") {
       browseOptions.currentPage = 1;

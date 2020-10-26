@@ -1,7 +1,8 @@
 export default function images(mountpath) {
   return {
     introArrow: `${mountpath}/assets/static/introArrow.svg`,
-    magnifier: `${mountpath}/assets/static/magnifier.svg`,
+    magnifierArrow: `${mountpath}/assets/static/magnifierArrow.svg`,
+    magnifierPlus: `${mountpath}/assets/static/magnifierPlus.svg`,
     collapseLeft: `${mountpath}/assets/static/collapseLeft.svg`,
     collapseRight: `${mountpath}/assets/static/collapseRight.svg`,
     primaryKey: `${mountpath}/assets/static/primaryKey.svg`,

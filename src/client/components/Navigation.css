@@ -67,6 +67,7 @@
   border-bottom: 1px solid var(--gray-600);
   background: var(--gray-100);
   color: var(--gray-800);
+  box-shadow: var(--box-shadow-floater);
 }
 
 .Navigation-dropdown-link {

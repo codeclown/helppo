@@ -8,6 +8,7 @@
 .TableCellTools__item {
   padding: var(--spacing-tiny);
   display: flex;
+  align-items: center;
 }
 
 .TableCellTools__item--clickable:hover {
@@ -21,4 +22,25 @@
 th:hover .TableCellTools__item--show-on-hover,
 td:hover .TableCellTools__item--show-on-hover {
   visibility: visible;
+}
+
+.TableCellTools__dropdown-container {
+  position: relative;
+}
+
+.TableCellTools__dropdown-list {
+  position: fixed;
+  background: #fff;
+  border: 1px solid var(--gray-600);
+  z-index: var(--z-index-dropdown);
+  box-shadow: var(--box-shadow-floater);
+  padding-top: var(--spacing-tiny);
+  padding-bottom: var(--spacing-tiny);
+}
+
+.TableCellTools__dropdown-list .TableCellTools__item {
+  padding-left: var(--spacing-slim);
+  padding-right: var(--spacing-slim);
+  padding-top: 0;
+  padding-bottom: 0;
 }

@@ -76,6 +76,9 @@ button:not(:disabled) {
   --color-red-700: #c53030;
   --color-red-800: #9b2c2c;
   --color-red-900: #742a2a;
+
+  --box-shadow-floater: 0 3px 4px 0 var(--gray-300),
+    0 2px 10px 0 var(--gray-200);
 }
 /* stylelint-enable custom-property-empty-line-before */
 
