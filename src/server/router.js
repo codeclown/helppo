@@ -16,6 +16,12 @@ const router = (config, assetRouter, driverApi) => {
     });
   }
 
+  if (!config.driver) {
+    app.use((req, res, next) => {
+      next(new Error("The 'driver' config-property is missing"));
+    });
+  }
+
   app.use("/assets", assetRouter);
 
   app.use("/api", driverApi);

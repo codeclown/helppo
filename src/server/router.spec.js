@@ -6,6 +6,9 @@ import errorHandler from "./errorHandler";
 
 const baseOptions = {
   errorHandler,
+  driver: {
+    /* dummy */
+  },
 };
 
 const dummyAssetRouter = express();
@@ -103,6 +106,22 @@ describe("router", () => {
     const request = supertest(app);
     const response = await request.get("/api/foobar");
     expect(response.text).to.equal("/foobar from dummyDriverApi");
+  });
+
+  it("renders error message if config.driver is missing", async () => {
+    const app = router(
+      { ...baseOptions, driver: null },
+      dummyAssetRouter,
+      dummyDriverApi
+    );
+    const request = supertest(app);
+    const response = await request.get("/foobar123/test");
+    expect(response.headers["content-type"]).to.equal(
+      "text/html; charset=utf-8"
+    );
+    expect(response.text).to.contain(
+      "errorMessage.textContent = \"The 'driver' config-property is missing\""
+    );
   });
 
   it("renders error message if driver reports connection closed", async () => {
