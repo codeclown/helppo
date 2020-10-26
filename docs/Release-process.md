@@ -9,13 +9,15 @@
 - [Prepare and merge changes to master](#prepare-and-merge-changes-to-master)
   - [Update Changelog](#update-changelog)
   - [(Optional) Build and run all tests](#optional-build-and-run-all-tests)
-  - [Make a PR](#make-a-pr)
+  - [Create and merge PR](#create-and-merge-pr)
+  - [Wait until master is green](#wait-until-master-is-green)
   - [Switch to master and pull](#switch-to-master-and-pull)
 - [Publish `helppo` to NPM](#publish-helppo-to-npm)
   - [Publish the package](#publish-the-package)
 - [Publish `helppo-cli` to NPM](#publish-helppo-cli-to-npm)
   - [Prepare package files](#prepare-package-files)
   - [Publish the package](#publish-the-package-1)
+- [Push changes to repository](#push-changes-to-repository)
 
 <!-- /hohhoijaa -->
 

@@ -14,8 +14,8 @@ Changes to be released in an upcoming release:
 
 ### Added
 
-- Implement columnType-specific Add filter -dropdown (see #1 for screenshot)
-- Implement Copy results -button to Query-page (see #2 for screenshot)
+- Implement columnType-specific Add filter -dropdown (see [#1](https://github.com/codeclown/helppo/issues/1) for screenshot)
+- Implement Copy results -button to Query-page (see [#2](https://github.com/codeclown/helppo/issues/2) for screenshot)
 - Add elementary type definition for HelppoMiddleware
 
 ### Changed
