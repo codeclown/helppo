@@ -29,6 +29,33 @@ describe("driverApi", () => {
         },
       });
     });
+
+    it("returns 500 response", async () => {
+      let errorHandlerCalledWith;
+      const mockedReturnValue = "__mockedReturnValue__";
+      const errorHandler = (...args) => {
+        errorHandlerCalledWith = args;
+        return mockedReturnValue;
+      };
+      const app = driverApi({
+        driver: baseDriver,
+        throwErrorOnPurpose: true,
+        errorHandler,
+      });
+      const request = supertest(app);
+      const response = await request.get("/foobar123");
+      expect(response.status).to.deep.equal(500);
+      expect(response.body).to.deep.equal({
+        error: {
+          message: mockedReturnValue,
+        },
+      });
+      expect(errorHandlerCalledWith).to.have.length(1);
+      expect(errorHandlerCalledWith[0]).to.be.an("error");
+      expect(errorHandlerCalledWith[0].message).to.equal(
+        "This error was thrown for testing purposes from driverApi"
+      );
+    });
   });
 
   describe("GET /schema", () => {

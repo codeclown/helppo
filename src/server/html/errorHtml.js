@@ -1,4 +1,4 @@
-export default function errorHtml(error) {
+export default function errorHtml(errorMessage) {
   return `
     <!DOCTYPE html>
     <html>
@@ -30,7 +30,7 @@ export default function errorHtml(error) {
         <p id="title">Server Error</p>
         <p id="errorMessage"></p>
         <script>
-          errorMessage.textContent = ${JSON.stringify(error.message)};
+          errorMessage.textContent = ${JSON.stringify(errorMessage)};
         </script>
       </body>
     </html>

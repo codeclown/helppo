@@ -9,6 +9,13 @@ function stripTrailingSlash(mountpath) {
 const router = (config, assetRouter, driverApi) => {
   const app = express();
 
+  // Testing utility
+  if (config.throwErrorOnPurpose) {
+    app.use((req, res, next) => {
+      next(new Error("This error was thrown for testing purposes from router"));
+    });
+  }
+
   app.use("/assets", assetRouter);
 
   app.use("/api", driverApi);
@@ -56,7 +63,8 @@ const router = (config, assetRouter, driverApi) => {
 
   // eslint-disable-next-line no-unused-vars
   app.use((error, req, res, next) => {
-    const html = errorHtml(error);
+    const errorMessage = config.errorHandler(error);
+    const html = errorHtml(errorMessage);
     return res.set("content-type", "text/html").send(html);
   });
 

@@ -4,6 +4,7 @@ import makeRouter from "./router";
 import * as builtInColumnTypes from "./builtInColumnTypes";
 import builtInFilterTypes from "./builtInFilterTypes";
 import readLicenseNotice from "./readLicenseNotice";
+import errorHandler from "./errorHandler";
 
 export { default as MysqlDriver } from "./drivers/MysqlDriver";
 
@@ -13,6 +14,7 @@ export default function helppo(config) {
   const licenseNotice = readLicenseNotice();
   config = Object.assign({}, config, {
     licenseNotice,
+    errorHandler,
     // At the moment custom column types are not supported
     columnTypes: builtInColumnTypes,
     filterTypes: builtInFilterTypes,
