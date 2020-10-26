@@ -79,7 +79,7 @@
     "watch:server": "babel src/server -w -d dist/server --config-file ./.babelrc.js",
     "watch:dev-server": "nodemon --delay 500ms --watch dist/server dist/server/cli/cli.js",
     "dev": "sh src/server/devServer/devServer.sh",
-    "lint:js": "eslint . --ignore-pattern '!.eslintrc.js'",
+    "lint:js": "eslint . --ignore-pattern '!.eslintrc.js' --max-warnings 0",
     "lint:css": "stylelint --config .stylelintrc.js 'src/**/*.css'",
     "lint": "yarn lint:css && yarn lint:js && prettier --check .",
     "test": "mocha --require @babel/register --require .setupTests.js",

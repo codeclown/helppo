@@ -3,9 +3,8 @@ import HeadingBlock from "../components/HeadingBlock";
 import Container from "../components/Container";
 import BlockLinkList from "../components/BlockLinkList";
 import niceifyName from "../utils/niceifyName";
-import { tableIndexUrl } from "../urls";
 
-const Welcome = ({ tables }) => {
+const Welcome = ({ urls, tables }) => {
   return h(
     Fragment,
     null,
@@ -17,7 +16,7 @@ const Welcome = ({ tables }) => {
         items: tables.map((table) => {
           return {
             title: niceifyName(table.name),
-            href: tableIndexUrl(table),
+            href: urls.tableIndexUrl(table),
           };
         }),
       })

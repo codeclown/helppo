@@ -3,6 +3,9 @@ import limitText from "../utils/limitText";
 
 export default class BaseColumnType extends Component {
   static valueAsText(value) {
+    if (value === null || value === undefined) {
+      return "";
+    }
     if (typeof value === "string") {
       return value;
     }

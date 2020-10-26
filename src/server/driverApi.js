@@ -19,6 +19,15 @@ const prepareAutoSchema = (schema) => {
 const driverApi = (config) => {
   const app = express();
 
+  // Testing utility
+  if (config.throwErrorOnPurpose) {
+    app.use((req, res, next) => {
+      next(
+        new Error("This error was thrown for testing purposes from driverApi")
+      );
+    });
+  }
+
   let schema = config.schema;
   if (schema === "auto") {
     const loadSchema = config.driver
@@ -81,7 +90,7 @@ const driverApi = (config) => {
       browseOptions = {};
     }
     if (typeof browseOptions.perPage !== "number") {
-      browseOptions.perPage = 10;
+      browseOptions.perPage = 20;
     }
     if (typeof browseOptions.currentPage !== "number") {
       browseOptions.currentPage = 1;
@@ -213,11 +222,11 @@ const driverApi = (config) => {
   });
 
   // eslint-disable-next-line no-unused-vars
-  app.use((err, req, res, next) => {
-    console.error(err.stack);
+  app.use((error, req, res, next) => {
+    const errorMessage = config.errorHandler(error);
     res.status(500).json({
       error: {
-        message: err.message,
+        message: errorMessage,
       },
     });
   });

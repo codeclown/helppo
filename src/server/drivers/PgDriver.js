@@ -67,6 +67,14 @@ export default class PgDriver {
     this.connection = connection;
   }
 
+  __internalOnClose(callback) {
+    this.connection.on("error", (error) => {
+      if (error.severity === "FATAL") {
+        callback(error);
+      }
+    });
+  }
+
   async query({ sql, params }) {
     const result = await this.connection.query(sql, params || []);
     return {

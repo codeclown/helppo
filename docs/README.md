@@ -16,6 +16,8 @@
 
 **Development guides:**
 
+- [Changelog](Changelog.md)<br>
+  Version history and changelog
 - [Contributing](Contributing.md)<br>
   How to contribute to this repository
 - [Development](Development.md)<br>

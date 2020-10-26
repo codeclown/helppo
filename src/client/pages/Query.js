@@ -5,9 +5,10 @@ import Table from "../components/Table";
 import QueryRunMessage from "../components/QueryRunMessage";
 import Code from "../components/Code";
 import Button, { ButtonStyles } from "../components/Button";
-import { runSqlQuery } from "../api";
+import CopyToClipboardButton from "../components/CopyToClipboardButton";
+import naiveCsvStringify from "../utils/naiveCsvStringify";
 
-const Query = ({ initialSql, replaceSqlInUrl, catchApiError }) => {
+const Query = ({ initialSql, replaceSqlInUrl, api, catchApiError }) => {
   const [sql, setSql] = useState(initialSql);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -21,7 +22,7 @@ const Query = ({ initialSql, replaceSqlInUrl, catchApiError }) => {
   const submit = async () => {
     const start = Date.now();
     setLoading(true);
-    const queryResult = await catchApiError(runSqlQuery(sql));
+    const queryResult = await catchApiError(api.runSqlQuery(sql));
     setLoading(false);
     setResult(queryResult);
     setRequestTime(Date.now() - start);
@@ -90,7 +91,22 @@ const Query = ({ initialSql, replaceSqlInUrl, catchApiError }) => {
                     `${requestTime}ms`,
                   ]
                     .filter((text) => text !== "")
-                    .join(" – ")
+                    .join(" – "),
+                  result.returnedRowsAmount > 0 &&
+                    h(
+                      CopyToClipboardButton,
+                      {
+                        style: ButtonStyles.GHOST,
+                        slim: true,
+                        onCopy: () => {
+                          return naiveCsvStringify([
+                            result.columnNames,
+                            ...result.rows,
+                          ]);
+                        },
+                      },
+                      `Copy results (csv)`
+                    )
                 )
           ),
           result.returnedRowsAmount > 0 &&

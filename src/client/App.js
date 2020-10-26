@@ -1,18 +1,5 @@
 import { Component, createElement as h, Fragment } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
-import {
-  tableIndexPattern,
-  tableIndexUrl,
-  browseTablePattern,
-  editRowPattern,
-  recentlyDeletedPattern,
-  recentlyDeletedUrl,
-  queryPattern,
-  queryUrl,
-  licenseNoticePattern,
-  licenseNoticeUrl,
-} from "./urls";
-import { navIconTable, navIconDots } from "./images";
 import BrowseTable from "./pages/BrowseTable";
 import EditRow from "./pages/EditRow";
 import Welcome from "./pages/Welcome";
@@ -202,7 +189,7 @@ class App extends Component {
       "div",
       null,
       h(PageTitle, null, "Helppo"),
-      h(Welcome, { tables: this.state.schema.tables })
+      h(Welcome, { urls: this.props.urls, tables: this.state.schema.tables })
     );
   }
 
@@ -248,6 +235,8 @@ class App extends Component {
     return h(BrowseTable, {
       key: routeProps.location.key,
       api: this.props.api,
+      urls: this.props.urls,
+      images: this.props.images,
       columnTypeComponents: this.state.columnTypeComponents,
       filterTypes: this.state.filterTypes,
       catchApiError: this.catchApiError,
@@ -283,6 +272,8 @@ class App extends Component {
     return h(EditRow, {
       key: routeProps.location.key,
       api: this.props.api,
+      urls: this.props.urls,
+      images: this.props.images,
       columnTypeComponents: this.state.columnTypeComponents,
       catchApiError: this.catchApiError,
       showNotification: this.showNotification,
@@ -304,6 +295,7 @@ class App extends Component {
     return h(Query, {
       initialSql,
       replaceSqlInUrl,
+      api: this.props.api,
       catchApiError: this.catchApiError,
     });
   }
@@ -318,6 +310,7 @@ class App extends Component {
 
   renderLicenseNotice() {
     return h(LicenseNotice, {
+      api: this.props.api,
       catchApiError: this.catchApiError,
     });
   }
@@ -345,22 +338,28 @@ class App extends Component {
         h(Navigation, {
           linkGroups: [
             {
-              icon: navIconTable,
+              icon: this.props.images.navIconTable,
               dropdownTitle:
                 this.state.schema.tables.length > 5 ? "Tables" : null,
               links: this.state.schema.tables.map((table) => ({
                 text: niceifyName(table.name),
-                url: tableIndexUrl(table),
+                url: this.props.urls.tableIndexUrl(table),
               })),
             },
             {
-              icon: navIconDots,
+              icon: this.props.images.navIconDots,
               dropdownTitle: "Other",
               links: [
-                { text: "Query", url: queryUrl() },
-                { text: "Recently deleted", url: recentlyDeletedUrl() },
+                { text: "Query", url: this.props.urls.queryUrl() },
+                {
+                  text: "Recently deleted",
+                  url: this.props.urls.recentlyDeletedUrl(),
+                },
                 { separator: true },
-                { text: "License notice", url: licenseNoticeUrl() },
+                {
+                  text: "License notice",
+                  url: this.props.urls.licenseNoticeUrl(),
+                },
               ],
             },
           ],
@@ -372,21 +371,27 @@ class App extends Component {
             Switch,
             null,
             h(Route, {
-              path: browseTablePattern,
+              path: this.props.urls.browseTablePattern,
               render: this.renderBrowseTable,
             }),
-            h(Route, { path: editRowPattern, render: this.renderEditRow }),
-            h(Redirect, { from: tableIndexPattern, to: browseTablePattern }),
             h(Route, {
-              path: queryPattern,
+              path: this.props.urls.editRowPattern,
+              render: this.renderEditRow,
+            }),
+            h(Redirect, {
+              from: this.props.urls.tableIndexPattern,
+              to: this.props.urls.browseTablePattern,
+            }),
+            h(Route, {
+              path: this.props.urls.queryPattern,
               render: this.renderQuery,
             }),
             h(Route, {
-              path: recentlyDeletedPattern,
+              path: this.props.urls.recentlyDeletedPattern,
               render: this.renderRecentlyDeleted,
             }),
             h(Route, {
-              path: licenseNoticePattern,
+              path: this.props.urls.licenseNoticePattern,
               render: this.renderLicenseNotice,
             }),
             h(Route, { exact: true, path: "/", render: this.renderWelcome }),

@@ -1,17 +1,9 @@
-import {
-  Component,
-  createElement as h,
-  Fragment,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Component, createElement as h, createRef, Fragment } from "react";
 import { Redirect } from "react-router-dom";
-import ClipboardJS from "clipboard";
-import { browseTableUrl, editRowUrl } from "../urls";
 import Button, { ButtonStyles } from "../components/Button";
 import Code from "../components/Code";
 import Container from "../components/Container";
+import CopyToClipboardButton from "../components/CopyToClipboardButton";
 import Filters from "../components/Filters";
 import LayoutColumns from "../components/LayoutColumns";
 import Table, { TableLink } from "../components/Table";
@@ -30,35 +22,6 @@ import niceifyName from "../utils/niceifyName";
 import range from "../utils/range";
 import naiveCsvStringify from "../utils/naiveCsvStringify";
 
-const CopyToClipboardButton = ({ onCopy, children }) => {
-  const buttonRef = useRef(null);
-  const [clipboard, setClipboard] = useState(null);
-  useEffect(() => {
-    if (buttonRef.current) {
-      setClipboard(
-        new ClipboardJS(buttonRef.current, {
-          container: buttonRef.current,
-          text: onCopy,
-        })
-      );
-      return () => {
-        if (clipboard) {
-          clipboard.destroy();
-        }
-      };
-    }
-  }, [buttonRef.current]);
-  return h(
-    Button,
-    {
-      ref: buttonRef,
-      style: ButtonStyles.GHOST,
-      onClick: () => {},
-    },
-    children
-  );
-};
-
 class BrowseTable extends Component {
   constructor(props) {
     super();
@@ -67,7 +30,7 @@ class BrowseTable extends Component {
       rows: null,
       browseOptions: Object.assign(
         {
-          perPage: 10,
+          perPage: 20,
           currentPage: 1,
           filters: [],
         },
@@ -89,6 +52,8 @@ class BrowseTable extends Component {
         (filterType) => filterType.key === "equals"
       ).columnTypes,
     };
+
+    this.containerRef = createRef();
 
     this.updateBrowseOptions = this.updateBrowseOptions.bind(this);
     this.getRows = this.getRows.bind(this);
@@ -205,8 +170,9 @@ class BrowseTable extends Component {
           limitText(niceName, 2)
         ),
         h(TableCellTools, {
+          images: this.props.images,
           isPrimaryKey,
-          uncollapseColumnUrl: browseTableUrl(
+          uncollapseColumnUrl: this.props.urls.browseTableUrl(
             this.props.table.name,
             this.state.browseOptions,
             {
@@ -229,9 +195,10 @@ class BrowseTable extends Component {
       null,
       h("span", null, niceName),
       h(TableCellTools, {
+        images: this.props.images,
         isPrimaryKey,
         columnComment: column.comment,
-        collapseColumnUrl: browseTableUrl(
+        collapseColumnUrl: this.props.urls.browseTableUrl(
           this.props.table.name,
           this.state.browseOptions,
           {
@@ -244,7 +211,7 @@ class BrowseTable extends Component {
         sortedAsc,
         sortAscUrl: sortedAsc
           ? null
-          : browseTableUrl(
+          : this.props.urls.browseTableUrl(
               this.props.table.name,
               {
                 ...this.state.browseOptions,
@@ -256,7 +223,7 @@ class BrowseTable extends Component {
         sortedDesc,
         sortDescUrl: sortedDesc
           ? null
-          : browseTableUrl(
+          : this.props.urls.browseTableUrl(
               this.props.table.name,
               {
                 ...this.state.browseOptions,
@@ -281,7 +248,7 @@ class BrowseTable extends Component {
     if (column.name === this.props.table.primaryKey) {
       return h(
         TableLink,
-        { to: editRowUrl(this.props.table, value) },
+        { to: this.props.urls.editRowUrl(this.props.table, value) },
         ColumnTypeComponent.valueAsText(value)
       );
     }
@@ -290,7 +257,7 @@ class BrowseTable extends Component {
       return h(
         TableLink,
         {
-          to: browseTableUrl(
+          to: this.props.urls.browseTableUrl(
             column.referencesTable,
             {
               filters: [
@@ -311,6 +278,7 @@ class BrowseTable extends Component {
     return h(ColumnTypeComponent, {
       editable: false,
       value,
+      images: this.props.images,
     });
   }
 
@@ -330,24 +298,36 @@ class BrowseTable extends Component {
       );
     }
 
+    const availableFilterTypes = column.secret
+      ? []
+      : this.props.filterTypes.filter((filterType) => {
+          return filterType.columnTypes.includes(column.type);
+        });
+
+    const filterUrls = availableFilterTypes.map((filterType) => {
+      return {
+        name: filterType.name,
+        url: this.props.urls.browseTableUrl(
+          this.props.table.name,
+          {
+            filters: [
+              ...this.state.browseOptions.filters,
+              { type: filterType.key, columnName: column.name, value },
+            ],
+          },
+          this.state.presentationOptions
+        ),
+      };
+    });
+
     return h(
       Fragment,
       null,
       this.renderColumnValue(column, value, ColumnTypeComponent),
       h(TableCellTools, {
-        addAsFilterUrl:
-          value !== null &&
-          this.state.columnTypesForAddAsFilter.includes(column.type) &&
-          browseTableUrl(
-            this.props.table.name,
-            {
-              filters: [
-                ...this.state.browseOptions.filters,
-                { type: "equals", columnName: column.name, value },
-              ],
-            },
-            this.state.presentationOptions
-          ),
+        images: this.props.images,
+        filterUrls,
+        dropdownContainer: this.containerRef.current,
       })
     );
   }
@@ -368,7 +348,7 @@ class BrowseTable extends Component {
         TableLink,
         {
           key: relation.table.name,
-          to: browseTableUrl(relation.table.name, { filters }),
+          to: this.props.urls.browseTableUrl(relation.table.name, { filters }),
         },
         niceifyName(relation.table.name)
       );
@@ -402,7 +382,7 @@ class BrowseTable extends Component {
   render() {
     if (this.state.updatedBrowseOptions) {
       return h(Redirect, {
-        to: browseTableUrl(
+        to: this.props.urls.browseTableUrl(
           this.props.table.name,
           this.state.updatedBrowseOptions,
           this.state.presentationOptions
@@ -412,7 +392,7 @@ class BrowseTable extends Component {
 
     if (this.state.updatedPresentationOptions) {
       return h(Redirect, {
-        to: browseTableUrl(
+        to: this.props.urls.browseTableUrl(
           this.props.table.name,
           this.state.browseOptions,
           this.state.updatedPresentationOptions
@@ -424,7 +404,7 @@ class BrowseTable extends Component {
 
     return h(
       "div",
-      null,
+      { ref: this.containerRef },
       h(PageTitle, null, title),
       h(HeadingBlock, { level: 2 }, title),
       h(
@@ -434,7 +414,7 @@ class BrowseTable extends Component {
           Button,
           {
             style: ButtonStyles.SUCCESS,
-            to: editRowUrl(this.props.table),
+            to: this.props.urls.editRowUrl(this.props.table),
           },
           "Create"
         ),
@@ -453,6 +433,7 @@ class BrowseTable extends Component {
             h(
               CopyToClipboardButton,
               {
+                style: ButtonStyles.GHOST,
                 onCopy: () => {
                   const column = this.props.table.columns.find(
                     (column) => column.name === this.props.table.primaryKey
@@ -478,6 +459,7 @@ class BrowseTable extends Component {
             h(
               CopyToClipboardButton,
               {
+                style: ButtonStyles.GHOST,
                 onCopy: () => {
                   return naiveCsvStringify([
                     this.props.table.columns.map((column) => column.name),
@@ -593,7 +575,7 @@ class BrowseTable extends Component {
             " ",
             h(Select, {
               slim: true,
-              options: [10, 100, 500, 2000].map((value) => ({
+              options: [20, 100, 500, 2000].map((value) => ({
                 value,
                 text: `Per page: ${value}`,
               })),

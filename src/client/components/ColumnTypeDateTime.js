@@ -8,7 +8,7 @@ export default class ColumnTypeDateTime extends BaseColumnType {
     return true;
   }
 
-  renderEditable({ value, onChange, inputProps }) {
+  renderEditable({ value, onChange, inputProps, images }) {
     const includeTime = this.includeTime();
     return h(
       Fragment,
@@ -23,6 +23,7 @@ export default class ColumnTypeDateTime extends BaseColumnType {
       h(DatePicker, {
         value,
         onChange,
+        images,
       })
     );
   }

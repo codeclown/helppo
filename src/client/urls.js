@@ -1,6 +1,3 @@
-// TODO should not read window like this
-const mountpath = typeof window !== "undefined" ? window.mountpath : "";
-
 const toUrl = (pattern, config) => {
   let url = pattern;
   if (config.params) {
@@ -20,48 +17,63 @@ const toUrl = (pattern, config) => {
   return url;
 };
 
-export const tableIndexPattern = `${mountpath}/table/:tableName`;
-export const tableIndexUrl = (table) =>
-  toUrl(tableIndexPattern, {
-    params: {
-      tableName: table.name,
+export default function urls(mountpath) {
+  return {
+    tableIndexPattern: `${mountpath}/table/:tableName`,
+    tableIndexUrl(table) {
+      return toUrl(this.tableIndexPattern, {
+        params: {
+          tableName: table.name,
+        },
+      });
     },
-  });
 
-export const browseTablePattern = `${mountpath}/table/:tableName/browse`;
-export const browseTableUrl = (
-  tableName,
-  browseOptions = undefined,
-  presentationOptions = undefined
-) =>
-  toUrl(browseTablePattern, {
-    params: {
+    browseTablePattern: `${mountpath}/table/:tableName/browse`,
+    browseTableUrl(
       tableName,
+      browseOptions = undefined,
+      presentationOptions = undefined
+    ) {
+      return toUrl(this.browseTablePattern, {
+        params: {
+          tableName,
+        },
+        query: {
+          browseOptions: browseOptions
+            ? JSON.stringify(browseOptions)
+            : undefined,
+          presentationOptions: presentationOptions
+            ? JSON.stringify(presentationOptions)
+            : undefined,
+        },
+      });
     },
-    query: {
-      browseOptions: browseOptions ? JSON.stringify(browseOptions) : undefined,
-      presentationOptions: presentationOptions
-        ? JSON.stringify(presentationOptions)
-        : undefined,
+
+    editRowPattern: `${mountpath}/table/:tableName/edit`,
+    editRowUrl(table, rowId = undefined) {
+      return toUrl(this.editRowPattern, {
+        params: {
+          tableName: typeof table === "string" ? table : table.name,
+        },
+        query: {
+          rowId: rowId ? JSON.stringify(rowId) : undefined,
+        },
+      });
     },
-  });
 
-export const editRowPattern = `${mountpath}/table/:tableName/edit`;
-export const editRowUrl = (table, rowId = undefined) =>
-  toUrl(editRowPattern, {
-    params: {
-      tableName: typeof table === "string" ? table : table.name,
+    recentlyDeletedPattern: `${mountpath}/recently-deleted`,
+    recentlyDeletedUrl() {
+      return toUrl(this.recentlyDeletedPattern, {});
     },
-    query: {
-      rowId: rowId ? JSON.stringify(rowId) : undefined,
+
+    queryPattern: `${mountpath}/query`,
+    queryUrl() {
+      return toUrl(this.queryPattern, {});
     },
-  });
 
-export const recentlyDeletedPattern = `${mountpath}/recently-deleted`;
-export const recentlyDeletedUrl = () => toUrl(recentlyDeletedPattern, {});
-
-export const queryPattern = `${mountpath}/query`;
-export const queryUrl = () => toUrl(queryPattern, {});
-
-export const licenseNoticePattern = `${mountpath}/license-notice`;
-export const licenseNoticeUrl = () => toUrl(licenseNoticePattern, {});
+    licenseNoticePattern: `${mountpath}/license-notice`,
+    licenseNoticeUrl() {
+      return toUrl(this.licenseNoticePattern, {});
+    },
+  };
+}
