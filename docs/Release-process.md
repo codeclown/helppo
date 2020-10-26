@@ -41,9 +41,14 @@ Make a commit with the changes before continuing.
 yarn ci
 ```
 
-### Make a PR
+### Create and merge PR
 
-… if not already made. Merge the PR after CI passes.
+- Create PR if not already exists
+- Merge the PR after CI is green
+
+### Wait until master is green
+
+Wait until CI is green in master.
 
 ### Switch to master and pull
 
