@@ -6,6 +6,7 @@ import Welcome from "./pages/Welcome";
 import Query from "./pages/Query";
 import RecentlyDeleted from "./pages/RecentlyDeleted";
 import LicenseNotice from "./pages/LicenseNotice";
+import Schema from "./pages/Schema";
 import ConfigNotice from "./components/ConfigNotice";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ErrorModal from "./components/ErrorModal";
@@ -68,6 +69,7 @@ class App extends Component {
     this.renderQuery = this.renderQuery.bind(this);
     this.renderRecentlyDeleted = this.renderRecentlyDeleted.bind(this);
     this.renderLicenseNotice = this.renderLicenseNotice.bind(this);
+    this.renderSchema = this.renderSchema.bind(this);
   }
 
   async componentDidMount() {
@@ -315,6 +317,12 @@ class App extends Component {
     });
   }
 
+  renderSchema() {
+    return h(Schema, {
+      schema: this.state.schema,
+    });
+  }
+
   render() {
     const Router = this.props.Router;
     const routerProps = this.props.routerProps || null;
@@ -355,6 +363,10 @@ class App extends Component {
                   text: "Recently deleted",
                   url: this.props.urls.recentlyDeletedUrl(),
                 },
+                {
+                  text: "Schema",
+                  url: this.props.urls.schemaUrl(),
+                },
                 { separator: true },
                 {
                   text: "License notice",
@@ -393,6 +405,10 @@ class App extends Component {
             h(Route, {
               path: this.props.urls.licenseNoticePattern,
               render: this.renderLicenseNotice,
+            }),
+            h(Route, {
+              path: this.props.urls.schemaPattern,
+              render: this.renderSchema,
             }),
             h(Route, { exact: true, path: "/", render: this.renderWelcome }),
             h(Route, { path: "/", render: () => h(Redirect, { to: "/" }) })
