@@ -5,14 +5,14 @@ import CheckboxInput from "../components/CheckboxInput";
 import Code from "../components/Code";
 import Container from "../components/Container";
 import FormHelpMessage from "../components/FormHelpMessage";
-import { NotificationStyles } from "../components/Notifications";
 import LayoutColumns from "../components/LayoutColumns";
-import RowEditLabel from "../components/RowEditLabel";
+import { NotificationStyles } from "../components/Notifications";
 import PageTitle from "../components/PageTitle";
+import RowEditLabel from "../components/RowEditLabel";
 import Table from "../components/Table";
 import TextInput from "../components/TextInput";
-import niceifyName from "../utils/niceifyName";
 import doubleQuotes from "../utils/doubleQuotes";
+import niceifyName from "../utils/niceifyName";
 
 const STATUS = {
   LOADING: "LOADING",

@@ -1,5 +1,5 @@
-import { createElement as h, forwardRef } from "react";
 import classNames from "classnames";
+import { createElement as h, forwardRef } from "react";
 
 const Select = forwardRef(
   ({ options, value, placeholder, slim, onChange }, ref) => {

@@ -1,5 +1,5 @@
-import { createElement as h, useEffect, useRef, useState } from "react";
 import ClipboardJS from "clipboard";
+import { createElement as h, useEffect, useRef, useState } from "react";
 import Button from "./Button";
 
 const CopyToClipboardButton = ({ onCopy, children, ...props }) => {

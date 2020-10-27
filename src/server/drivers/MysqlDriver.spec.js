@@ -1,6 +1,6 @@
 import mysql from "mysql";
-import { driverSpec } from "./driverSpec";
 import MysqlDriver from "./MysqlDriver";
+import { driverSpec } from "./driverSpec";
 
 describe("MysqlDriver", () => {
   let connection;

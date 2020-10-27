@@ -1,6 +1,6 @@
-import { createElement as h, Component, createRef } from "react";
 import classNames from "classnames";
 import Clipboard from "clipboard";
+import { createElement as h, Component, createRef } from "react";
 
 class CopyBadge extends Component {
   constructor() {

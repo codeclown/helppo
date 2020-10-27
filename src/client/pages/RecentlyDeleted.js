@@ -1,8 +1,8 @@
 import { Component, createElement as h, Fragment } from "react";
 import Code from "../components/Code";
 import Container from "../components/Container";
-import Table, { TableLink } from "../components/Table";
 import PageTitle from "../components/PageTitle";
+import Table, { TableLink } from "../components/Table";
 import limitText from "../utils/limitText";
 import niceifyName from "../utils/niceifyName";
 

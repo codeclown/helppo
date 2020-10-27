@@ -1,5 +1,4 @@
 import validateBrowseOptions from "../validateBrowseOptions";
-
 import {
   getTablesSql,
   getIndexesSql,

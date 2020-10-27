@@ -1,7 +1,7 @@
 import { createElement as h, Component, Fragment } from "react";
-import Container from "./Container";
-import CodeBlock from "./CodeBlock";
 import Button, { ButtonStyles } from "./Button";
+import CodeBlock from "./CodeBlock";
+import Container from "./Container";
 
 class ErrorModal extends Component {
   render() {

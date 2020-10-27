@@ -1,11 +1,11 @@
 import { createElement as h, Fragment, useState } from "react";
+import Button, { ButtonStyles } from "../components/Button";
+import Code from "../components/Code";
 import CodeBlock from "../components/CodeBlock";
 import Container from "../components/Container";
-import Table from "../components/Table";
-import QueryRunMessage from "../components/QueryRunMessage";
-import Code from "../components/Code";
-import Button, { ButtonStyles } from "../components/Button";
 import CopyToClipboardButton from "../components/CopyToClipboardButton";
+import QueryRunMessage from "../components/QueryRunMessage";
+import Table from "../components/Table";
 import naiveCsvStringify from "../utils/naiveCsvStringify";
 
 const Query = ({ initialSql, replaceSqlInUrl, api, catchApiError }) => {

@@ -5,22 +5,22 @@ import Code from "../components/Code";
 import Container from "../components/Container";
 import CopyToClipboardButton from "../components/CopyToClipboardButton";
 import Filters from "../components/Filters";
-import LayoutColumns from "../components/LayoutColumns";
-import Table, { TableLink } from "../components/Table";
-import Select from "../components/Select";
 import HeadingBlock from "../components/HeadingBlock";
-import PageTitle from "../components/PageTitle";
-import Pagination from "../components/Pagination";
-import TableCellTools from "../components/TableCellTools";
-import TotalResults from "../components/TotalResults";
+import LayoutColumns from "../components/LayoutColumns";
 import {
   NotificationStyles,
   NotificationDelays,
 } from "../components/Notifications";
+import PageTitle from "../components/PageTitle";
+import Pagination from "../components/Pagination";
+import Select from "../components/Select";
+import Table, { TableLink } from "../components/Table";
+import TableCellTools from "../components/TableCellTools";
+import TotalResults from "../components/TotalResults";
 import limitText from "../utils/limitText";
+import naiveCsvStringify from "../utils/naiveCsvStringify";
 import niceifyName from "../utils/niceifyName";
 import range from "../utils/range";
-import naiveCsvStringify from "../utils/naiveCsvStringify";
 
 class BrowseTable extends Component {
   constructor(props) {

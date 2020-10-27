@@ -1,7 +1,7 @@
 import { createElement as h, Fragment } from "react";
 import BaseColumnType from "./BaseColumnType";
-import TextInput from "./TextInput";
 import DatePicker from "./DatePicker";
+import TextInput from "./TextInput";
 
 export default class ColumnTypeDateTime extends BaseColumnType {
   includeTime() {

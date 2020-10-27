@@ -1,5 +1,5 @@
-import { createElement as h } from "react";
 import classNames from "classnames";
+import { createElement as h } from "react";
 
 const CheckboxInput = ({ checked, radio, onChange, children }) => {
   return h(

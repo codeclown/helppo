@@ -1,6 +1,6 @@
-import { createElement as h } from "react";
-import { shallow } from "enzyme";
 import { expect } from "chai";
+import { shallow } from "enzyme";
+import { createElement as h } from "react";
 import { StaticRouter as Router } from "react-router-dom";
 import Navigation from "./Navigation";
 

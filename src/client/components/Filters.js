@@ -1,8 +1,8 @@
 import { createElement as h, Component, createRef } from "react";
+import niceifyName from "../utils/niceifyName";
+import Button, { ButtonStyles } from "./Button";
 import Select from "./Select";
 import TextInput from "./TextInput";
-import Button, { ButtonStyles } from "./Button";
-import niceifyName from "../utils/niceifyName";
 
 class Filters extends Component {
   constructor(props) {

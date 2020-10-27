@@ -1,7 +1,7 @@
 import { createElement as h, Component } from "react";
 import { mapStackTrace } from "sourcemapped-stacktrace";
-import Container from "./Container";
 import CodeBlock from "./CodeBlock";
+import Container from "./Container";
 
 class ErrorBoundary extends Component {
   constructor(props) {

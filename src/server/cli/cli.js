@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import readline from "readline";
 import express from "express";
+import readline from "readline";
+import * as mysqlResolver from "./mysqlResolver";
 import parseArgs from "./parseArgs";
 import * as pgResolver from "./pgResolver";
-import * as mysqlResolver from "./mysqlResolver";
 
 // Expected user flows, in regards to prompting and errors:
 //
