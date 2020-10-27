@@ -10,6 +10,12 @@ Changes to be released in an upcoming release:
 
 -
 
+## 0.2.1 - 2020-10-27
+
+### Fixed
+
+- Fix an issue where table cells could show an extraneous "0" next to the column value ()
+
 ## 0.2.0 - 2020-10-26
 
 ### Added
