@@ -155,7 +155,7 @@ const TableCellTools = ({
         imageUrl: images.sortDesc,
       }),
     filterUrls &&
-      filterUrls.length &&
+      filterUrls.length > 0 &&
       h(
         TableCellToolsItem,
         {
