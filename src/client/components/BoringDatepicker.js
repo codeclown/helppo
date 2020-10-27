@@ -7,20 +7,11 @@ const classNames = {
 
 const dateRegex = /\d{4}-\d{2}-\d{2}/;
 
-const userAgent = navigator.userAgent.toLowerCase();
-const isDesktopSafari =
-  !("ontouchstart" in window) &&
-  userAgent.includes("safari") &&
-  !userAgent.includes("chrome") &&
-  !userAgent.includes("android");
-
-const isIe = typeof window.document.documentMode !== "undefined";
-
 class BoOoOoringDatepicker {
   constructor(options) {
     this.options = Object.assign(
       {
-        doc: typeof document !== "undefined" ? document : undefined,
+        win: typeof window !== "undefined" ? window : undefined,
         existingWrapperElement: null,
         onChange: () => {},
       },
@@ -48,16 +39,17 @@ class BoOoOoringDatepicker {
     //   </span>
 
     const wrapperElement =
-      this.options.existingWrapperElement || document.createElement("span");
+      this.options.existingWrapperElement ||
+      this.options.win.document.createElement("span");
     wrapperElement.classList.add(classNames.wrapper);
 
-    if (isDesktopSafari || isIe) {
+    if (!this.isSupported()) {
       // Not via CSS class because we don't want to mess with
       // CSS-set display values, to not mess up user styles
       wrapperElement.style.display = "none";
     }
 
-    const dateInputElement = document.createElement("input");
+    const dateInputElement = this.options.win.document.createElement("input");
     dateInputElement.type = "date";
     dateInputElement.classList.add(classNames.input);
     wrapperElement.appendChild(dateInputElement);
@@ -75,8 +67,8 @@ class BoOoOoringDatepicker {
   }
 
   addStylesheet() {
-    if (!this.options.doc.querySelector("style#boringDatepicker")) {
-      const style = this.options.doc.createElement("style");
+    if (!this.options.win.document.querySelector("style#boringDatepicker")) {
+      const style = this.options.win.document.createElement("style");
       style.id = "boringDatepicker";
       style.textContent = `
         .${classNames.wrapper} {
@@ -104,8 +96,21 @@ class BoOoOoringDatepicker {
           cursor: pointer;
         }
       `;
-      this.options.doc.head.appendChild(style);
+      this.options.win.document.head.appendChild(style);
     }
+  }
+
+  isSupported() {
+    const userAgent = this.options.win.navigator.userAgent.toLowerCase();
+    const isDesktopSafari =
+      !("ontouchstart" in this.options.win) &&
+      userAgent.includes("safari") &&
+      !userAgent.includes("chrome") &&
+      !userAgent.includes("android");
+
+    const isIe = typeof this.options.win.document.documentMode !== "undefined";
+
+    return !isDesktopSafari && !isIe;
   }
 }
 
