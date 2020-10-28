@@ -101,16 +101,10 @@ class BoOoOoringDatepicker {
   }
 
   isSupported() {
-    const userAgent = this.options.win.navigator.userAgent.toLowerCase();
-    const isDesktopSafari =
-      !("ontouchstart" in this.options.win) &&
-      userAgent.includes("safari") &&
-      !userAgent.includes("chrome") &&
-      !userAgent.includes("android");
-
-    const isIe = typeof this.options.win.document.documentMode !== "undefined";
-
-    return !isDesktopSafari && !isIe;
+    const input = this.options.win.document.createElement("input");
+    input.type = "date";
+    input.value = "invalid date value";
+    return input.value !== "invalid date value";
   }
 }
 
