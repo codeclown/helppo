@@ -2,6 +2,7 @@ import { createElement as h, Fragment } from "react";
 
 const PageTitle = ({ children }) => {
   if (typeof document === "undefined") {
+    // eslint-disable-next-line no-console
     console.log("Warning: Rendering PageTitle without access to DOM");
     return h(Fragment);
   }

@@ -175,6 +175,7 @@ export default class MysqlDriver {
         columns[column.TABLE_NAME].push(obj);
       } catch (error) {
         // TODO collect and print in UI the columns that failed
+        // eslint-disable-next-line no-console
         console.error(
           `Adding column ${column.COLUMN_NAME} to schema failed with error: ${error.message}`
         );

@@ -36,6 +36,7 @@ const driverApi = (config) => {
         schema = prepareAutoSchema(_schema);
       })
       .catch((error) => {
+        // eslint-disable-next-line no-console
         console.error(`getSchema failed with error: ${error.stack}`);
       });
     app.use((req, res, next) => loadSchema.then(() => next()));

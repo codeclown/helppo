@@ -173,6 +173,7 @@ class App extends Component {
         ),
       });
     } catch (exception) {
+      // eslint-disable-next-line no-console
       console.error(exception);
       this.setState({ status: STATUS.DEFAULT });
       this.setState({

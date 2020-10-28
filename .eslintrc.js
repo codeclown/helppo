@@ -17,6 +17,7 @@ module.exports = {
     "filenames/match-exported": "error",
     "filenames/no-index": "error",
     "import/extensions": "error",
+    "no-console": "warn",
   },
   overrides: [
     {

@@ -114,6 +114,7 @@ class BrowseTable extends Component {
           successfullyDeleted.push(rowId);
           this.props.rememberDeletedRow(this.props.table, row);
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error(error);
           this.props.showNotification(`Deleting row ${rowId} failed`, {
             style: NotificationStyles.DANGER,

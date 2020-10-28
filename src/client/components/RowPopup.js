@@ -61,6 +61,7 @@ const RowPopup = ({ popupContainer, getRow, children }) => {
           setRow(row);
           setStatus(STATUS.READY);
         } catch (exception) {
+          // eslint-disable-next-line no-console
           console.error(exception);
           setStatus(STATUS.ERRORED);
         }

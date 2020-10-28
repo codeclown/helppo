@@ -1,16 +1,20 @@
 import classNames from "classnames";
 import { createElement as h } from "react";
 
+const pointRadius = 8;
+const pointAmount = 8;
+const points = [];
+for (let i = 0; i < pointAmount; i++) {
+  const radius = 45 - pointRadius;
+  const theta = (2 * Math.PI * i) / pointAmount;
+  points.push({
+    x: 45 + radius * Math.cos(theta),
+    y: 45 + radius * Math.sin(theta),
+    animationPhase: i,
+  });
+}
+
 const LoadingSpinner = ({ height = 32, dim }) => {
-  const boxes = [
-    { x: 0, y: 0, animationPhase: 0 },
-    { x: 0, y: 1, animationPhase: 1 },
-    { x: 0, y: 2, animationPhase: 2 },
-    { x: 2, y: 0, animationPhase: 2 },
-    { x: 2, y: 1, animationPhase: 3 },
-    { x: 2, y: 2, animationPhase: 4 },
-    { x: 1, y: 1, animationPhase: 2 },
-  ];
   return h(
     "svg",
     {
@@ -19,17 +23,15 @@ const LoadingSpinner = ({ height = 32, dim }) => {
       viewBox: "0 0 90 90",
       xmlns: "http://www.w3.org/2000/svg",
     },
-    boxes.map(({ x, y, animationPhase }, index) =>
+    points.map(({ x, y, animationPhase }, index) =>
       h(
-        "rect",
+        "circle",
         {
           key: index,
           className: "LoadingSpinner__rect",
-          width: 24,
-          height: 24,
-          x: x * 30 + 3,
-          y: y * 30 + 3,
-          rx: 10,
+          cx: x,
+          cy: y,
+          r: pointRadius,
         },
         h("animate", {
           attributeName: "opacity",

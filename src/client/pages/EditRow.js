@@ -126,6 +126,7 @@ class EditRow extends Component {
         await this.getRow();
       }
     } catch (exception) {
+      // eslint-disable-next-line no-console
       console.error(exception);
       this.setState({ status: STATUS.DEFAULT });
     }

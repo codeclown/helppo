@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-console */
+
 import express from "express";
 import readline from "readline";
 import * as mysqlResolver from "./mysqlResolver";
