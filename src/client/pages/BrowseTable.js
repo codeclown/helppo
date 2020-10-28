@@ -14,8 +14,9 @@ import {
 import PageTitle from "../components/PageTitle";
 import Pagination from "../components/Pagination";
 import Select from "../components/Select";
-import Table, { TableLink } from "../components/Table";
+import Table from "../components/Table";
 import TableCellTools from "../components/TableCellTools";
+import TableLink, { TableLinkStyles } from "../components/TableLink";
 import TotalResults from "../components/TotalResults";
 import limitText from "../utils/limitText";
 import naiveCsvStringify from "../utils/naiveCsvStringify";
@@ -248,7 +249,10 @@ class BrowseTable extends Component {
     if (column.name === this.props.table.primaryKey) {
       return h(
         TableLink,
-        { to: this.props.urls.editRowUrl(this.props.table, value) },
+        {
+          style: TableLinkStyles.ROUNDED,
+          to: this.props.urls.editRowUrl(this.props.table, value),
+        },
         ColumnTypeComponent.valueAsText(value)
       );
     }

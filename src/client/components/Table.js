@@ -1,17 +1,5 @@
 import classNames from "classnames";
 import { createElement as h } from "react";
-import { Link } from "react-router-dom";
-
-export const TableLink = ({ className, children, ...props }) => {
-  return h(
-    props.to ? Link : "button",
-    {
-      className: classNames("Table__link", className),
-      ...props,
-    },
-    children
-  );
-};
 
 const Table = ({
   columnTitles,
