@@ -298,6 +298,7 @@ class App extends Component {
       initialSql,
       replaceSqlInUrl,
       api: this.props.api,
+      userDefaults: this.props.userDefaults,
       catchApiError: this.catchApiError,
     });
   }

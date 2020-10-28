@@ -8,11 +8,22 @@ import QueryRunMessage from "../components/QueryRunMessage";
 import Table from "../components/Table";
 import naiveCsvStringify from "../utils/naiveCsvStringify";
 
-const Query = ({ initialSql, replaceSqlInUrl, api, catchApiError }) => {
+const textareaMinHeight = 80;
+
+const Query = ({
+  initialSql,
+  replaceSqlInUrl,
+  api,
+  userDefaults,
+  catchApiError,
+}) => {
   const [sql, setSql] = useState(initialSql);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [requestTime, setRequestTime] = useState(null);
+  const [textareaHeight, setTextareaHeight] = useState(
+    userDefaults.getQueryTextareaHeight() || textareaMinHeight
+  );
 
   const onChange = (value) => {
     replaceSqlInUrl(value);
@@ -43,13 +54,19 @@ const Query = ({ initialSql, replaceSqlInUrl, api, catchApiError }) => {
         CodeBlock,
         {
           editable: true,
-          minHeight: 140,
+          resizable: true,
+          minHeight: textareaMinHeight,
+          height: textareaHeight,
           placeholder: "SELECT * FROM example",
           onChange,
           onKeyDown: (event) => {
             if (event.which == 13 && (event.metaKey || event.ctrlKey)) {
               submit();
             }
+          },
+          onResize: (newHeight) => {
+            setTextareaHeight(newHeight);
+            userDefaults.setQueryTextareaHeight(newHeight);
           },
         },
         sql
