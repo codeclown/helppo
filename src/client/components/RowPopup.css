@@ -1,0 +1,12 @@
+.RowPopup {
+  position: fixed;
+  background: #fff;
+  border: 1px solid var(--gray-600);
+  z-index: var(--z-index-dropdown);
+  box-shadow: var(--box-shadow-floater);
+  padding-top: var(--spacing-tiny);
+  padding-bottom: var(--spacing-tiny);
+  padding-right: var(--spacing-default);
+  max-height: 50%;
+  overflow: auto;
+}

@@ -24,6 +24,11 @@
   white-space: nowrap;
 }
 
+.Table--tiny th,
+.Table--tiny td {
+  padding: var(--spacing-tiny);
+}
+
 .Table th {
   border-bottom: 2px solid var(--gray-300);
   font-weight: var(--font-weight-bold);
@@ -33,6 +38,10 @@
 .Table td {
   border-bottom: 1px solid var(--gray-300);
   vertical-align: top;
+}
+
+.Table--noBorder td {
+  border-bottom: none;
 }
 
 .Table th:first-child,

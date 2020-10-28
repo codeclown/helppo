@@ -53,7 +53,7 @@ class EditRow extends Component {
   async getRow() {
     if (this.props.rowId) {
       const { rows } = await this.props.catchApiError(
-        this.props.api.getTableRows(this.props.table, {
+        this.props.api.getTableRows(this.props.table.name, {
           perPage: 1,
           filters: [
             {

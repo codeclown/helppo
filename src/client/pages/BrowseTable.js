@@ -13,6 +13,7 @@ import {
 } from "../components/Notifications";
 import PageTitle from "../components/PageTitle";
 import Pagination from "../components/Pagination";
+import RowPopup from "../components/RowPopup";
 import Select from "../components/Select";
 import Table from "../components/Table";
 import TableCellTools from "../components/TableCellTools";
@@ -148,7 +149,10 @@ class BrowseTable extends Component {
       totalResults,
       browseOptions,
     } = await this.props.catchApiError(
-      this.props.api.getTableRows(this.props.table, this.state.browseOptions)
+      this.props.api.getTableRows(
+        this.props.table.name,
+        this.state.browseOptions
+      )
     );
     if (browseOptions === this.state.browseOptions) {
       this.setState({ rows, totalPages, totalResults });
@@ -259,23 +263,46 @@ class BrowseTable extends Component {
 
     if (column.referencesColumn) {
       return h(
-        TableLink,
+        RowPopup,
         {
-          to: this.props.urls.browseTableUrl(
-            column.referencesTable,
-            {
-              filters: [
-                {
-                  type: "equals",
-                  columnName: column.referencesColumn,
-                  value,
-                },
-              ],
-            },
-            {}
-          ),
+          popupContainer: this.containerRef.current,
+          getRow: async () => {
+            const { rows } = await this.props.api.getTableRows(
+              column.referencesTable,
+              {
+                perPage: 1,
+                currentPage: 1,
+                filters: [
+                  {
+                    type: "equals",
+                    columnName: column.referencesColumn,
+                    value,
+                  },
+                ],
+              }
+            );
+            return rows[0];
+          },
         },
-        ColumnTypeComponent.valueAsText(value)
+        h(
+          TableLink,
+          {
+            to: this.props.urls.browseTableUrl(
+              column.referencesTable,
+              {
+                filters: [
+                  {
+                    type: "equals",
+                    columnName: column.referencesColumn,
+                    value,
+                  },
+                ],
+              },
+              {}
+            ),
+          },
+          ColumnTypeComponent.valueAsText(value)
+        )
       );
     }
 
