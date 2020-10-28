@@ -6,6 +6,7 @@ import Code from "../components/Code";
 import Container from "../components/Container";
 import FormHelpMessage from "../components/FormHelpMessage";
 import LayoutColumns from "../components/LayoutColumns";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { NotificationStyles } from "../components/Notifications";
 import PageTitle from "../components/PageTitle";
 import RowEditLabel from "../components/RowEditLabel";
@@ -261,7 +262,7 @@ class EditRow extends Component {
     }
 
     if (this.state.status === STATUS.LOADING) {
-      return h(Container, null, "Loading…");
+      return h(Container, null, h(LoadingSpinner, { height: 16 }));
     }
 
     if (!this.state.row) {

@@ -1,13 +1,14 @@
 import classNames from "classnames";
 import { createElement as h } from "react";
 
-const Container = ({ verticalSlim = false, children }) => {
+const Container = ({ verticalSlim, spaceInBetween, children }) => {
   return h(
     "div",
     {
       className: classNames(
         "Container",
-        verticalSlim && "Container--verticalSlim"
+        verticalSlim && "Container--verticalSlim",
+        spaceInBetween && "Container--spaceInBetween"
       ),
     },
     children

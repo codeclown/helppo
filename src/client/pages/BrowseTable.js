@@ -7,6 +7,7 @@ import CopyToClipboardButton from "../components/CopyToClipboardButton";
 import Filters from "../components/Filters";
 import HeadingBlock from "../components/HeadingBlock";
 import LayoutColumns from "../components/LayoutColumns";
+import LoadingSpinner from "../components/LoadingSpinner";
 import {
   NotificationStyles,
   NotificationDelays,
@@ -553,7 +554,10 @@ class BrowseTable extends Component {
         ],
         rows:
           this.state.rows === null ? [] : this.state.rows.map(this.renderRow),
-        blankSlateContent: this.state.rows === null ? "Loading…" : "No rows.",
+        blankSlateContent:
+          this.state.rows === null
+            ? h(LoadingSpinner, { height: 16, dim: true })
+            : "No rows.",
         columnWidths: [
           30,
           ...this.props.table.columns.map((column) =>

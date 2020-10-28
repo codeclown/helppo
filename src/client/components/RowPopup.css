@@ -10,3 +10,8 @@
   max-height: 50%;
   overflow: auto;
 }
+
+.RowPopup__text {
+  display: flex;
+  padding: var(--spacing-slim) 0 var(--spacing-slim) var(--spacing-default);
+}

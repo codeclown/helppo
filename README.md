@@ -21,10 +21,24 @@ Instant database management interface in your browser
 
 ## Quickstart
 
+### Installation
+
 ```bash
 npm install -g helppo-cli
-helppo-cli postgres://... # or mysql://...
+# or
+yarn global install helppo-cli
 ```
+
+For more options, see [Installation](./docs/CLI.md#installation).
+
+### Usage
+
+```bash
+helppo-cli postgres://...
+helppo-cli mysql://...
+```
+
+For more examples, see [Usage](./docs/CLI.md#usage).
 
 ## What is it
 

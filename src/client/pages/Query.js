@@ -4,6 +4,7 @@ import Code from "../components/Code";
 import CodeBlock from "../components/CodeBlock";
 import Container from "../components/Container";
 import CopyToClipboardButton from "../components/CopyToClipboardButton";
+import LoadingSpinner from "../components/LoadingSpinner";
 import QueryRunMessage from "../components/QueryRunMessage";
 import Table from "../components/Table";
 import naiveCsvStringify from "../utils/naiveCsvStringify";
@@ -73,7 +74,7 @@ const Query = ({
       ),
       h(
         Container,
-        null,
+        { spaceInBetween: true },
         h(
           Button,
           {
@@ -82,7 +83,8 @@ const Query = ({
             style: ButtonStyles.SUCCESS,
           },
           loading ? "Running…" : "Run query"
-        )
+        ),
+        loading && h(LoadingSpinner, { height: 16 })
       ),
       result &&
         h(

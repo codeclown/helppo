@@ -1,0 +1,11 @@
+.LoadingSpinner {
+  display: inline-block;
+}
+
+.LoadingSpinner__rect {
+  fill: var(--gray-700);
+}
+
+.LoadingSpinner--dim .LoadingSpinner__rect {
+  fill: var(--gray-400);
+}

@@ -4,6 +4,7 @@ import limitText from "../utils/limitText";
 import niceifyName from "../utils/niceifyName";
 import Code from "./Code";
 import ErrorBoundary from "./ErrorBoundary";
+import LoadingSpinner from "./LoadingSpinner";
 import Table from "./Table";
 
 const STATUS = {
@@ -14,9 +15,13 @@ const STATUS = {
 
 const RowPopupContent = ({ status, row }) => {
   return status === STATUS.LOADING
-    ? "Loading…"
+    ? h(
+        "div",
+        { className: "RowPopup__text" },
+        h(LoadingSpinner, { height: 16 })
+      )
     : status === STATUS.ERRORED
-    ? "Something went wrong."
+    ? h("div", { className: "RowPopup__text" }, "Something went wrong.")
     : h(Table, {
         marginTop: true,
         tiny: true,
