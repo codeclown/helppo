@@ -1,6 +1,6 @@
 import express from "express";
-import indexHtml from "./html/indexHtml";
 import errorHtml from "./html/errorHtml";
+import indexHtml from "./html/indexHtml";
 
 function stripTrailingSlash(mountpath) {
   return mountpath.replace(/\/*$/, "");

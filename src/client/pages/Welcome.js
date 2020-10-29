@@ -1,7 +1,7 @@
 import { createElement as h, Fragment } from "react";
-import HeadingBlock from "../components/HeadingBlock";
-import Container from "../components/Container";
 import BlockLinkList from "../components/BlockLinkList";
+import Container from "../components/Container";
+import HeadingBlock from "../components/HeadingBlock";
 import niceifyName from "../utils/niceifyName";
 
 const Welcome = ({ urls, tables }) => {

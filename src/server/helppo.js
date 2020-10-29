@@ -1,10 +1,10 @@
 import makeAssetRouter from "./assetRouter";
-import makeDriverApi from "./driverApi";
-import makeRouter from "./router";
 import * as builtInColumnTypes from "./builtInColumnTypes";
 import builtInFilterTypes from "./builtInFilterTypes";
-import readLicenseNotice from "./readLicenseNotice";
+import makeDriverApi from "./driverApi";
 import errorHandler from "./errorHandler";
+import readLicenseNotice from "./readLicenseNotice";
+import makeRouter from "./router";
 
 export { default as MysqlDriver } from "./drivers/MysqlDriver";
 

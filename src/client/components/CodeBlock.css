@@ -1,17 +1,27 @@
 .CodeBlock {
   position: relative;
+  display: block;
+}
+
+.CodeBlock--wrapLines {
+  white-space: pre-wrap;
+}
+
+.CodeBlock__content {
+  display: block;
   padding: var(--spacing-default);
   font-family: var(--font-family-monospace);
   background-color: var(--gray-200);
   font-size: 85%;
   white-space: pre;
-  overflow: auto;
-  display: block;
   width: 100%;
+  resize: none;
+  overflow: auto;
 }
 
-.CodeBlock--wrapLines {
-  white-space: pre-wrap;
+.CodeBlock__content:focus {
+  outline: none;
+  background-color: var(--gray-300);
 }
 
 .CodeBlock__copyBadge {
@@ -34,4 +44,30 @@
 .CodeBlock__copyBadge:active {
   background-color: var(--gray-500);
   color: var(--gray-600);
+}
+
+.CodeBlock__resizeHandle {
+  position: relative;
+  height: 3px;
+  background-color: var(--gray-300);
+}
+
+.CodeBlock__resizeHandle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  margin-left: -3px;
+  top: 1px;
+  width: 6px;
+  height: 1px;
+  background-color: var(--gray-500);
+}
+
+.CodeBlock__resizeHandle:hover {
+  background-color: var(--gray-600);
+  cursor: pointer;
+}
+
+.CodeBlock__resizeHandle:hover::after {
+  background-color: #fff;
 }

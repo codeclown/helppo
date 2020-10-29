@@ -1,19 +1,9 @@
 import classNames from "classnames";
 import { createElement as h } from "react";
-import { Link } from "react-router-dom";
-
-export const TableLink = ({ className, children, ...props }) => {
-  return h(
-    props.to ? Link : "button",
-    {
-      className: classNames("Table__link", className),
-      ...props,
-    },
-    children
-  );
-};
 
 const Table = ({
+  tiny,
+  noBorder,
   columnTitles,
   columnWidths,
   columnVerticalAlignments,
@@ -22,7 +12,12 @@ const Table = ({
   marginTop,
   leftColumnIsTh,
 }) => {
-  const cellStyles = columnTitles.map((column, index) => {
+  const columnCountArray =
+    columnTitles ||
+    columnWidths ||
+    columnVerticalAlignments ||
+    Object.keys(rows[0]);
+  const cellStyles = columnCountArray.map((column, index) => {
     const styles = {};
     if (columnWidths && columnWidths[index]) {
       styles.width = columnWidths[index];
@@ -41,7 +36,7 @@ const Table = ({
         {
           key: index,
         },
-        columnTitles.map((column, cellIndex) =>
+        columnCountArray.map((column, cellIndex) =>
           h(
             "td",
             {
@@ -78,27 +73,30 @@ const Table = ({
       {
         className: classNames(
           "Table",
+          tiny && "Table--tiny",
+          noBorder && "Table--noBorder",
           marginTop && "Table--marginTop",
           leftColumnIsTh && "Table--leftColumnIsTh"
         ),
       },
-      h(
-        "thead",
-        null,
+      columnTitles &&
         h(
-          "tr",
+          "thead",
           null,
-          columnTitles.map((title, index) =>
-            h(
-              "th",
-              {
-                key: index,
-              },
-              title
+          h(
+            "tr",
+            null,
+            columnTitles.map((title, index) =>
+              h(
+                "th",
+                {
+                  key: index,
+                },
+                title
+              )
             )
           )
-        )
-      ),
+        ),
       h("tbody", null, ...bodyContent)
     )
   );

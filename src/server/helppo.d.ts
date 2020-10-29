@@ -1,6 +1,6 @@
 import { Router } from "express";
-import PgDriver from "./drivers/PgDriver";
 import MysqlDriver from "./drivers/MysqlDriver";
+import PgDriver from "./drivers/PgDriver";
 
 export = HelppoMiddleware;
 

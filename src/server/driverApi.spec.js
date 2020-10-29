@@ -1,5 +1,5 @@
-import supertest from "supertest";
 import { expect } from "chai";
+import supertest from "supertest";
 import driverApi from "./driverApi";
 
 const baseDriver = {

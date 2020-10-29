@@ -3,8 +3,9 @@ import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import api from "./api";
-import urls from "./urls";
 import images from "./images";
+import urls from "./urls";
+import userDefaults from "./userDefaults";
 
 const app = h(App, {
   mountpath: window.mountpath,
@@ -12,6 +13,7 @@ const app = h(App, {
   api: api(window.mountpath),
   urls: urls(window.mountpath),
   images: images(window.mountpath),
+  userDefaults: userDefaults(),
 });
 
 const container = document.querySelector(".app");

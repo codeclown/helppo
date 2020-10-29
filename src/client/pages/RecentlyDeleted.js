@@ -1,8 +1,9 @@
 import { Component, createElement as h, Fragment } from "react";
 import Code from "../components/Code";
 import Container from "../components/Container";
-import Table, { TableLink } from "../components/Table";
 import PageTitle from "../components/PageTitle";
+import Table from "../components/Table";
+import TableLink, { TableLinkStyles } from "../components/TableLink";
 import limitText from "../utils/limitText";
 import niceifyName from "../utils/niceifyName";
 
@@ -38,6 +39,7 @@ class RecentlyDeleted extends Component {
                 h(
                   TableLink,
                   {
+                    style: TableLinkStyles.ROUNDED,
                     onClick: () => restoreRow(obj),
                     disabled: pending || !canBeRestored,
                     title: canBeRestored

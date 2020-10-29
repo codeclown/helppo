@@ -1,8 +1,8 @@
+import { expect } from "chai";
 import express from "express";
 import supertest from "supertest";
-import { expect } from "chai";
-import router from "./router";
 import errorHandler from "./errorHandler";
+import router from "./router";
 
 const baseOptions = {
   errorHandler,

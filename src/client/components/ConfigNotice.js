@@ -1,7 +1,7 @@
 import { createElement as h } from "react";
-import Container from "./Container";
 import Code from "./Code";
 import CodeBlock from "./CodeBlock";
+import Container from "./Container";
 
 const ConfigNotice = ({ suggestedFreshSchema }) => {
   if (suggestedFreshSchema) {

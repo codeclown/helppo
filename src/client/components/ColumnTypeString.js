@@ -1,7 +1,7 @@
 import { createElement as h, Fragment } from "react";
 import BaseColumnType from "./BaseColumnType";
-import TextInput from "./TextInput";
 import FormHelpMessage from "./FormHelpMessage";
+import TextInput from "./TextInput";
 
 export default class ColumnTypeString extends BaseColumnType {
   isMultiLine() {

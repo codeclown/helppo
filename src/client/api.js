@@ -24,9 +24,9 @@ export default function api(mountpath) {
       return response;
     },
 
-    async getTableRows(table, browseOptions) {
+    async getTableRows(tableName, browseOptions) {
       const response = await ajax
-        .get(`/api/table/${table.name}/rows`)
+        .get(`/api/table/${tableName}/rows`)
         .query({
           browseOptions: JSON.stringify(browseOptions),
         })

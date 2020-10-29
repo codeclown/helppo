@@ -1,1 +1,1 @@
-{ "embeddedLanguageFormatting": "off" }
+{ "embeddedLanguageFormatting": "off", "importOrder": ["^[^.].*", "\\..*"] }

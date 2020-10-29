@@ -1,18 +1,30 @@
 import { createElement as h, Fragment, useState } from "react";
+import Button, { ButtonStyles } from "../components/Button";
+import Code from "../components/Code";
 import CodeBlock from "../components/CodeBlock";
 import Container from "../components/Container";
-import Table from "../components/Table";
-import QueryRunMessage from "../components/QueryRunMessage";
-import Code from "../components/Code";
-import Button, { ButtonStyles } from "../components/Button";
 import CopyToClipboardButton from "../components/CopyToClipboardButton";
+import LoadingSpinner from "../components/LoadingSpinner";
+import QueryRunMessage from "../components/QueryRunMessage";
+import Table from "../components/Table";
 import naiveCsvStringify from "../utils/naiveCsvStringify";
 
-const Query = ({ initialSql, replaceSqlInUrl, api, catchApiError }) => {
+const textareaMinHeight = 80;
+
+const Query = ({
+  initialSql,
+  replaceSqlInUrl,
+  api,
+  userDefaults,
+  catchApiError,
+}) => {
   const [sql, setSql] = useState(initialSql);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [requestTime, setRequestTime] = useState(null);
+  const [textareaHeight, setTextareaHeight] = useState(
+    userDefaults.getQueryTextareaHeight() || textareaMinHeight
+  );
 
   const onChange = (value) => {
     replaceSqlInUrl(value);
@@ -43,7 +55,9 @@ const Query = ({ initialSql, replaceSqlInUrl, api, catchApiError }) => {
         CodeBlock,
         {
           editable: true,
-          minHeight: 140,
+          resizable: true,
+          minHeight: textareaMinHeight,
+          height: textareaHeight,
           placeholder: "SELECT * FROM example",
           onChange,
           onKeyDown: (event) => {
@@ -51,12 +65,16 @@ const Query = ({ initialSql, replaceSqlInUrl, api, catchApiError }) => {
               submit();
             }
           },
+          onResize: (newHeight) => {
+            setTextareaHeight(newHeight);
+            userDefaults.setQueryTextareaHeight(newHeight);
+          },
         },
         sql
       ),
       h(
         Container,
-        null,
+        { spaceInBetween: true },
         h(
           Button,
           {
@@ -65,7 +83,8 @@ const Query = ({ initialSql, replaceSqlInUrl, api, catchApiError }) => {
             style: ButtonStyles.SUCCESS,
           },
           loading ? "Running…" : "Run query"
-        )
+        ),
+        loading && h(LoadingSpinner, { height: 16 })
       ),
       result &&
         h(

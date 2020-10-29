@@ -1,7 +1,7 @@
-import { createElement as h } from "react";
-import { shallow } from "enzyme";
-import { MemoryRouter as Router } from "react-router-dom";
 import { expect } from "chai";
+import { shallow } from "enzyme";
+import { createElement as h } from "react";
+import { MemoryRouter as Router } from "react-router-dom";
 import App from "./App";
 
 describe("App", () => {

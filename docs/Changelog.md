@@ -10,6 +10,16 @@ Changes to be released in an upcoming release:
 
 -
 
+## 0.3.0 - 2020-10-29
+
+### Added
+
+- Show related row information when hovering a foreign key value (see [#6](https://github.com/codeclown/helppo/issues/6) for screenshot)
+- Show related rows on Edit row -page (see [#7](https://github.com/codeclown/helppo/issues/7) for screenshot)
+- Make SQL editor vertically resizable (see [#5](https://github.com/codeclown/helppo/issues/5) for screenshot)
+- Implement Schema-page (see [#4](https://github.com/codeclown/helppo/issues/4) for screenshot)
+- Add a loading spinner to views where loading happens
+
 ## 0.2.1 - 2020-10-27
 
 ### Fixed

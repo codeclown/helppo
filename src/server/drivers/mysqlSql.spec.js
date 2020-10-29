@@ -1,6 +1,6 @@
 import matchSnapshot from "snap-shot-it";
-import { schemaSqlSpecHelper } from "./driverSpec";
 import { createMysqlSchemaSql } from "./MysqlDriver";
+import { schemaSqlSpecHelper } from "./driverSpec";
 import {
   getTablesSql,
   getIndexesSql,

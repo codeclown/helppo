@@ -1,7 +1,7 @@
 import { createElement as h } from "react";
-import BaseColumnType from "./BaseColumnType";
 import CheckboxInput from "../components/CheckboxInput";
 import Code from "../components/Code";
+import BaseColumnType from "./BaseColumnType";
 
 export default class ColumnTypeBoolean extends BaseColumnType {
   renderEditable({ value, onChange }) {

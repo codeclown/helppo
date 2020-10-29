@@ -5,22 +5,25 @@ import Code from "../components/Code";
 import Container from "../components/Container";
 import CopyToClipboardButton from "../components/CopyToClipboardButton";
 import Filters from "../components/Filters";
-import LayoutColumns from "../components/LayoutColumns";
-import Table, { TableLink } from "../components/Table";
-import Select from "../components/Select";
 import HeadingBlock from "../components/HeadingBlock";
-import PageTitle from "../components/PageTitle";
-import Pagination from "../components/Pagination";
-import TableCellTools from "../components/TableCellTools";
-import TotalResults from "../components/TotalResults";
+import LayoutColumns from "../components/LayoutColumns";
+import LoadingSpinner from "../components/LoadingSpinner";
 import {
   NotificationStyles,
   NotificationDelays,
 } from "../components/Notifications";
+import PageTitle from "../components/PageTitle";
+import Pagination from "../components/Pagination";
+import RowPopup from "../components/RowPopup";
+import Select from "../components/Select";
+import Table from "../components/Table";
+import TableCellTools from "../components/TableCellTools";
+import TableLink, { TableLinkStyles } from "../components/TableLink";
+import TotalResults from "../components/TotalResults";
 import limitText from "../utils/limitText";
+import naiveCsvStringify from "../utils/naiveCsvStringify";
 import niceifyName from "../utils/niceifyName";
 import range from "../utils/range";
-import naiveCsvStringify from "../utils/naiveCsvStringify";
 
 class BrowseTable extends Component {
   constructor(props) {
@@ -111,6 +114,7 @@ class BrowseTable extends Component {
           successfullyDeleted.push(rowId);
           this.props.rememberDeletedRow(this.props.table, row);
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error(error);
           this.props.showNotification(`Deleting row ${rowId} failed`, {
             style: NotificationStyles.DANGER,
@@ -147,7 +151,10 @@ class BrowseTable extends Component {
       totalResults,
       browseOptions,
     } = await this.props.catchApiError(
-      this.props.api.getTableRows(this.props.table, this.state.browseOptions)
+      this.props.api.getTableRows(
+        this.props.table.name,
+        this.state.browseOptions
+      )
     );
     if (browseOptions === this.state.browseOptions) {
       this.setState({ rows, totalPages, totalResults });
@@ -248,30 +255,56 @@ class BrowseTable extends Component {
     if (column.name === this.props.table.primaryKey) {
       return h(
         TableLink,
-        { to: this.props.urls.editRowUrl(this.props.table, value) },
+        {
+          style: TableLinkStyles.ROUNDED,
+          to: this.props.urls.editRowUrl(this.props.table, value),
+        },
         ColumnTypeComponent.valueAsText(value)
       );
     }
 
     if (column.referencesColumn) {
       return h(
-        TableLink,
+        RowPopup,
         {
-          to: this.props.urls.browseTableUrl(
-            column.referencesTable,
-            {
-              filters: [
-                {
-                  type: "equals",
-                  columnName: column.referencesColumn,
-                  value,
-                },
-              ],
-            },
-            {}
-          ),
+          popupContainer: this.containerRef.current,
+          getRow: async () => {
+            const { rows } = await this.props.api.getTableRows(
+              column.referencesTable,
+              {
+                perPage: 1,
+                currentPage: 1,
+                filters: [
+                  {
+                    type: "equals",
+                    columnName: column.referencesColumn,
+                    value,
+                  },
+                ],
+              }
+            );
+            return rows[0];
+          },
         },
-        ColumnTypeComponent.valueAsText(value)
+        h(
+          TableLink,
+          {
+            to: this.props.urls.browseTableUrl(
+              column.referencesTable,
+              {
+                filters: [
+                  {
+                    type: "equals",
+                    columnName: column.referencesColumn,
+                    value,
+                  },
+                ],
+              },
+              {}
+            ),
+          },
+          ColumnTypeComponent.valueAsText(value)
+        )
       );
     }
 
@@ -522,7 +555,10 @@ class BrowseTable extends Component {
         ],
         rows:
           this.state.rows === null ? [] : this.state.rows.map(this.renderRow),
-        blankSlateContent: this.state.rows === null ? "Loading…" : "No rows.",
+        blankSlateContent:
+          this.state.rows === null
+            ? h(LoadingSpinner, { height: 16, dim: true })
+            : "No rows.",
         columnWidths: [
           30,
           ...this.props.table.columns.map((column) =>

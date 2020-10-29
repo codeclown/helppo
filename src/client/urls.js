@@ -75,5 +75,10 @@ export default function urls(mountpath) {
     licenseNoticeUrl() {
       return toUrl(this.licenseNoticePattern, {});
     },
+
+    schemaPattern: `${mountpath}/schema`,
+    schemaUrl() {
+      return toUrl(this.schemaPattern, {});
+    },
   };
 }

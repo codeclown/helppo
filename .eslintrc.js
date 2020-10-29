@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ["eslint:recommended", "prettier"],
+  extends: ["eslint:recommended", "prettier", "plugin:import/recommended"],
   ignorePatterns: ["dist/", "__snapshots__"],
   parserOptions: {
     ecmaVersion: 2020,
@@ -14,8 +14,10 @@ module.exports = {
   },
   plugins: ["filenames"],
   rules: {
-    "filenames/match-exported": 2,
-    "filenames/no-index": 2,
+    "filenames/match-exported": "error",
+    "filenames/no-index": "error",
+    "import/extensions": "error",
+    "no-console": "warn",
   },
   overrides: [
     {

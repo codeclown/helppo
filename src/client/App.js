@@ -1,27 +1,28 @@
 import { Component, createElement as h, Fragment } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
-import BrowseTable from "./pages/BrowseTable";
-import EditRow from "./pages/EditRow";
-import Welcome from "./pages/Welcome";
-import Query from "./pages/Query";
-import RecentlyDeleted from "./pages/RecentlyDeleted";
-import LicenseNotice from "./pages/LicenseNotice";
+import ColumnTypeBoolean from "./components/ColumnTypeBoolean";
+import ColumnTypeDate from "./components/ColumnTypeDate";
+import ColumnTypeDateTime from "./components/ColumnTypeDateTime";
+import ColumnTypeInteger from "./components/ColumnTypeInteger";
+import ColumnTypeString from "./components/ColumnTypeString";
+import ColumnTypeText from "./components/ColumnTypeText";
 import ConfigNotice from "./components/ConfigNotice";
+import Container from "./components/Container";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ErrorModal from "./components/ErrorModal";
-import Container from "./components/Container";
 import Navigation from "./components/Navigation";
 import Notifications, {
   NotificationDelays,
   NotificationStyles,
 } from "./components/Notifications";
 import PageTitle from "./components/PageTitle";
-import ColumnTypeInteger from "./components/ColumnTypeInteger";
-import ColumnTypeString from "./components/ColumnTypeString";
-import ColumnTypeText from "./components/ColumnTypeText";
-import ColumnTypeDate from "./components/ColumnTypeDate";
-import ColumnTypeDateTime from "./components/ColumnTypeDateTime";
-import ColumnTypeBoolean from "./components/ColumnTypeBoolean";
+import BrowseTable from "./pages/BrowseTable";
+import EditRow from "./pages/EditRow";
+import LicenseNotice from "./pages/LicenseNotice";
+import Query from "./pages/Query";
+import RecentlyDeleted from "./pages/RecentlyDeleted";
+import Schema from "./pages/Schema";
+import Welcome from "./pages/Welcome";
 import niceifyName from "./utils/niceifyName";
 
 const STATUS = {
@@ -68,6 +69,7 @@ class App extends Component {
     this.renderQuery = this.renderQuery.bind(this);
     this.renderRecentlyDeleted = this.renderRecentlyDeleted.bind(this);
     this.renderLicenseNotice = this.renderLicenseNotice.bind(this);
+    this.renderSchema = this.renderSchema.bind(this);
   }
 
   async componentDidMount() {
@@ -171,6 +173,7 @@ class App extends Component {
         ),
       });
     } catch (exception) {
+      // eslint-disable-next-line no-console
       console.error(exception);
       this.setState({ status: STATUS.DEFAULT });
       this.setState({
@@ -278,6 +281,7 @@ class App extends Component {
       catchApiError: this.catchApiError,
       showNotification: this.showNotification,
       rememberDeletedRow: this.rememberDeletedRow,
+      schema: this.state.schema,
       table,
       rowId,
     });
@@ -296,6 +300,7 @@ class App extends Component {
       initialSql,
       replaceSqlInUrl,
       api: this.props.api,
+      userDefaults: this.props.userDefaults,
       catchApiError: this.catchApiError,
     });
   }
@@ -312,6 +317,12 @@ class App extends Component {
     return h(LicenseNotice, {
       api: this.props.api,
       catchApiError: this.catchApiError,
+    });
+  }
+
+  renderSchema() {
+    return h(Schema, {
+      schema: this.state.schema,
     });
   }
 
@@ -355,6 +366,10 @@ class App extends Component {
                   text: "Recently deleted",
                   url: this.props.urls.recentlyDeletedUrl(),
                 },
+                {
+                  text: "Schema",
+                  url: this.props.urls.schemaUrl(),
+                },
                 { separator: true },
                 {
                   text: "License notice",
@@ -393,6 +408,10 @@ class App extends Component {
             h(Route, {
               path: this.props.urls.licenseNoticePattern,
               render: this.renderLicenseNotice,
+            }),
+            h(Route, {
+              path: this.props.urls.schemaPattern,
+              render: this.renderSchema,
             }),
             h(Route, { exact: true, path: "/", render: this.renderWelcome }),
             h(Route, { path: "/", render: () => h(Redirect, { to: "/" }) })

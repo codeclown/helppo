@@ -1,7 +1,7 @@
 import { createElement as h, Fragment } from "react";
 import BaseColumnType from "./BaseColumnType";
-import TextInput from "./TextInput";
 import DatePicker from "./DatePicker";
+import TextInput from "./TextInput";
 
 export default class ColumnTypeDateTime extends BaseColumnType {
   includeTime() {
@@ -10,21 +10,19 @@ export default class ColumnTypeDateTime extends BaseColumnType {
 
   renderEditable({ value, onChange, inputProps, images }) {
     const includeTime = this.includeTime();
+    value = value === null ? "" : value;
     return h(
       Fragment,
       null,
       h(TextInput, {
         ...inputProps,
+        ref: this.inputRef,
         size: includeTime ? 18 : 12,
-        value: value === null ? "" : value,
+        value,
         onChange,
       }),
       " ",
-      h(DatePicker, {
-        value,
-        onChange,
-        images,
-      })
+      h(DatePicker, { value, onChange, images })
     );
   }
 }

@@ -1,30 +1,11 @@
-import { createElement as h, useRef } from "react";
-
-const dateRegex = /\d{4}-\d{2}-\d{2}/;
+import { createElement as h } from "react";
+import BoringDatepicker from "./BoringDatepicker";
 
 const DatePicker = ({ value, onChange, images }) => {
-  const inputRef = useRef(null);
-  const dateStringMatch = typeof value === "string" && value.match(dateRegex);
-  const dateString = dateStringMatch ? dateStringMatch[0] : "";
   return h(
-    "div",
-    { className: "DatePicker" },
-    h("img", { className: "DatePicker__icon", src: images.calendar }),
-    h("input", {
-      ref: inputRef,
-      className: "DatePicker__input",
-      type: "date",
-      value: dateString,
-      onChange: (event) => {
-        const dateString = event.target.value;
-        if (dateStringMatch) {
-          const newValue = value.replace(dateRegex, dateString);
-          onChange(newValue);
-        } else {
-          onChange(dateString);
-        }
-      },
-    })
+    BoringDatepicker,
+    { value, onChange, className: "DatePicker" },
+    h("img", { src: images.calendar })
   );
 };
 

@@ -1,6 +1,6 @@
 import { Client } from "pg";
-import { driverSpec } from "./driverSpec";
 import PgDriver from "./PgDriver";
+import { driverSpec } from "./driverSpec";
 
 describe("PgDriver", () => {
   let connection;

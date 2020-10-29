@@ -1,6 +1,7 @@
 import { createElement as h, useEffect, useState } from "react";
 import CodeBlock from "../components/CodeBlock";
 import Container from "../components/Container";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const LicenseNotice = ({ api, catchApiError }) => {
   const [licenseNotice, setLicenseNotice] = useState(null);
@@ -22,7 +23,7 @@ const LicenseNotice = ({ api, catchApiError }) => {
           },
           licenseNotice
         )
-      : "Loading license notice…"
+      : h(LoadingSpinner, { height: 16 })
   );
 };
 

@@ -2,7 +2,7 @@
 <img src="docs/screenshots/readme_logo.png" alt="Helppo" />
 </p>
 <p align="center">
-Instant database management interface in your browser
+Plug-n-play database management interface (CRUD)
 </p>
 <p align="center">
 <a href="https://www.npmjs.com/package/helppo-cli"><img src="https://img.shields.io/badge/npm-helppo--cli-blue" alt="helppo-cli on npm"></a>
@@ -21,10 +21,24 @@ Instant database management interface in your browser
 
 ## Quickstart
 
+### Installation
+
 ```bash
 npm install -g helppo-cli
-helppo-cli postgres://... # or mysql://...
+# or
+yarn global install helppo-cli
 ```
+
+For more options, see [Installation](./docs/CLI.md#installation).
+
+### Usage
+
+```bash
+helppo-cli postgres://...
+helppo-cli mysql://...
+```
+
+For more examples, see [Usage](./docs/CLI.md#usage).
 
 ## What is it
 

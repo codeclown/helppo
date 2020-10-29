@@ -6,6 +6,7 @@ html {
 *::after,
 *::before {
   box-sizing: inherit;
+  outline-color: var(--color-blue-600);
 }
 
 * {

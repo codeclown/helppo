@@ -190,6 +190,7 @@ export default class PgDriver {
         columnsByTable[column.table_name].push(obj);
       } catch (error) {
         // TODO collect and print in UI the columns that failed
+        // eslint-disable-next-line no-console
         console.error(
           `Warning: Column ${column.table_name}.${column.column_name} was skipped due to error: ${error.stack}`
         );
