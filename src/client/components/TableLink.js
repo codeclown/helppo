@@ -10,6 +10,7 @@ export const TableLinkStyles = {
 const TableLink = ({
   className,
   style = TableLinkStyles.DEFAULT,
+  tiny,
   children,
   ...props
 }) => {
@@ -19,6 +20,7 @@ const TableLink = ({
       className: classNames(
         "TableLink",
         className,
+        tiny && "TableLink--tiny",
         style && `TableLink--${style}`
       ),
       ...props,

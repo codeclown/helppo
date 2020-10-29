@@ -8,6 +8,11 @@
   margin-left: var(--spacing-tiny);
 }
 
+.TableLink--tiny {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .TableLink:disabled {
   opacity: 0.5;
   cursor: default;

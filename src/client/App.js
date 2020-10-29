@@ -281,6 +281,7 @@ class App extends Component {
       catchApiError: this.catchApiError,
       showNotification: this.showNotification,
       rememberDeletedRow: this.rememberDeletedRow,
+      schema: this.state.schema,
       table,
       rowId,
     });

@@ -33,7 +33,7 @@ const RowPopupContent = ({ status, row }) => {
             niceifyName(columnName),
             value === null
               ? h(Code, null, "NULL")
-              : limitText(value.toString()),
+              : limitText(value.toString(), 50),
           ];
         }),
       });

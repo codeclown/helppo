@@ -1,24 +1,206 @@
-import { Component, createElement as h, Fragment } from "react";
+import {
+  Component,
+  createElement as h,
+  Fragment,
+  useEffect,
+  useState,
+} from "react";
 import { Redirect, Link } from "react-router-dom";
 import Button, { ButtonStyles } from "../components/Button";
 import CheckboxInput from "../components/CheckboxInput";
 import Code from "../components/Code";
 import Container from "../components/Container";
 import FormHelpMessage from "../components/FormHelpMessage";
+import HeadingBlock from "../components/HeadingBlock";
 import LayoutColumns from "../components/LayoutColumns";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { NotificationStyles } from "../components/Notifications";
 import PageTitle from "../components/PageTitle";
 import RowEditLabel from "../components/RowEditLabel";
 import Table from "../components/Table";
+import TableLink, { TableLinkStyles } from "../components/TableLink";
 import TextInput from "../components/TextInput";
 import doubleQuotes from "../utils/doubleQuotes";
+import limitText from "../utils/limitText";
 import niceifyName from "../utils/niceifyName";
 
 const STATUS = {
   LOADING: "LOADING",
   DEFAULT: "DEFAULT",
   SAVING: "SAVING",
+};
+
+const RelatedRows = ({
+  api,
+  urls,
+  schema,
+  table,
+  row,
+  columnTypeComponents,
+}) => {
+  const loading = "LOADING";
+  const errored = "ERRORED";
+  const ready = "READY";
+
+  const [status, setStatus] = useState(loading);
+  const [collections, setCollections] = useState(null);
+
+  useEffect(() => {
+    const referencesToOtherTables = table.columns.reduce(
+      (collections, column) => {
+        if (column.referencesTable) {
+          collections.push({
+            table: schema.tables.find(
+              (table) => table.name === column.referencesTable
+            ),
+            columnName: column.referencesColumn,
+            value: row[column.name],
+          });
+        }
+        return collections;
+      },
+      []
+    );
+
+    const columnsReferencingThisTable = schema.tables.reduce(
+      (matches, otherTable) => {
+        otherTable.columns.forEach((column) => {
+          if (column.referencesTable === table.name) {
+            matches.push({
+              table: otherTable,
+              columnName: column.name,
+              value: row[column.referencesColumn],
+            });
+          }
+        });
+        return matches;
+      },
+      []
+    );
+
+    Promise.all(
+      [...referencesToOtherTables, ...columnsReferencingThisTable].map(
+        (collection) => {
+          return api
+            .getTableRows(collection.table.name, {
+              perPage: 5,
+              filters: [
+                {
+                  type: "equals",
+                  columnName: collection.columnName,
+                  value: collection.value,
+                },
+              ],
+            })
+            .then((results) => {
+              return {
+                ...collection,
+                results,
+              };
+            });
+        }
+      )
+    )
+      .then((collections) => {
+        setCollections(collections);
+        setStatus(ready);
+      })
+      .catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(error);
+        setStatus(errored);
+      });
+  }, []);
+
+  if (status === loading) {
+    return h(Container, null, h(LoadingSpinner, { height: 16 }));
+  }
+
+  if (status === errored) {
+    return h(Container, null, "Something went wrong.");
+  }
+
+  if (!collections.length) {
+    return h(Container, null, "No relations to other tables.");
+  }
+
+  return h(
+    Fragment,
+    null,
+    collections.map((collection, index) => {
+      const columns = collection.table.columns.filter(
+        (column) => !column.secret
+      );
+      return h(
+        Fragment,
+        null,
+        h(
+          HeadingBlock,
+          { level: 2 },
+          `Related rows in ${niceifyName(collection.table.name)}`
+        ),
+        h(
+          Container,
+          { key: index },
+          h(Table, {
+            tiny: true,
+            blankSlateContent: "No rows.",
+            columnTitles: columns.map((column) => niceifyName(column.name)),
+            rows: collection.results.rows.map((row) =>
+              columns.map((column) => {
+                const value = row[column.name];
+                if (value === null) {
+                  return h(Code, null, "NULL");
+                }
+                const ColumnTypeComponent = columnTypeComponents[column.type];
+                if (column.name === collection.table.primaryKey) {
+                  return h(
+                    TableLink,
+                    {
+                      style: TableLinkStyles.ROUNDED,
+                      tiny: true,
+                      to: urls.browseTableUrl(collection.table.name, {
+                        filters: [
+                          {
+                            type: "equals",
+                            columnName: column.name,
+                            value: value,
+                          },
+                        ],
+                      }),
+                    },
+                    ColumnTypeComponent.valueAsText(value)
+                  );
+                }
+                return limitText(ColumnTypeComponent.valueAsText(value), 50);
+              })
+            ),
+          })
+        ),
+        h(
+          Container,
+          { verticalSlim: true },
+          h(
+            Button,
+            {
+              to: urls.browseTableUrl(collection.table.name, {
+                filters: [
+                  {
+                    type: "equals",
+                    columnName: collection.columnName,
+                    value: collection.value,
+                  },
+                ],
+              }),
+              style: ButtonStyles.GHOST,
+              slim: true,
+            },
+            `Browse all ${collection.results.totalResults} results`
+          )
+        )
+      );
+    })
+  );
 };
 
 class EditRow extends Component {
@@ -340,7 +522,15 @@ class EditRow extends Component {
                 "Delete row"
               )
           )
-        )
+        ),
+        h(RelatedRows, {
+          api: this.props.api,
+          urls: this.props.urls,
+          schema: this.props.schema,
+          table: this.props.table,
+          columnTypeComponents: this.props.columnTypeComponents,
+          row: this.state.row,
+        })
       )
     );
   }
