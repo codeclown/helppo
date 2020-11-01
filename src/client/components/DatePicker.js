@@ -1,5 +1,5 @@
+import BoringDatepicker from "boring-datepicker/src/react";
 import { createElement as h } from "react";
-import BoringDatepicker from "./BoringDatepicker";
 
 const DatePicker = ({ value, onChange, images }) => {
   return h(

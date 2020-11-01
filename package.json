@@ -28,6 +28,7 @@
     "@babel/runtime": "^7.11.2",
     "@trivago/prettier-plugin-sort-imports": "^1.2.0",
     "babelify": "^10.0.0",
+    "boring-datepicker": "^1.0.0",
     "browserify": "^16.5.0",
     "browserify-plugin-license-notice": "^1.0.0",
     "bundlesize": "^0.18.0",

@@ -67,7 +67,7 @@ Keeping the file up-to-date is automated, via `browserify-plugin-license-notice`
 The previously mentioned browserify plugin also includes a CLI tool to update the file. For when needed:
 
 ```shell
-$ browserify-bundle-license-notice dist/client/client.js > LICENSE-3RD-PARTIES
+$ ./node_modules/.bin/browserify-bundle-license-notice dist/client/client.js > LICENSE-3RD-PARTIES
 ```
 
 As an added measure, in the CI steps the same binary is ran in "CI mode", which means that if the file is out-dated, the build shall fail.
