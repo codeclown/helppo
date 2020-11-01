@@ -256,6 +256,7 @@ export default class MysqlDriver {
           ],
           orderByColumn: null,
           orderByDirection: "asc",
+          wildcardSearch: "",
         }
       );
       return select.rows[0];

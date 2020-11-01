@@ -1,8 +1,16 @@
-import { Component, createElement as h, createRef, Fragment } from "react";
+import { debounce as debounceLib } from "debounce";
+import {
+  createElement as h,
+  useState,
+  Fragment,
+  useRef,
+  useEffect,
+  useCallback,
+} from "react";
 import { Redirect } from "react-router-dom";
 import Button, { ButtonStyles } from "../components/Button";
 import Code from "../components/Code";
-import Container from "../components/Container";
+import Container, { ContainerRight } from "../components/Container";
 import CopyToClipboardButton from "../components/CopyToClipboardButton";
 import Filters from "../components/Filters";
 import HeadingBlock from "../components/HeadingBlock";
@@ -19,85 +27,296 @@ import Select from "../components/Select";
 import Table from "../components/Table";
 import TableCellTools from "../components/TableCellTools";
 import TableLink, { TableLinkStyles } from "../components/TableLink";
+import TextInput from "../components/TextInput";
 import TotalResults from "../components/TotalResults";
 import limitText from "../utils/limitText";
 import naiveCsvStringify from "../utils/naiveCsvStringify";
 import niceifyName from "../utils/niceifyName";
 import range from "../utils/range";
 
-class BrowseTable extends Component {
-  constructor(props) {
-    super();
+export const ColumnTitle = ({
+  presentationOptions,
+  images,
+  urls,
+  table,
+  browseOptions,
+  column,
+}) => {
+  const niceName = niceifyName(column.name);
+  const isPrimaryKey = table.primaryKey === column.name;
 
-    this.state = {
-      rows: null,
-      browseOptions: Object.assign(
+  if (presentationOptions.collapsedColumns.includes(column.name)) {
+    return h(
+      Fragment,
+      null,
+      h(
+        "span",
         {
-          perPage: 20,
-          currentPage: 1,
-          filters: [],
+          title: niceName.length > 2 ? niceName : "",
         },
-        props.browseOptions
+        limitText(niceName, 2)
       ),
-      updatedBrowseOptions: null,
-      presentationOptions: Object.assign(
+      h(TableCellTools, {
+        images,
+        isPrimaryKey,
+        uncollapseColumnUrl: urls.browseTableUrl(table.name, browseOptions, {
+          collapsedColumns: presentationOptions.collapsedColumns.filter(
+            (name) => name !== column.name
+          ),
+        }),
+      })
+    );
+  }
+
+  const { orderByColumn, orderByDirection } = browseOptions;
+  const sorted = orderByColumn === column.name;
+  const sortedAsc = sorted && orderByDirection === "asc";
+  const sortedDesc = sorted && orderByDirection === "desc";
+
+  return h(
+    Fragment,
+    null,
+    h("span", null, niceName),
+    h(TableCellTools, {
+      images,
+      isPrimaryKey,
+      columnComment: column.comment,
+      collapseColumnUrl: urls.browseTableUrl(table.name, browseOptions, {
+        collapsedColumns: [
+          ...presentationOptions.collapsedColumns,
+          column.name,
+        ],
+      }),
+      sortedAsc,
+      sortAscUrl: sortedAsc
+        ? null
+        : urls.browseTableUrl(
+            table.name,
+            {
+              ...browseOptions,
+              orderByColumn: column.name,
+              orderByDirection: "asc",
+            },
+            presentationOptions
+          ),
+      sortedDesc,
+      sortDescUrl: sortedDesc
+        ? null
+        : urls.browseTableUrl(
+            table.name,
+            {
+              ...browseOptions,
+              orderByColumn: column.name,
+              orderByDirection: "desc",
+            },
+            presentationOptions
+          ),
+    })
+  );
+};
+
+const Cell = ({
+  row,
+  column,
+  columnTypeComponents,
+  presentationOptions,
+  filterTypes,
+  urls,
+  table,
+  browseOptions,
+  images,
+  containerRef,
+  api,
+}) => {
+  const value = row[column.name];
+  const ColumnTypeComponent = columnTypeComponents[column.type];
+
+  if (presentationOptions.collapsedColumns.includes(column.name)) {
+    const string = value === null ? "" : ColumnTypeComponent.valueAsText(value);
+    return h(
+      "span",
+      {
+        title: limitText(string, 200),
+      },
+      "…"
+    );
+  }
+
+  const availableFilterTypes = column.secret
+    ? []
+    : filterTypes.filter((filterType) => {
+        return filterType.columnTypes.includes(column.type);
+      });
+
+  const filterUrls = availableFilterTypes.map((filterType) => {
+    return {
+      name: filterType.name,
+      url: urls.browseTableUrl(
+        table.name,
         {
-          collapsedColumns: [],
+          filters: [
+            ...browseOptions.filters,
+            { type: filterType.key, columnName: column.name, value },
+          ],
         },
-        props.presentationOptions
-      ),
-      selectedRows: [],
-      updatedPresentationOptions: null,
-      totalPages: 1,
-      totalResults: null,
-      // TODO now only possible to add "equals" filter... should show a dropdown with all the column-specific options
-      columnTypesForAddAsFilter: props.filterTypes.find(
-        (filterType) => filterType.key === "equals"
-      ).columnTypes,
-    };
-
-    this.containerRef = createRef();
-
-    this.updateBrowseOptions = this.updateBrowseOptions.bind(this);
-    this.getRows = this.getRows.bind(this);
-    this.deleteSelectedRows = this.deleteSelectedRows.bind(this);
-    this.renderColumnTitle = this.renderColumnTitle.bind(this);
-    this.renderValueCell = this.renderValueCell.bind(this);
-    this.renderRelatedTableLinks = this.renderRelatedTableLinks.bind(this);
-    this.renderRow = this.renderRow.bind(this);
-  }
-
-  componentDidMount() {
-    this.getRows();
-  }
-
-  updateBrowseOptions(browseOptions) {
-    this.setState({
-      updatedBrowseOptions: Object.assign(
-        {},
-        this.state.browseOptions,
-        browseOptions
-      ),
-    });
-  }
-
-  updatePresentationOptions(presentationOptions) {
-    this.setState({
-      updatedPresentationOptions: Object.assign(
-        {},
-        this.state.presentationOptions,
         presentationOptions
       ),
-    });
+    };
+  });
+
+  return h(
+    Fragment,
+    null,
+    h(Value, {
+      column,
+      value,
+      table,
+      ColumnTypeComponent,
+      urls,
+      api,
+      containerRef,
+      images,
+    }),
+    h(TableCellTools, {
+      images,
+      filterUrls,
+      dropdownContainer: containerRef.current,
+    })
+  );
+};
+
+const Value = ({
+  column,
+  value,
+  table,
+  ColumnTypeComponent,
+  urls,
+  api,
+  containerRef,
+  images,
+}) => {
+  if (column.secret) {
+    return h("span", { title: "Value is hidden" }, "*****");
   }
 
-  async deleteSelectedRows() {
+  if (value === null) {
+    return h(Code, null, "NULL");
+  }
+
+  if (column.name === table.primaryKey) {
+    return h(
+      TableLink,
+      {
+        style: TableLinkStyles.ROUNDED,
+        to: urls.editRowUrl(table, value),
+      },
+      ColumnTypeComponent.valueAsText(value)
+    );
+  }
+
+  if (column.referencesColumn) {
+    return h(
+      RowPopup,
+      {
+        popupContainer: containerRef.current,
+        getRow: async () => {
+          const { rows } = await api.getTableRows(column.referencesTable, {
+            perPage: 1,
+            currentPage: 1,
+            filters: [
+              {
+                type: "equals",
+                columnName: column.referencesColumn,
+                value,
+              },
+            ],
+          });
+          return rows[0];
+        },
+      },
+      h(
+        TableLink,
+        {
+          to: urls.browseTableUrl(
+            column.referencesTable,
+            {
+              filters: [
+                {
+                  type: "equals",
+                  columnName: column.referencesColumn,
+                  value,
+                },
+              ],
+            },
+            {}
+          ),
+        },
+        ColumnTypeComponent.valueAsText(value)
+      )
+    );
+  }
+
+  return h(ColumnTypeComponent, {
+    editable: false,
+    value,
+    images,
+  });
+};
+
+const RelatedTableLinks = ({ relations, row, urls }) => {
+  if (relations.length === 0) {
+    return "–";
+  }
+  return relations.map((relation) => {
+    const filters = [
+      {
+        type: "equals",
+        columnName: relation.column.name,
+        value: row[relation.column.referencesColumn],
+      },
+    ];
+    return h(
+      TableLink,
+      {
+        key: relation.table.name,
+        to: urls.browseTableUrl(relation.table.name, { filters }),
+      },
+      niceifyName(relation.table.name)
+    );
+  });
+};
+
+const BrowseTable = ({
+  locationKey,
+  api,
+  urls,
+  images,
+  columnTypeComponents,
+  filterTypes,
+  catchApiError,
+  showNotification,
+  rememberDeletedRow,
+  table,
+  relations,
+  browseOptions,
+  presentationOptions,
+  debounce = debounceLib,
+}) => {
+  const containerRef = useRef();
+  const [rows, setRows] = useState(null);
+  const [totalResults, setTotalResults] = useState(null);
+  const [totalPages, setTotalPages] = useState(null);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [redirectTo, setRedirectTo] = useState(null);
+  const [wildcardSearch, setWildcardSearch] = useState(
+    browseOptions.wildcardSearch
+  );
+
+  const deleteSelectedRows = useCallback(async () => {
     // Safe guard limiting only to a subset of visible rows, as it should be,
     // just in case there has been a state mess-up
-    const visibleRowIds = this.state.rows.map(
-      (row) => row[this.props.table.primaryKey]
-    );
-    const rowIdsToDelete = this.state.selectedRows.filter((rowId) =>
+    const visibleRowIds = rows.map((row) => row[table.primaryKey]);
+    const rowIdsToDelete = selectedRows.filter((rowId) =>
       visibleRowIds.includes(rowId)
     );
     if (!rowIdsToDelete.length) {
@@ -106,17 +325,15 @@ class BrowseTable extends Component {
     const successfullyDeleted = [];
     await Promise.all(
       rowIdsToDelete.map(async (rowId) => {
-        const row = this.state.rows.find(
-          (row) => row[this.props.table.primaryKey] === rowId
-        );
+        const row = rows.find((row) => row[table.primaryKey] === rowId);
         try {
-          await this.props.api.deleteRow(this.props.table, rowId);
+          await api.deleteRow(table, rowId);
           successfullyDeleted.push(rowId);
-          this.props.rememberDeletedRow(this.props.table, row);
+          rememberDeletedRow(table, row);
         } catch (error) {
           // eslint-disable-next-line no-console
           console.error(error);
-          this.props.showNotification(`Deleting row ${rowId} failed`, {
+          showNotification(`Deleting row ${rowId} failed`, {
             style: NotificationStyles.DANGER,
             clearAfter: NotificationDelays.SLOW,
           });
@@ -124,7 +341,7 @@ class BrowseTable extends Component {
       })
     );
     if (successfullyDeleted.length) {
-      this.props.showNotification(
+      showNotification(
         `Row${
           successfullyDeleted.length === 1 ? "" : "s"
         } ${successfullyDeleted.join(", ")} ${
@@ -132,498 +349,291 @@ class BrowseTable extends Component {
         } deleted`
       );
     }
-    await this.getRows();
-    const stillVisibleRowIds = this.state.rows.map(
-      (row) => row[this.props.table.primaryKey]
-    );
-    const selectedRowIdsToRemain = this.state.selectedRows.filter((rowId) =>
+    await getRows();
+    const stillVisibleRowIds = rows.map((row) => row[table.primaryKey]);
+    const selectedRowIdsToRemain = selectedRows.filter((rowId) =>
       stillVisibleRowIds.includes(rowId)
     );
-    this.setState(() => ({
-      selectedRows: selectedRowIdsToRemain,
-    }));
-  }
+    setSelectedRows(selectedRowIdsToRemain);
+  }, [rows, table, selectedRows, browseOptions]);
 
-  async getRows() {
-    const {
-      rows,
-      totalPages,
-      totalResults,
-      browseOptions,
-    } = await this.props.catchApiError(
-      this.props.api.getTableRows(
-        this.props.table.name,
-        this.state.browseOptions
-      )
+  const getRows = useCallback(async () => {
+    const { rows, totalPages, totalResults } = await catchApiError(
+      api.getTableRows(table.name, browseOptions)
     );
-    if (browseOptions === this.state.browseOptions) {
-      this.setState({ rows, totalPages, totalResults });
-    }
-  }
+    setTotalPages(totalPages);
+    setTotalResults(totalResults);
+    setRows(rows);
+  }, [table, browseOptions]);
 
-  renderColumnTitle(column) {
-    const niceName = niceifyName(column.name);
-    const isPrimaryKey = this.props.table.primaryKey === column.name;
+  const updateBrowseOptions = useCallback(
+    (updated, push = true) => {
+      const to = urls.browseTableUrl(
+        table.name,
+        Object.assign({}, browseOptions, updated),
+        presentationOptions
+      );
+      setRedirectTo({ to, push });
+    },
+    [table, browseOptions, presentationOptions]
+  );
 
-    if (this.state.presentationOptions.collapsedColumns.includes(column.name)) {
-      return h(
-        Fragment,
+  const debouncedWildcardSearch = useCallback(
+    debounce(
+      (newValue) =>
+        updateBrowseOptions(
+          { wildcardSearch: newValue },
+          browseOptions.wildcardSearch !== ""
+        ),
+      500
+    ),
+    [browseOptions]
+  );
+
+  useEffect(() => {
+    setRedirectTo(null);
+    setWildcardSearch(browseOptions.wildcardSearch);
+    getRows();
+  }, [locationKey, table, browseOptions]);
+
+  const title = niceifyName(table.name);
+
+  return h(
+    "div",
+    { ref: containerRef },
+    redirectTo && h(Redirect, { ...redirectTo }),
+    h(PageTitle, null, title),
+    h(HeadingBlock, { level: 2 }, title),
+    h(
+      Container,
+      { horizontal: true },
+      h(
+        Button,
+        {
+          style: ButtonStyles.SUCCESS,
+          to: urls.editRowUrl(table),
+        },
+        "Create"
+      ),
+      selectedRows.length !== 0 &&
+        h(
+          Fragment,
+          null,
+          h(
+            Button,
+            {
+              style: ButtonStyles.DANGER,
+              onClick: deleteSelectedRows,
+            },
+            `Delete ${selectedRows.length} rows`
+          ),
+          h(
+            CopyToClipboardButton,
+            {
+              style: ButtonStyles.GHOST,
+              onCopy: () => {
+                const column = table.columns.find(
+                  (column) => column.name === table.primaryKey
+                );
+                const ColumnTypeComponent = columnTypeComponents[column.type];
+                return rows
+                  .map((row) => {
+                    const value = row[table.primaryKey];
+                    return value === null
+                      ? ""
+                      : ColumnTypeComponent.valueAsText(value).replace(
+                          /\n/g,
+                          "\\n"
+                        );
+                  })
+                  .join("\n");
+              },
+            },
+            `Copy ${niceifyName(table.primaryKey)} values`
+          ),
+          h(
+            CopyToClipboardButton,
+            {
+              style: ButtonStyles.GHOST,
+              onCopy: () => {
+                return naiveCsvStringify([
+                  table.columns.map((column) => column.name),
+                  ...rows.map((row) =>
+                    table.columns.map((column) => {
+                      const ColumnTypeComponent =
+                        columnTypeComponents[column.type];
+                      const value = row[column.name];
+                      return row[column.name] === null || column.secret
+                        ? ""
+                        : ColumnTypeComponent.valueAsText(value);
+                    })
+                  ),
+                ]);
+              },
+            },
+            `Copy rows (csv)`
+          )
+        ),
+      h(
+        ContainerRight,
         null,
+        h(TextInput, {
+          placeholder: "Search…",
+          size: 24,
+          value: wildcardSearch,
+          onChange: (value) => {
+            setWildcardSearch(value);
+            debouncedWildcardSearch(value);
+          },
+        })
+      )
+    ),
+    h(
+      Container,
+      null,
+      h(
+        Filters,
+        {
+          key: locationKey,
+          filterTypes: filterTypes,
+          filters: browseOptions.filters,
+          columns: table.columns,
+          onChange: (filters) => updateBrowseOptions({ filters }),
+        },
+        "Create"
+      )
+    ),
+    h(Table, {
+      columnTitles: [
+        rows !== null &&
+          h("input", {
+            type: "checkbox",
+            className: "Table__checkbox",
+            disabled: !table.primaryKey,
+            title: table.primaryKey
+              ? "Select all"
+              : "Selecting rows is not possible because this table does not have a Primary Key",
+            checked:
+              selectedRows.length > 0 && selectedRows.length === rows.length,
+            onChange: (event) => {
+              setSelectedRows(
+                event.target.checked
+                  ? rows.map((row) => row[table.primaryKey])
+                  : []
+              );
+            },
+          }),
+        ...table.columns.map((column, index) =>
+          h(ColumnTitle, {
+            key: index,
+            presentationOptions,
+            images,
+            urls,
+            table,
+            browseOptions,
+            column,
+          })
+        ),
+        "Relations",
+      ],
+      rows:
+        rows === null
+          ? []
+          : rows.map((row) => {
+              const primaryKey = table.primaryKey && row[table.primaryKey];
+              return [
+                table.primaryKey &&
+                  h("input", {
+                    type: "checkbox",
+                    className: "Table__checkbox",
+                    checked: selectedRows.includes(primaryKey),
+                    onChange: (event) => {
+                      setSelectedRows(
+                        event.target.checked
+                          ? [...selectedRows, primaryKey]
+                          : selectedRows.filter((item) => item !== primaryKey)
+                      );
+                    },
+                  }),
+                ...table.columns.map((column, index) =>
+                  h(Cell, {
+                    key: index,
+                    row,
+                    column,
+                    columnTypeComponents,
+                    presentationOptions,
+                    filterTypes,
+                    urls,
+                    table,
+                    browseOptions,
+                    images,
+                    containerRef,
+                    api,
+                  })
+                ),
+                h(RelatedTableLinks, { relations, row, urls }),
+              ];
+            }),
+      blankSlateContent:
+        rows === null
+          ? h(LoadingSpinner, { height: 16, dim: true })
+          : "No rows.",
+      columnWidths: [
+        30,
+        ...table.columns.map((column) =>
+          presentationOptions.collapsedColumns.includes(column.name)
+            ? 40
+            : "auto"
+        ),
+        "auto",
+      ],
+    }),
+    h(
+      Container,
+      null,
+      h(
+        LayoutColumns,
+        { justifyEvenly: true, centerVertically: true },
+        h(
+          TotalResults,
+          null,
+          `Total results: ${totalResults !== null ? totalResults : "Unknown"}`
+        ),
+        totalResults > 0 &&
+          h(Pagination, {
+            currentPage: browseOptions.currentPage,
+            totalPages: totalPages,
+            showPreviousNextButtons: true,
+            onChange: (currentPage) => updateBrowseOptions({ currentPage }),
+          }),
         h(
           "span",
-          {
-            title: niceName.length > 2 ? niceName : "",
-          },
-          limitText(niceName, 2)
-        ),
-        h(TableCellTools, {
-          images: this.props.images,
-          isPrimaryKey,
-          uncollapseColumnUrl: this.props.urls.browseTableUrl(
-            this.props.table.name,
-            this.state.browseOptions,
-            {
-              collapsedColumns: this.state.presentationOptions.collapsedColumns.filter(
-                (name) => name !== column.name
-              ),
-            }
-          ),
-        })
-      );
-    }
-
-    const { orderByColumn, orderByDirection } = this.state.browseOptions;
-    const sorted = orderByColumn === column.name;
-    const sortedAsc = sorted && orderByDirection === "asc";
-    const sortedDesc = sorted && orderByDirection === "desc";
-
-    return h(
-      Fragment,
-      null,
-      h("span", null, niceName),
-      h(TableCellTools, {
-        images: this.props.images,
-        isPrimaryKey,
-        columnComment: column.comment,
-        collapseColumnUrl: this.props.urls.browseTableUrl(
-          this.props.table.name,
-          this.state.browseOptions,
-          {
-            collapsedColumns: [
-              ...this.state.presentationOptions.collapsedColumns,
-              column.name,
-            ],
-          }
-        ),
-        sortedAsc,
-        sortAscUrl: sortedAsc
-          ? null
-          : this.props.urls.browseTableUrl(
-              this.props.table.name,
-              {
-                ...this.state.browseOptions,
-                orderByColumn: column.name,
-                orderByDirection: "asc",
-              },
-              this.state.presentationOptions
-            ),
-        sortedDesc,
-        sortDescUrl: sortedDesc
-          ? null
-          : this.props.urls.browseTableUrl(
-              this.props.table.name,
-              {
-                ...this.state.browseOptions,
-                orderByColumn: column.name,
-                orderByDirection: "desc",
-              },
-              this.state.presentationOptions
-            ),
-      })
-    );
-  }
-
-  renderColumnValue(column, value, ColumnTypeComponent) {
-    if (column.secret) {
-      return h("span", { title: "Value is hidden" }, "*****");
-    }
-
-    if (value === null) {
-      return h(Code, null, "NULL");
-    }
-
-    if (column.name === this.props.table.primaryKey) {
-      return h(
-        TableLink,
-        {
-          style: TableLinkStyles.ROUNDED,
-          to: this.props.urls.editRowUrl(this.props.table, value),
-        },
-        ColumnTypeComponent.valueAsText(value)
-      );
-    }
-
-    if (column.referencesColumn) {
-      return h(
-        RowPopup,
-        {
-          popupContainer: this.containerRef.current,
-          getRow: async () => {
-            const { rows } = await this.props.api.getTableRows(
-              column.referencesTable,
-              {
-                perPage: 1,
-                currentPage: 1,
-                filters: [
-                  {
-                    type: "equals",
-                    columnName: column.referencesColumn,
-                    value,
-                  },
-                ],
-              }
-            );
-            return rows[0];
-          },
-        },
-        h(
-          TableLink,
-          {
-            to: this.props.urls.browseTableUrl(
-              column.referencesTable,
-              {
-                filters: [
-                  {
-                    type: "equals",
-                    columnName: column.referencesColumn,
-                    value,
-                  },
-                ],
-              },
-              {}
-            ),
-          },
-          ColumnTypeComponent.valueAsText(value)
-        )
-      );
-    }
-
-    return h(ColumnTypeComponent, {
-      editable: false,
-      value,
-      images: this.props.images,
-    });
-  }
-
-  renderValueCell(row, column) {
-    const value = row[column.name];
-    const ColumnTypeComponent = this.props.columnTypeComponents[column.type];
-
-    if (this.state.presentationOptions.collapsedColumns.includes(column.name)) {
-      const string =
-        value === null ? "" : ColumnTypeComponent.valueAsText(value);
-      return h(
-        "span",
-        {
-          title: limitText(string, 200),
-        },
-        "…"
-      );
-    }
-
-    const availableFilterTypes = column.secret
-      ? []
-      : this.props.filterTypes.filter((filterType) => {
-          return filterType.columnTypes.includes(column.type);
-        });
-
-    const filterUrls = availableFilterTypes.map((filterType) => {
-      return {
-        name: filterType.name,
-        url: this.props.urls.browseTableUrl(
-          this.props.table.name,
-          {
-            filters: [
-              ...this.state.browseOptions.filters,
-              { type: filterType.key, columnName: column.name, value },
-            ],
-          },
-          this.state.presentationOptions
-        ),
-      };
-    });
-
-    return h(
-      Fragment,
-      null,
-      this.renderColumnValue(column, value, ColumnTypeComponent),
-      h(TableCellTools, {
-        images: this.props.images,
-        filterUrls,
-        dropdownContainer: this.containerRef.current,
-      })
-    );
-  }
-
-  renderRelatedTableLinks(row) {
-    if (this.props.relations.length === 0) {
-      return "–";
-    }
-    return this.props.relations.map((relation) => {
-      const filters = [
-        {
-          type: "equals",
-          columnName: relation.column.name,
-          value: row[relation.column.referencesColumn],
-        },
-      ];
-      return h(
-        TableLink,
-        {
-          key: relation.table.name,
-          to: this.props.urls.browseTableUrl(relation.table.name, { filters }),
-        },
-        niceifyName(relation.table.name)
-      );
-    });
-  }
-
-  renderRow(row) {
-    const primaryKey =
-      this.props.table.primaryKey && row[this.props.table.primaryKey];
-    return [
-      this.props.table.primaryKey &&
-        h("input", {
-          type: "checkbox",
-          className: "Table__checkbox",
-          checked: this.state.selectedRows.includes(primaryKey),
-          onChange: (event) => {
-            this.setState({
-              selectedRows: event.target.checked
-                ? [...this.state.selectedRows, primaryKey]
-                : this.state.selectedRows.filter((item) => item !== primaryKey),
-            });
-          },
-        }),
-      ...this.props.table.columns.map((column) =>
-        this.renderValueCell(row, column)
-      ),
-      this.renderRelatedTableLinks(row),
-    ];
-  }
-
-  render() {
-    if (this.state.updatedBrowseOptions) {
-      return h(Redirect, {
-        to: this.props.urls.browseTableUrl(
-          this.props.table.name,
-          this.state.updatedBrowseOptions,
-          this.state.presentationOptions
-        ),
-      });
-    }
-
-    if (this.state.updatedPresentationOptions) {
-      return h(Redirect, {
-        to: this.props.urls.browseTableUrl(
-          this.props.table.name,
-          this.state.browseOptions,
-          this.state.updatedPresentationOptions
-        ),
-      });
-    }
-
-    const title = niceifyName(this.props.table.name);
-
-    return h(
-      "div",
-      { ref: this.containerRef },
-      h(PageTitle, null, title),
-      h(HeadingBlock, { level: 2 }, title),
-      h(
-        Container,
-        null,
-        h(
-          Button,
-          {
-            style: ButtonStyles.SUCCESS,
-            to: this.props.urls.editRowUrl(this.props.table),
-          },
-          "Create"
-        ),
-        this.state.selectedRows.length !== 0 &&
-          h(
-            Fragment,
-            null,
-            h(
-              Button,
-              {
-                style: ButtonStyles.DANGER,
-                onClick: this.deleteSelectedRows,
-              },
-              `Delete ${this.state.selectedRows.length} rows`
-            ),
-            h(
-              CopyToClipboardButton,
-              {
-                style: ButtonStyles.GHOST,
-                onCopy: () => {
-                  const column = this.props.table.columns.find(
-                    (column) => column.name === this.props.table.primaryKey
-                  );
-                  const ColumnTypeComponent = this.props.columnTypeComponents[
-                    column.type
-                  ];
-                  return this.state.rows
-                    .map((row) => {
-                      const value = row[this.props.table.primaryKey];
-                      return value === null
-                        ? ""
-                        : ColumnTypeComponent.valueAsText(value).replace(
-                            /\n/g,
-                            "\\n"
-                          );
-                    })
-                    .join("\n");
-                },
-              },
-              `Copy ${niceifyName(this.props.table.primaryKey)} values`
-            ),
-            h(
-              CopyToClipboardButton,
-              {
-                style: ButtonStyles.GHOST,
-                onCopy: () => {
-                  return naiveCsvStringify([
-                    this.props.table.columns.map((column) => column.name),
-                    ...this.state.rows.map((row) =>
-                      this.props.table.columns.map((column) => {
-                        const ColumnTypeComponent = this.props
-                          .columnTypeComponents[column.type];
-                        const value = row[column.name];
-                        return row[column.name] === null || column.secret
-                          ? ""
-                          : ColumnTypeComponent.valueAsText(value);
-                      })
-                    ),
-                  ]);
-                },
-              },
-              `Copy rows (csv)`
-            )
-          )
-      ),
-      h(
-        Container,
-        null,
-        h(
-          Filters,
-          {
-            filterTypes: this.props.filterTypes,
-            filters: this.state.browseOptions.filters,
-            columns: this.props.table.columns,
-            onChange: (filters) => this.updateBrowseOptions({ filters }),
-          },
-          "Create"
-        )
-      ),
-      h(Table, {
-        columnTitles: [
-          this.state.rows !== null &&
-            h("input", {
-              type: "checkbox",
-              className: "Table__checkbox",
-              disabled: !this.props.table.primaryKey,
-              title: this.props.table.primaryKey
-                ? "Select all"
-                : "Selecting rows is not possible because this table does not have a Primary Key",
-              checked:
-                this.state.selectedRows.length > 0 &&
-                this.state.selectedRows.length === this.state.rows.length,
-              onChange: (event) => {
-                this.setState({
-                  selectedRows: event.target.checked
-                    ? this.state.rows.map(
-                        (row) => row[this.props.table.primaryKey]
-                      )
-                    : [],
-                });
-              },
-            }),
-          ...this.props.table.columns.map(this.renderColumnTitle),
-          "Relations",
-        ],
-        rows:
-          this.state.rows === null ? [] : this.state.rows.map(this.renderRow),
-        blankSlateContent:
-          this.state.rows === null
-            ? h(LoadingSpinner, { height: 16, dim: true })
-            : "No rows.",
-        columnWidths: [
-          30,
-          ...this.props.table.columns.map((column) =>
-            this.state.presentationOptions.collapsedColumns.includes(
-              column.name
-            )
-              ? 40
-              : "auto"
-          ),
-          "auto",
-        ],
-      }),
-      h(
-        Container,
-        null,
-        h(
-          LayoutColumns,
-          { justifyEvenly: true, centerVertically: true },
-          h(
-            TotalResults,
-            null,
-            `Total results: ${
-              this.state.totalResults !== null
-                ? this.state.totalResults
-                : "Unknown"
-            }`
-          ),
-          this.state.totalResults > 0 &&
-            h(Pagination, {
-              currentPage: this.state.browseOptions.currentPage,
-              totalPages: this.state.totalPages,
-              showPreviousNextButtons: true,
-              onChange: (currentPage) =>
-                this.updateBrowseOptions({ currentPage }),
-            }),
-          h(
-            "span",
-            null,
-            this.state.totalPages > 5 &&
-              h(Select, {
-                slim: true,
-                options: range(1, this.state.totalPages).map((value) => ({
-                  value,
-                  text: `Jump to page: ${value}`,
-                })),
-                value: this.state.browseOptions.currentPage,
-                onChange: (currentPage) =>
-                  this.updateBrowseOptions({ currentPage }),
-              }),
-            " ",
+          null,
+          totalPages > 5 &&
             h(Select, {
               slim: true,
-              options: [20, 100, 500, 2000].map((value) => ({
+              options: range(1, totalPages).map((value) => ({
                 value,
-                text: `Per page: ${value}`,
+                text: `Jump to page: ${value}`,
               })),
-              value: this.state.browseOptions.perPage,
-              onChange: (perPage) =>
-                this.updateBrowseOptions({ perPage, currentPage: 1 }),
-            })
-          )
+              value: browseOptions.currentPage,
+              onChange: (currentPage) => updateBrowseOptions({ currentPage }),
+            }),
+          " ",
+          h(Select, {
+            slim: true,
+            options: [20, 100, 500, 2000].map((value) => ({
+              value,
+              text: `Per page: ${value}`,
+            })),
+            value: browseOptions.perPage,
+            onChange: (perPage) =>
+              updateBrowseOptions({ perPage, currentPage: 1 }),
+          })
         )
       )
-    );
-  }
-}
+    )
+  );
+};
 
 export default BrowseTable;

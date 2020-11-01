@@ -279,6 +279,7 @@ export default class PgDriver {
           ],
           orderByColumn: null,
           orderByDirection: "asc",
+          wildcardSearch: "",
         }
       );
       return select.rows[0];

@@ -229,14 +229,27 @@ class App extends Component {
     } catch (exception) {
       // ...
     }
+    browseOptions = Object.assign(
+      {
+        perPage: 20,
+        currentPage: 1,
+        filters: [],
+        wildcardSearch: "",
+      },
+      browseOptions
+    );
     let presentationOptions = {};
     try {
       presentationOptions = JSON.parse(searchParams.get("presentationOptions"));
     } catch (exception) {
       // ...
     }
+    presentationOptions = Object.assign(
+      { collapsedColumns: [] },
+      presentationOptions
+    );
     return h(BrowseTable, {
-      key: routeProps.location.key,
+      locationKey: routeProps.location.key,
       api: this.props.api,
       urls: this.props.urls,
       images: this.props.images,

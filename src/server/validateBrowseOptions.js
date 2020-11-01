@@ -5,6 +5,7 @@ const validateBrowseOptions = (columnNames, filterTypes, browseOptions) => {
     filters,
     orderByColumn,
     orderByDirection,
+    wildcardSearch,
   } = browseOptions;
   if (!Number.isInteger(perPage)) {
     throw new Error("Expected browseOptions.perPage to be an integer");
@@ -42,6 +43,9 @@ const validateBrowseOptions = (columnNames, filterTypes, browseOptions) => {
     throw new Error(
       "Expected browseOptions.orderByDirection to be 'asc' or 'desc'"
     );
+  }
+  if (typeof wildcardSearch !== "string") {
+    throw new Error("Expected browseOptions.wildcardSearch to be a string");
   }
 };
 

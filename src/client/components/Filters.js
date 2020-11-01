@@ -124,7 +124,13 @@ class Filters extends Component {
   render() {
     return h(
       "form",
-      { className: "Filters", onSubmit: this.onChange },
+      {
+        className: "Filters",
+        onSubmit: (event) => {
+          event.preventDefault();
+          this.onChange();
+        },
+      },
       h(
         "div",
         { className: "toolbar" },
@@ -153,7 +159,10 @@ class Filters extends Component {
             className: "toolbar-button toolbar-button--right",
             title:
               "Link to this page, including currently active filters, presentation options such as collapsed columns, and current page number",
-            href: window.location.toString(),
+            href:
+              typeof window !== "undefined"
+                ? window.location.toString()
+                : "[window.location.toString()]",
           },
           "Link to this page"
         )

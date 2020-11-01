@@ -59,6 +59,15 @@ const testSchema = {
   ],
 };
 
+const baseBrowseOptions = {
+  perPage: 10,
+  currentPage: 1,
+  filters: [],
+  orderByColumn: null,
+  orderByDirection: "asc",
+  wildcardSearch: "",
+};
+
 // Runtime-check to ensure that the table names contain uppercase characters.
 // This is to ensure that the following tests also test case-sensitiveness of database engines.
 const uppercaseRegex = /[A-Z]/;
@@ -308,13 +317,7 @@ export function driverSpec(refObject, { rawSqlQueries }) {
         teamsTable.name,
         teamsTable.columns.map((column) => column.name),
         [],
-        {
-          perPage: 10,
-          currentPage: 1,
-          filters: [],
-          orderByColumn: null,
-          orderByDirection: "asc",
-        }
+        baseBrowseOptions
       );
       expect(result).to.deep.equal({
         rows: [],
@@ -329,13 +332,7 @@ export function driverSpec(refObject, { rawSqlQueries }) {
         teamsTable.name,
         teamsTable.columns.map((column) => column.name),
         [],
-        {
-          perPage: 10,
-          currentPage: 1,
-          filters: [],
-          orderByColumn: null,
-          orderByDirection: "asc",
-        }
+        baseBrowseOptions
       );
       expect(result).to.deep.equal({
         rows: testRows["Teams"],
@@ -350,13 +347,7 @@ export function driverSpec(refObject, { rawSqlQueries }) {
         teamsTable.name,
         ["Id"],
         [],
-        {
-          perPage: 10,
-          currentPage: 1,
-          filters: [],
-          orderByColumn: null,
-          orderByDirection: "asc",
-        }
+        baseBrowseOptions
       );
       expect(result).to.deep.equal({
         rows: testRows["Teams"].map((row) => {
@@ -379,11 +370,8 @@ export function driverSpec(refObject, { rawSqlQueries }) {
               teamsTable.columns.map((column) => column.name),
               [],
               {
+                ...baseBrowseOptions,
                 perPage: invalidValue,
-                currentPage: 1,
-                filters: [],
-                orderByColumn: null,
-                orderByDirection: "asc",
               }
             )
           ).to.be.rejectedWith(
@@ -401,11 +389,8 @@ export function driverSpec(refObject, { rawSqlQueries }) {
             teamsTable.columns.map((column) => column.name),
             [],
             {
+              ...baseBrowseOptions,
               perPage,
-              currentPage: 1,
-              filters: [],
-              orderByColumn: null,
-              orderByDirection: "asc",
             }
           );
         };
@@ -457,11 +442,8 @@ export function driverSpec(refObject, { rawSqlQueries }) {
               teamsTable.columns.map((column) => column.name),
               builtInFilterTypes.map((filterType) => filterType.key),
               {
-                perPage: 10,
-                currentPage: 1,
+                ...baseBrowseOptions,
                 filters: invalidValue,
-                orderByColumn: null,
-                orderByDirection: "asc",
               }
             )
           ).to.be.rejectedWith(
@@ -477,11 +459,8 @@ export function driverSpec(refObject, { rawSqlQueries }) {
               teamsTable.columns.map((column) => column.name),
               builtInFilterTypes.map((filterType) => filterType.key),
               {
-                perPage: 10,
-                currentPage: 1,
+                ...baseBrowseOptions,
                 filters: [{ type: invalidType, columnName: "Id", value: 1 }],
-                orderByColumn: null,
-                orderByDirection: "asc",
               }
             )
           ).to.be.rejectedWith(
@@ -495,13 +474,10 @@ export function driverSpec(refObject, { rawSqlQueries }) {
             teamsTable.columns.map((column) => column.name),
             builtInFilterTypes.map((filterType) => filterType.key),
             {
-              perPage: 10,
-              currentPage: 1,
+              ...baseBrowseOptions,
               filters: [
                 { type: "equals", columnName: "not_exist_123", value: 1 },
               ],
-              orderByColumn: null,
-              orderByDirection: "asc",
             }
           )
         ).to.be.rejectedWith(
@@ -516,8 +492,7 @@ export function driverSpec(refObject, { rawSqlQueries }) {
             table.columns.map((column) => column.name),
             builtInFilterTypes.map((filterType) => filterType.key),
             {
-              perPage: 10,
-              currentPage: 1,
+              ...baseBrowseOptions,
               filters: [
                 {
                   type,
@@ -525,8 +500,6 @@ export function driverSpec(refObject, { rawSqlQueries }) {
                   value,
                 },
               ],
-              orderByColumn: null,
-              orderByDirection: "asc",
             }
           )
         ).rows.map((row) => row[columnName]);
@@ -577,6 +550,48 @@ export function driverSpec(refObject, { rawSqlQueries }) {
       });
     });
 
+    describe("browseOptions.wildcardSearch", () => {
+      it("is validated", async () => {
+        const invalidValues = [null, undefined, 0.3, false, true, {}, []];
+        for (let invalidValue of invalidValues) {
+          await expect(
+            refObject.driver.getTableRows(
+              teamsTable.name,
+              teamsTable.columns.map((column) => column.name),
+              [],
+              {
+                ...baseBrowseOptions,
+                wildcardSearch: invalidValue,
+              }
+            )
+          ).to.be.rejectedWith(
+            "Expected browseOptions.wildcardSearch to be a string"
+          );
+        }
+      });
+
+      // TODO
+      // const searchRows = async (table, wildcardSearch, returnColumnName) => {
+      //   return (
+      //     await refObject.driver.getTableRows(
+      //       table.name,
+      //       table.columns.map((column) => column.name),
+      //       builtInFilterTypes.map((filterType) => filterType.key),
+      //       {
+      //         ...baseBrowseOptions,
+      //         wildcardSearch,
+      //       }
+      //     )
+      //   ).rows.map((row) => row[returnColumnName]);
+      // };
+      // it("searches text-based columns", async () => {
+      //   await insertTestRows(testRows);
+      //   expect(await searchRows(teamsTable, "rtti", "Name")).to.deep.equal([
+      //     "Mar",
+      //   ]);
+      // });
+    });
+
     describe("browseOptions.orderByColumn and browseOptions.orderByDirection", () => {
       it("orderByColumn is validated", async () => {
         const invalidValues = [undefined, 0.3, "", false, true, {}, ["asd"]];
@@ -587,11 +602,8 @@ export function driverSpec(refObject, { rawSqlQueries }) {
               teamsTable.columns.map((column) => column.name),
               [],
               {
-                perPage: 10,
-                currentPage: 1,
-                filters: [],
+                ...baseBrowseOptions,
                 orderByColumn: invalidValue,
-                orderByDirection: "asc",
               }
             )
           ).to.be.rejectedWith(
@@ -620,10 +632,7 @@ export function driverSpec(refObject, { rawSqlQueries }) {
               teamsTable.columns.map((column) => column.name),
               [],
               {
-                perPage: 10,
-                currentPage: 1,
-                filters: [],
-                orderByColumn: null,
+                ...baseBrowseOptions,
                 orderByDirection: invalidValue,
               }
             )
@@ -642,9 +651,7 @@ export function driverSpec(refObject, { rawSqlQueries }) {
               usersTable.columns.map((column) => column.name),
               [],
               {
-                perPage: 10,
-                currentPage: 1,
-                filters: [],
+                ...baseBrowseOptions,
                 orderByColumn: "TeamId",
                 orderByDirection,
               }
@@ -744,8 +751,7 @@ export function driverSpec(refObject, { rawSqlQueries }) {
         ["Id", "Name"],
         [],
         {
-          perPage: 10,
-          currentPage: 1,
+          ...baseBrowseOptions,
           filters: [
             {
               type: "equals",
@@ -753,8 +759,6 @@ export function driverSpec(refObject, { rawSqlQueries }) {
               value: testRows["Teams"][0].Id,
             },
           ],
-          orderByColumn: null,
-          orderByDirection: "asc",
         }
       );
       expect(fullRows.rows[0]).to.deep.equal(
@@ -800,13 +804,7 @@ export function driverSpec(refObject, { rawSqlQueries }) {
         usersTable.name,
         usersTable.columns.map((column) => column.name),
         [],
-        {
-          perPage: 10,
-          currentPage: 1,
-          filters: [],
-          orderByColumn: null,
-          orderByDirection: "asc",
-        }
+        baseBrowseOptions
       );
 
       const exampleRow = testRows["Users"][0];
@@ -817,13 +815,7 @@ export function driverSpec(refObject, { rawSqlQueries }) {
         usersTable.name,
         usersTable.columns.map((column) => column.name),
         [],
-        {
-          perPage: 10,
-          currentPage: 1,
-          filters: [],
-          orderByColumn: null,
-          orderByDirection: "asc",
-        }
+        baseBrowseOptions
       );
 
       expect(rowsAfter.totalResults).to.be.above(0);
