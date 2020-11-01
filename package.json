@@ -67,6 +67,8 @@
     "supertest": "^4.0.2",
     "svgo": "^1.3.2",
     "terser": "^4.6.7",
+    "ts-mocha": "^8.0.0",
+    "typescript": "^4.0.5",
     "watchify": "^3.11.1",
     "yea": "^1.3.0"
   },
@@ -86,7 +88,7 @@
     "lint:js": "eslint . --ignore-pattern '!.eslintrc.js' --max-warnings 0",
     "lint:css": "stylelint --config .stylelintrc.js 'src/**/*.css'",
     "lint": "yarn lint:css && prettier --check . && yarn lint:js",
-    "test": "mocha --require @babel/register --require .setupTests.js",
+    "test": "ts-mocha --require @babel/register --require .setupTests.js",
     "test:update": "SNAPSHOT_UPDATE=1 yarn test",
     "test:docs": "hohhoijaa --check docs/*.md || { echo 'Run `yarn build:docs` to update markdown files'; exit 1; }",
     "test:third-party-license-notice": "browserify-bundle-license-notice dist/client/client.js --check LICENSE-3RD-PARTIES",
