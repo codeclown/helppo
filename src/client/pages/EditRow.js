@@ -133,7 +133,7 @@ const RelatedRows = ({
       );
       return h(
         Fragment,
-        null,
+        { key: index },
         h(
           HeadingBlock,
           { level: 2 },
@@ -141,7 +141,7 @@ const RelatedRows = ({
         ),
         h(
           Container,
-          { key: index },
+          null,
           h(Table, {
             tiny: true,
             blankSlateContent: "No rows.",
