@@ -10,6 +10,12 @@ Changes to be released in an upcoming release:
 
 -
 
+## 0.3.1 - 2020-11-01
+
+### Fixed
+
+- Fix an React key error being logged to the console
+
 ## 0.3.0 - 2020-10-29
 
 ### Added
