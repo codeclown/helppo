@@ -1,7 +1,18 @@
+import {
+  QueryObject,
+  BrowseFilter,
+  BrowseFilterType,
+  BrowseOptions,
+  QueryParam,
+  QueryFormatter,
+  HelppoTable,
+  RowObject,
+} from "../types";
+
 function addFilter(
   query: QueryObject,
   filter: BrowseFilter,
-  formatter: ParamFormatter
+  formatter: QueryFormatter
 ): QueryObject {
   let value = filter.value;
   if (filter.type === "contains" || filter.type === "notContains") {
@@ -32,7 +43,7 @@ function applyFilters(
   query: QueryObject,
   columnNames: string[],
   browseOptions: BrowseOptions,
-  formatter: ParamFormatter
+  formatter: QueryFormatter
 ) {
   if (browseOptions.filters.length || browseOptions.wildcardSearch !== "") {
     query = formatter(query, ["WHERE "]);
@@ -74,7 +85,7 @@ export function selectRows(
   tableName: string,
   columnNames: string[],
   browseOptions: BrowseOptions,
-  formatter: ParamFormatter
+  formatter: QueryFormatter
 ): QueryObject {
   let query = {
     sql: "",
@@ -83,7 +94,7 @@ export function selectRows(
 
   query = formatter(query, [
     "SELECT ",
-    { param: columnNames },
+    { identifier: columnNames },
     " FROM ",
     { identifier: tableName },
     " ",
@@ -114,7 +125,7 @@ export function countRows(
   tableName: string,
   columnNames: string[],
   browseOptions: BrowseOptions,
-  formatter: ParamFormatter
+  formatter: QueryFormatter
 ): QueryObject {
   let query = {
     sql: "",
@@ -140,7 +151,7 @@ export function updateRow(
   primaryKeyValue: QueryParam,
   columnNames: string[],
   columnValues: QueryParam[],
-  formatter: ParamFormatter
+  formatter: QueryFormatter
 ): QueryObject {
   let query = {
     sql: "",
@@ -177,7 +188,7 @@ export function insertRow(
   columnNames: string[],
   columnValues: QueryParam[],
   primaryKey: string | null,
-  formatter: ParamFormatter
+  formatter: QueryFormatter
 ): QueryObject {
   let query = {
     sql: "",
@@ -205,7 +216,9 @@ export function insertRow(
   query = formatter(query, [" ) "]);
 
   if (primaryKey !== null) {
-    query = formatter(query, ["RETURNING ", { identifier: primaryKey }, " "]);
+    query = formatter(query, ["RETURNING ", { identifier: primaryKey }, " "], {
+      isReturningClause: true,
+    });
   }
 
   return query;
@@ -215,7 +228,7 @@ export function deleteRow(
   tableName: string,
   primaryKey: string,
   primaryKeyValue: NonNullable<QueryParam>,
-  formatter: ParamFormatter
+  formatter: QueryFormatter
 ): QueryObject {
   let query = {
     sql: "",
@@ -235,64 +248,151 @@ export function deleteRow(
   return query;
 }
 
-// SQL identifiers and key words must begin with a letter (a-z, but also
-// letters with diacritical marks and non-Latin letters) or an underscore
-// (_). Subsequent characters in an identifier or key word can be letters,
-// underscores, digits (0-9), or dollar signs ($).
-// Source: https://www.postgresql.org/docs/9.2/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-function validPostgresIdentifier(string) {
-  if (!string.match(/^[A-Za-z0-9_][A-Za-z0-9_$]*$/)) {
-    throw new Error(
-      `String ${JSON.stringify(string)} is not a valid SQL identifier`
-    );
-  }
-  return `"${string}"`;
-}
-export const pgQueryFormatter: ParamFormatter = (originalQuery, segments) => {
-  return segments.reduce((query, segment) => {
-    if (typeof segment === "string") {
-      return {
-        sql: query.sql + segment,
-        params: [...query.params],
-      };
-    }
-    if (typeof segment.param !== "undefined") {
-      return {
-        sql: query.sql + `$${query.params.length + 1}`,
-        params: [...query.params, segment.param],
-      };
-    }
-    if (typeof segment.identifier !== "undefined") {
-      return {
-        sql: query.sql + validPostgresIdentifier(segment.identifier),
-        params: [...query.params],
-      };
-    }
-  }, originalQuery);
+export type CommonSqlDriverQueryResult = {
+  results: RowObject[];
+  fields: { name: string }[];
+  affectedRowCount?: number;
 };
 
-export const mysqlQueryFormatter: ParamFormatter = (
-  originalQuery,
-  segments
-) => {
-  return segments.reduce((query, segment) => {
-    if (typeof segment === "string") {
-      return {
-        sql: query.sql + segment,
-        params: [...query.params],
-      };
+export abstract class CommonSqlDriver {
+  queryFormatter: QueryFormatter;
+
+  constructor(formatter: QueryFormatter) {
+    this.queryFormatter = formatter;
+  }
+
+  abstract query({
+    sql,
+    params,
+  }: QueryObject): Promise<CommonSqlDriverQueryResult>;
+
+  async getRows(
+    table: HelppoTable,
+    browseOptions: BrowseOptions
+  ): Promise<{
+    rows: RowObject[];
+    totalPages: number;
+    totalResults: number;
+  }> {
+    const [rowsQuery, countQuery] = await Promise.all([
+      this.query(
+        selectRows(
+          table.name,
+          table.columns.map((column) => column.name),
+          browseOptions,
+          this.queryFormatter
+        )
+      ),
+      this.query(
+        countRows(
+          table.name,
+          table.columns.map((column) => column.name),
+          browseOptions,
+          this.queryFormatter
+        )
+      ),
+    ]);
+    const rows: RowObject[] = rowsQuery.results.map((result) => {
+      const obj = {};
+      rowsQuery.fields.forEach((field) => {
+        obj[field.name] = result[field.name];
+      });
+      return obj;
+    });
+    const totalResults =
+      typeof countQuery.results[0].amount === "string"
+        ? parseInt(countQuery.results[0].amount)
+        : (countQuery.results[0].amount as number);
+    const totalPages =
+      browseOptions.perPage === 0
+        ? 0
+        : Math.ceil(totalResults / browseOptions.perPage);
+    return { rows, totalResults, totalPages };
+  }
+
+  abstract getAffectedRowsAmount(queryResult: unknown): number;
+
+  abstract getLastInsertedId(queryResult: unknown, table: HelppoTable): string;
+
+  abstract resolveInsertException(error: Error): void;
+
+  async saveRow(
+    table: HelppoTable,
+    rowId: string,
+    row: RowObject
+  ): Promise<RowObject> {
+    try {
+      const columnNames = table.columns
+        .map((column) => column.name)
+        .filter((columnName) => Object.keys(row).includes(columnName));
+      if (rowId) {
+        await this.query(
+          updateRow(
+            table.name,
+            table.primaryKey,
+            rowId,
+            columnNames,
+            columnNames.map((columnName) => row[columnName]),
+            this.queryFormatter
+          )
+        );
+      } else {
+        const insert = await this.query(
+          insertRow(
+            table.name,
+            columnNames,
+            columnNames.map((columnName) => row[columnName]),
+            table.primaryKey,
+            this.queryFormatter
+          )
+        );
+        rowId = this.getLastInsertedId(insert, table);
+      }
+      const rowFromDb = await this.getRows(table, {
+        perPage: 1,
+        currentPage: 1,
+        filters: [
+          {
+            type: "equals",
+            columnName: table.primaryKey,
+            value: rowId,
+          },
+        ],
+        orderByColumn: null,
+        orderByDirection: "asc",
+        wildcardSearch: "",
+      });
+      return rowFromDb.rows[0];
+    } catch (exception) {
+      this.resolveInsertException(exception);
+      throw exception;
     }
-    if (typeof segment.param !== "undefined") {
-      return {
-        sql: query.sql + "?",
-        params: [...query.params, segment.param],
-      };
+  }
+
+  async deleteRow(table: HelppoTable, rowId: string): Promise<void> {
+    if (table.primaryKey) {
+      await this.query(
+        deleteRow(table.name, table.primaryKey, rowId, this.queryFormatter)
+      );
     }
-    if (typeof segment.identifier !== "undefined") {
-      return {
-        sql: query.sql + "??",
-        params: [...query.params, segment.identifier],
-      };
-    }
-  }, originalQuery);
-};
+  }
+
+  async executeRawSqlQuery(
+    sql: string
+  ): Promise<{
+    affectedRowsAmount: number;
+    returnedRowsAmount: number;
+    columnNames: string[];
+    rows: QueryParam[][];
+  }> {
+    const result = await this.query({ sql, params: [] });
+    const rows = Array.isArray(result.results) ? result.results : [];
+    const columnNames = rows.length ? Object.keys(rows[0]) : [];
+    return {
+      affectedRowsAmount: this.getAffectedRowsAmount(result),
+      returnedRowsAmount: rows.length,
+      columnNames,
+      rows: rows.map((row) => columnNames.map((columnName) => row[columnName])),
+    };
+  }
+}

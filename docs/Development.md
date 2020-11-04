@@ -29,7 +29,7 @@ The following paragraphs answer questions you might have when getting started.
 
 **JavaScript** files are contained inside `src/`. They are linted via eslint (run `yarn lint:js`). Only standard ES syntax is allowed. Upon build-time the files are compiled via babel into `build/` to ensure compatibility with `require`.
 
-**Tests** are contained inside `src/` adjacent to the source files (e.g. `App.js` and `App.spec.js`). Some tests use **snapshots**, which are stored in `<repository_root>/__snapshots__`.
+**Tests** are contained inside `src/` adjacent to the source files (e.g. `App.js` and `App.spec.js`).
 
 **CSS** files are contained inside `src/` adjacent to the source files (e.g. `Navigation.js` and `Navigation.css`). Upon build-time they are concatenated into one large CSS file. They are also linted (run `yarn lint:css`). There is also `base.css` which defines global styles and CSS variables.
 
@@ -38,6 +38,17 @@ The following paragraphs answer questions you might have when getting started.
 **Dependencies** for the client bundle are listed under `devDependencies`. Only server-side dependencies are needed under `dependencies`.
 
 **Do I need X?** You need _git_ for version control, _yarn_ for running stuff and _Docker_ for running tests. That should be it.
+
+## Code style, linting, etc.
+
+Code style and formatting is automatically ensured via:
+
+- eslint
+- Prettier
+
+It's recommended to take advantage of this automation by installing the appropriate plugins in your editor of choice, if you haven't already.
+
+Optionally, install an IDE plugin (such as https://github.com/frigus02/vscode-sql-tagged-template-literals) to take advantage of `/*sql*/` comments scattered around the driver code.
 
 ## Set up a local development environment
 
@@ -133,12 +144,6 @@ Limit the tests to run via usual mocha grepping:
 
 ```bash
 yarn test -g "full schema"
-```
-
-Many tests rely on snapshots. If you want to update a conflicting snapshot, run:
-
-```bash
-yarn test:update
 ```
 
 ### Lint

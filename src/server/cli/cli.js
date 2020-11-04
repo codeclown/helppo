@@ -94,7 +94,7 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
 
   if (!args.showColors) {
-    for (let key of colors) {
+    for (let key in colors) {
       colors[key] = "";
     }
   }
@@ -127,6 +127,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
     return;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { default: helppo, PgDriver, MysqlDriver } = require(args.dev
     ? "../helppo"
     : "helppo");

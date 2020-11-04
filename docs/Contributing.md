@@ -72,15 +72,6 @@ $ ./node_modules/.bin/browserify-bundle-license-notice dist/client/client.js > L
 
 As an added measure, in the CI steps the same binary is ran in "CI mode", which means that if the file is out-dated, the build shall fail.
 
-### Code style, linting, etc.
-
-Code style and formatting is automatically ensured via:
-
-- eslint
-- Prettier
-
-It's recommended to take advantage of this automation by installing the appropriate plugins in your editor of choice, if you haven't already.
-
 ## Setting up a local development environment
 
 See [`Development.md`](./Development.md).

@@ -1,7 +1,6 @@
 import { expect } from "chai";
+import { mysqlQueryFormatter } from "./MysqlDriver";
 import {
-  mysqlQueryFormatter,
-  pgQueryFormatter,
   selectRows,
   countRows,
   updateRow,
@@ -9,135 +8,9 @@ import {
   deleteRow,
 } from "./commonSql";
 
+// Using mysqlQueryFormatter because it nicely differentiates identifiers and values
+
 describe("commonSql", () => {
-  describe("mysqlQueryFormatter", () => {
-    it("formats params and identifiers", () => {
-      expect(
-        mysqlQueryFormatter({ sql: "", params: [] }, [
-          "SELECT ",
-          { param: ["Id", "Name"] },
-          " FROM ",
-          { identifier: "FooBar" },
-          " ",
-        ])
-      ).to.deep.equal({
-        sql: "SELECT ? FROM ?? ",
-        params: [["Id", "Name"], "FooBar"],
-      });
-    });
-
-    it("passes through wildcard params", () => {
-      expect(
-        mysqlQueryFormatter({ sql: "", params: [] }, [
-          "WHERE ",
-          { identifier: "FooBar" },
-          " LIKE ",
-          { param: "%Test%" },
-          " ",
-        ])
-      ).to.deep.equal({
-        sql: "WHERE ?? LIKE ? ",
-        params: ["FooBar", "%Test%"],
-      });
-    });
-
-    it("extends previous query", () => {
-      expect(
-        mysqlQueryFormatter(
-          {
-            sql: "SELECT ? FROM ?? ",
-            params: [["Id", "Name"], "FooBar"],
-          },
-          ["WHERE ", { identifier: "Id" }, " = ", { param: "foobar" }, " "]
-        )
-      ).to.deep.equal({
-        sql: "SELECT ? FROM ?? WHERE ?? = ? ",
-        params: [["Id", "Name"], "FooBar", "Id", "foobar"],
-      });
-    });
-  });
-
-  describe("pgQueryFormatter", () => {
-    it("formats params and identifiers", () => {
-      expect(
-        pgQueryFormatter(
-          {
-            sql: "",
-            params: [],
-          },
-          [
-            "SELECT ",
-            { param: ["Id", "Name"] },
-            " FROM ",
-            { identifier: "FooBar" },
-            " ",
-          ]
-        )
-      ).to.deep.equal({
-        sql: 'SELECT $1 FROM "FooBar" ',
-        params: [["Id", "Name"]],
-      });
-    });
-
-    it("passes through wildcard params", () => {
-      expect(
-        pgQueryFormatter({ sql: "", params: [] }, [
-          "WHERE ",
-          { identifier: "FooBar" },
-          " LIKE ",
-          { param: "%Test%" },
-          " ",
-        ])
-      ).to.deep.equal({
-        sql: 'WHERE "FooBar" LIKE $1 ',
-        params: ["%Test%"],
-      });
-    });
-
-    it("extends previous query", () => {
-      expect(
-        pgQueryFormatter(
-          {
-            sql: 'SELECT $1 FROM "FooBar" ',
-            params: [["Id", "Name"]],
-          },
-          ["WHERE ", { identifier: "Id" }, " = ", { param: "foobar" }, " "]
-        )
-      ).to.deep.equal({
-        sql: 'SELECT $1 FROM "FooBar" WHERE "Id" = $2 ',
-        params: [["Id", "Name"], "foobar"],
-      });
-    });
-
-    it("escapes identifiers", () => {
-      const format = (identifier: string): string =>
-        pgQueryFormatter(
-          {
-            sql: "",
-            params: [],
-          },
-          [{ identifier }]
-        ).sql;
-      expect(format("Id")).to.equal('"Id"');
-      expect(format("RandomName")).to.equal('"RandomName"');
-    });
-
-    it("throws on invalid identifiers", () => {
-      const format = (identifier: string): string =>
-        pgQueryFormatter(
-          {
-            sql: "",
-            params: [],
-          },
-          [{ identifier }]
-        ).sql;
-      expect(() => format("Fo o")).to.throw(/is not a valid SQL identifier/);
-      expect(() => format("Foo'")).to.throw(/is not a valid SQL identifier/);
-      expect(() => format('Foo"')).to.throw(/is not a valid SQL identifier/);
-      expect(() => format("Foo--")).to.throw(/is not a valid SQL identifier/);
-    });
-  });
-
   describe("selectRows", () => {
     it("returns SELECT query", () => {
       expect(
@@ -156,7 +29,7 @@ describe("commonSql", () => {
         )
       ).to.deep.equal({
         params: [["Id", "Name"], "FooBar", 10, 0],
-        sql: "SELECT ? FROM ?? LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? LIMIT ? OFFSET ? ",
       });
     });
 
@@ -178,7 +51,7 @@ describe("commonSql", () => {
       ).to.deep.equal(
         {
           params: [["Id", "Name"], "FooBar", "Name", 10, 0],
-          sql: "SELECT ? FROM ?? ORDER BY ?? ASC LIMIT ? OFFSET ? ",
+          sql: "SELECT ?? FROM ?? ORDER BY ?? ASC LIMIT ? OFFSET ? ",
         },
         "asc"
       );
@@ -200,7 +73,7 @@ describe("commonSql", () => {
       ).to.deep.equal(
         {
           params: [["Id", "Name"], "FooBar", "Name", 10, 0],
-          sql: "SELECT ? FROM ?? ORDER BY ?? DESC LIMIT ? OFFSET ? ",
+          sql: "SELECT ?? FROM ?? ORDER BY ?? DESC LIMIT ? OFFSET ? ",
         },
         "desc"
       );
@@ -223,7 +96,7 @@ describe("commonSql", () => {
         )
       ).to.deep.equal({
         params: [["Id", "Name"], "FooBar", 42, 168],
-        sql: "SELECT ? FROM ?? LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? LIMIT ? OFFSET ? ",
       });
     });
 
@@ -244,7 +117,7 @@ describe("commonSql", () => {
         )
       ).to.deep.equal({
         params: [["Id", "Name"], "FooBar", "Name", "foo_bar", 10, 0],
-        sql: "SELECT ? FROM ?? WHERE ?? = ? LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? WHERE ?? = ? LIMIT ? OFFSET ? ",
       });
 
       expect(
@@ -265,7 +138,7 @@ describe("commonSql", () => {
         )
       ).to.deep.equal({
         params: [["Id", "Name"], "FooBar", "Name", "foo_bar", 10, 0],
-        sql: "SELECT ? FROM ?? WHERE ?? != ? LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? WHERE ?? != ? LIMIT ? OFFSET ? ",
       });
 
       expect(
@@ -286,7 +159,7 @@ describe("commonSql", () => {
         )
       ).to.deep.equal({
         params: [["Id", "Name"], "FooBar", "Name", "%foo_bar%", 10, 0],
-        sql: "SELECT ? FROM ?? WHERE ?? LIKE ? LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? WHERE ?? LIKE ? LIMIT ? OFFSET ? ",
       });
 
       expect(
@@ -307,7 +180,7 @@ describe("commonSql", () => {
         )
       ).to.deep.equal({
         params: [["Id", "Name"], "FooBar", "Name", "%foo_bar%", 10, 0],
-        sql: "SELECT ? FROM ?? WHERE ?? NOT LIKE ? LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? WHERE ?? NOT LIKE ? LIMIT ? OFFSET ? ",
       });
 
       expect(
@@ -326,7 +199,7 @@ describe("commonSql", () => {
         )
       ).to.deep.equal({
         params: [["Id", "Name"], "FooBar", "Name", 10, 0],
-        sql: "SELECT ? FROM ?? WHERE ?? IS NULL LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? WHERE ?? IS NULL LIMIT ? OFFSET ? ",
       });
 
       expect(
@@ -345,7 +218,7 @@ describe("commonSql", () => {
         )
       ).to.deep.equal({
         params: [["Id", "Name"], "FooBar", "Name", 10, 0],
-        sql: "SELECT ? FROM ?? WHERE ?? IS NOT NULL LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? WHERE ?? IS NOT NULL LIMIT ? OFFSET ? ",
       });
 
       expect(
@@ -364,7 +237,7 @@ describe("commonSql", () => {
         )
       ).to.deep.equal({
         params: [["Id", "Name"], "FooBar", "Name", 42, 10, 0],
-        sql: "SELECT ? FROM ?? WHERE ?? > ? LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? WHERE ?? > ? LIMIT ? OFFSET ? ",
       });
 
       expect(
@@ -383,7 +256,7 @@ describe("commonSql", () => {
         )
       ).to.deep.equal({
         params: [["Id", "Name"], "FooBar", "Name", 42, 10, 0],
-        sql: "SELECT ? FROM ?? WHERE ?? >= ? LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? WHERE ?? >= ? LIMIT ? OFFSET ? ",
       });
 
       expect(
@@ -402,7 +275,7 @@ describe("commonSql", () => {
         )
       ).to.deep.equal({
         params: [["Id", "Name"], "FooBar", "Name", 42, 10, 0],
-        sql: "SELECT ? FROM ?? WHERE ?? < ? LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? WHERE ?? < ? LIMIT ? OFFSET ? ",
       });
 
       expect(
@@ -421,7 +294,7 @@ describe("commonSql", () => {
         )
       ).to.deep.equal({
         params: [["Id", "Name"], "FooBar", "Name", 42, 10, 0],
-        sql: "SELECT ? FROM ?? WHERE ?? <= ? LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? WHERE ?? <= ? LIMIT ? OFFSET ? ",
       });
     });
 
@@ -455,7 +328,7 @@ describe("commonSql", () => {
           0,
         ],
         sql:
-          "SELECT ? FROM ?? WHERE ?? = ? AND ?? NOT LIKE ? LIMIT ? OFFSET ? ",
+          "SELECT ?? FROM ?? WHERE ?? = ? AND ?? NOT LIKE ? LIMIT ? OFFSET ? ",
       });
     });
 
@@ -485,7 +358,7 @@ describe("commonSql", () => {
           10,
           0,
         ],
-        sql: "SELECT ? FROM ?? WHERE ?? LIKE ? OR ?? LIKE ? LIMIT ? OFFSET ? ",
+        sql: "SELECT ?? FROM ?? WHERE ?? LIKE ? OR ?? LIKE ? LIMIT ? OFFSET ? ",
       });
     });
 
@@ -523,7 +396,7 @@ describe("commonSql", () => {
           0,
         ],
         sql:
-          "SELECT ? FROM ?? WHERE ?? = ? AND ?? NOT LIKE ? AND ( ?? LIKE ? OR ?? LIKE ? ) LIMIT ? OFFSET ? ",
+          "SELECT ?? FROM ?? WHERE ?? = ? AND ?? NOT LIKE ? AND ( ?? LIKE ? OR ?? LIKE ? ) LIMIT ? OFFSET ? ",
       });
     });
   });
@@ -634,15 +507,6 @@ describe("commonSql", () => {
       ).to.deep.equal({
         params: ["FooBar", "Name", "New Name"],
         sql: "INSERT INTO ?? ( ?? ) VALUES ( ? ) ",
-      });
-    });
-
-    it("returns INSERT query with RETURNING", () => {
-      expect(
-        insertRow("FooBar", ["Name"], ["New Name"], "Id", mysqlQueryFormatter)
-      ).to.deep.equal({
-        params: ["FooBar", "Name", "New Name", "Id"],
-        sql: "INSERT INTO ?? ( ?? ) VALUES ( ? ) RETURNING ?? ",
       });
     });
   });

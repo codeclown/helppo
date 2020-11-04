@@ -24,6 +24,24 @@ These are the ones available currently:
 
 ### How to use
 
+`pg`:
+
+```js
+import { PgDriver } from "helppo";
+import { Client } from 'pg';
+const connection = new Client(...);
+const driver = new PgDriver(connection);
+```
+
+`mysql`:
+
+```js
+import { MysqlDriver } from "helppo";
+import { createConnection } from 'mysql';
+const connection = createConnection(...);
+const driver = new MysqlDriver(connection);
+```
+
 See [Configuration.md](./Configuration.md#driver).
 
 ## How it works
