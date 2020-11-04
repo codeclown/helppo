@@ -1,3 +1,4 @@
+import filterTypes from "../filterTypes";
 import {
   QueryObject,
   BrowseFilter,
@@ -41,7 +42,7 @@ function addFilter(
 
 function applyFilters(
   query: QueryObject,
-  columnNames: string[],
+  wildcardSearchableColumns: string[],
   browseOptions: BrowseOptions,
   formatter: QueryFormatter
 ) {
@@ -59,20 +60,24 @@ function applyFilters(
       if (browseOptions.filters.length) {
         query = formatter(query, ["AND ( "]);
       }
-      columnNames.forEach((columnName, index) => {
-        if (index > 0) {
-          query = formatter(query, ["OR "]);
-        }
-        query = addFilter(
-          query,
-          {
-            type: "contains",
-            columnName,
-            value: browseOptions.wildcardSearch,
-          },
-          formatter
-        );
-      });
+      if (wildcardSearchableColumns.length) {
+        wildcardSearchableColumns.forEach((columnName, index) => {
+          if (index > 0) {
+            query = formatter(query, ["OR "]);
+          }
+          query = addFilter(
+            query,
+            {
+              type: "contains",
+              columnName,
+              value: browseOptions.wildcardSearch.toLowerCase(),
+            },
+            formatter
+          );
+        });
+      } else {
+        query = formatter(query, [{ param: 1 }, " = ", { param: 0 }, " "]);
+      }
       if (browseOptions.filters.length) {
         query = formatter(query, [") "]);
       }
@@ -84,6 +89,7 @@ function applyFilters(
 export function selectRows(
   tableName: string,
   columnNames: string[],
+  wildcardSearchableColumns: string[],
   browseOptions: BrowseOptions,
   formatter: QueryFormatter
 ): QueryObject {
@@ -100,7 +106,12 @@ export function selectRows(
     " ",
   ]);
 
-  query = applyFilters(query, columnNames, browseOptions, formatter);
+  query = applyFilters(
+    query,
+    wildcardSearchableColumns,
+    browseOptions,
+    formatter
+  );
 
   if (browseOptions.orderByColumn !== null) {
     query = formatter(query, [
@@ -123,7 +134,7 @@ export function selectRows(
 
 export function countRows(
   tableName: string,
-  columnNames: string[],
+  wildcardSearchableColumns: string[],
   browseOptions: BrowseOptions,
   formatter: QueryFormatter
 ): QueryObject {
@@ -140,7 +151,12 @@ export function countRows(
     " ",
   ]);
 
-  query = applyFilters(query, columnNames, browseOptions, formatter);
+  query = applyFilters(
+    query,
+    wildcardSearchableColumns,
+    browseOptions,
+    formatter
+  );
 
   return query;
 }
@@ -274,11 +290,24 @@ export abstract class CommonSqlDriver {
     totalPages: number;
     totalResults: number;
   }> {
+    const containsFilter = filterTypes.find(
+      (filterType) => filterType.key === "contains"
+    );
+    const wildcardSearchableColumns: string[] = table.columns
+      .filter((column) => {
+        return (
+          !column.secret &&
+          containsFilter &&
+          containsFilter.columnTypes.includes(column.type)
+        );
+      })
+      .map((column) => column.name);
     const [rowsQuery, countQuery] = await Promise.all([
       this.query(
         selectRows(
           table.name,
           table.columns.map((column) => column.name),
+          wildcardSearchableColumns,
           browseOptions,
           this.queryFormatter
         )
@@ -286,7 +315,7 @@ export abstract class CommonSqlDriver {
       this.query(
         countRows(
           table.name,
-          table.columns.map((column) => column.name),
+          wildcardSearchableColumns,
           browseOptions,
           this.queryFormatter
         )

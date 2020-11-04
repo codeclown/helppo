@@ -158,6 +158,7 @@ const Cell = ({
             ...browseOptions.filters,
             { type: filterType.key, columnName: column.name, value },
           ],
+          wildcardSearch: browseOptions.wildcardSearch,
         },
         presentationOptions
       ),

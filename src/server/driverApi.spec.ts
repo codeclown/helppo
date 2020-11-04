@@ -302,6 +302,7 @@ describe("driverApi", () => {
           orderByColumn: null,
           orderByDirection: "asc",
           perPage: 20,
+          wildcardSearch: "",
         },
       ]);
       expect(response.body).to.deep.equal(mockedReturnValue);
@@ -314,6 +315,7 @@ describe("driverApi", () => {
         orderByColumn: "id",
         orderByDirection: "desc",
         perPage: 123,
+        wildcardSearch: "search",
       };
       const response = await request
         .get("/table/teams/rows")
@@ -332,6 +334,7 @@ describe("driverApi", () => {
         orderByColumn: "secret_column",
         orderByDirection: "desc",
         perPage: 123,
+        wildcardSearch: "",
       };
       const response = await request
         .get("/table/teams/rows")

@@ -6,6 +6,7 @@
 
 - [Table of Contents](#table-of-contents)
 - [Read this first!](#read-this-first)
+- [Code style, linting, etc.](#code-style-linting-etc)
 - [Set up a local development environment](#set-up-a-local-development-environment)
   - [Starting databases via docker](#starting-databases-via-docker)
 - [Local development server](#local-development-server)

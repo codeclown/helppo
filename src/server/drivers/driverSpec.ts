@@ -1,5 +1,10 @@
 import { expect } from "chai";
-import { BrowseOptions, HelppoDriver, HelppoSchema } from "../types";
+import {
+  BrowseOptions,
+  HelppoDriver,
+  HelppoSchema,
+  HelppoTable,
+} from "../types";
 
 const testSchema: HelppoSchema = {
   tables: [
@@ -305,26 +310,45 @@ export function driverSpec(
     });
 
     describe("browseOptions.wildcardSearch", () => {
-      // TODO
-      // const searchRows = async (table, wildcardSearch, returnColumnName) => {
-      //   return (
-      //     await refObject.driver.getRows(
-      //       table.name,
-      //       table.columns.map((column) => column.name),
-      //       builtInFilterTypes.map((filterType) => filterType.key),
-      //       {
-      //         ...baseBrowseOptions,
-      //         wildcardSearch,
-      //       }
-      //     )
-      //   ).rows.map((row) => row[returnColumnName]);
-      // };
-      // it("searches text-based columns", async () => {
-      //   await insertTestRows(testRows);
-      //   expect(await searchRows(teamsTable, "rtti", "Name")).to.deep.equal([
-      //     "Mar",
-      //   ]);
-      // });
+      const searchRows = async (table, wildcardSearch, returnColumnName) => {
+        return (
+          await refObject.driver.getRows(table, {
+            ...baseBrowseOptions,
+            wildcardSearch,
+          })
+        ).rows.map((row) => row[returnColumnName]);
+      };
+
+      it("searches from text columns", async () => {
+        await insertTestRows(testRows);
+        expect(await searchRows(usersTable, "test", "Email")).to.deep.equal([]);
+        expect(await searchRows(usersTable, "rtti", "Email")).to.deep.equal([
+          "martti@example.com",
+        ]);
+        expect(await searchRows(usersTable, "t", "Email")).to.deep.equal([
+          "martti@example.com",
+          "albert@example.com",
+        ]);
+      });
+
+      it("does not search from secret columns", async () => {
+        await insertTestRows(testRows);
+        const withSecretEmail: HelppoTable = {
+          ...usersTable,
+          columns: usersTable.columns.map((column) => {
+            if (column.name === "Email") {
+              return {
+                ...column,
+                secret: true,
+              };
+            }
+            return column;
+          }),
+        };
+        expect(
+          await searchRows(withSecretEmail, "rtti", "Email")
+        ).to.deep.equal([]);
+      });
     });
 
     describe("browseOptions.orderByColumn and browseOptions.orderByDirection", () => {

@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "lib": [
-      "es2017.object"
-    ]
+    "lib": ["es2017.object"]
   }
 }

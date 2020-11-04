@@ -1,10 +1,6 @@
 import { formatDate, formatTime } from "./dateFormatting";
 import { ColumnType, HelppoColumnType, QueryParam } from "./types";
 
-
-
-
-
 // The mapping of possible column types
 // ---
 // In the future this could be extended to support adding custom

@@ -17,6 +17,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -38,6 +39,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -60,6 +62,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -84,6 +87,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 42,
             currentPage: 5,
@@ -105,6 +109,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -124,6 +129,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -145,6 +151,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -166,6 +173,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -187,6 +195,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -206,6 +215,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -225,6 +235,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -244,6 +255,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -263,6 +275,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -282,6 +295,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -303,6 +317,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -337,6 +352,30 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
+          {
+            perPage: 10,
+            currentPage: 1,
+            filters: [],
+            orderByColumn: null,
+            orderByDirection: "asc",
+            wildcardSearch: "find stuff",
+          },
+          mysqlQueryFormatter
+        )
+      ).to.deep.equal({
+        params: [["Id", "Name"], "FooBar", "Name", "%find stuff%", 10, 0],
+        sql: "SELECT ?? FROM ?? WHERE ?? LIKE ? LIMIT ? OFFSET ? ",
+      });
+    });
+
+    it("widcard search with multiple columns", () => {
+      expect(
+        selectRows(
+          "FooBar",
+          ["Id", "Name"],
+          // Note that normally an integer column shouldn't be included here
+          ["Id", "Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -367,6 +406,7 @@ describe("commonSql", () => {
         selectRows(
           "FooBar",
           ["Id", "Name"],
+          ["Name"],
           {
             perPage: 10,
             currentPage: 1,
@@ -388,15 +428,13 @@ describe("commonSql", () => {
           "foo_bar",
           "Name",
           "%hmm%",
-          "Id",
-          "%find stuff%",
           "Name",
           "%find stuff%",
           10,
           0,
         ],
         sql:
-          "SELECT ?? FROM ?? WHERE ?? = ? AND ?? NOT LIKE ? AND ( ?? LIKE ? OR ?? LIKE ? ) LIMIT ? OFFSET ? ",
+          "SELECT ?? FROM ?? WHERE ?? = ? AND ?? NOT LIKE ? AND ( ?? LIKE ? ) LIMIT ? OFFSET ? ",
       });
     });
   });

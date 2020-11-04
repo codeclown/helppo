@@ -129,6 +129,9 @@ const driverApi = (
     if (typeof browseOptions.orderByDirection !== "string") {
       browseOptions.orderByDirection = "asc";
     }
+    if (typeof browseOptions.wildcardSearch !== "string") {
+      browseOptions.wildcardSearch = "";
+    }
     return config.driver
       .getRows(table, browseOptions)
       .then(async (result) => {

@@ -9,7 +9,6 @@
 - [Pull Requests](#pull-requests)
   - [Allowed licenses for third-party dependencies](#allowed-licenses-for-third-party-dependencies)
     - [Third-party license notice](#third-party-license-notice)
-  - [Code style, linting, etc.](#code-style-linting-etc)
 - [Setting up a local development environment](#setting-up-a-local-development-environment)
 
 <!-- /hohhoijaa -->
