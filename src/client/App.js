@@ -10,6 +10,7 @@ import ConfigNotice from "./components/ConfigNotice";
 import Container from "./components/Container";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ErrorModal from "./components/ErrorModal";
+import InlineLink from "./components/InlineLink";
 import Navigation from "./components/Navigation";
 import Notifications, {
   NotificationDelays,
@@ -23,6 +24,7 @@ import Query from "./pages/Query";
 import RecentlyDeleted from "./pages/RecentlyDeleted";
 import Schema from "./pages/Schema";
 import Welcome from "./pages/Welcome";
+import doubleQuotes from "./utils/doubleQuotes";
 import niceifyName from "./utils/niceifyName";
 
 const STATUS = {
@@ -196,18 +198,27 @@ class App extends Component {
     );
   }
 
+  renderTableNotFound(tableName) {
+    return h(
+      Fragment,
+      null,
+      h(PageTitle, null, `Table ${doubleQuotes(tableName)} not found`),
+      h(
+        Container,
+        null,
+        `Table ${doubleQuotes(tableName)} not found. `,
+        h(InlineLink, { to: this.props.urls.homeUrl() }, "Go to table list.")
+      )
+    );
+  }
+
   renderBrowseTable(routeProps) {
     const { tableName } = routeProps.match.params;
     const table = this.state.schema.tables.find(
       (table) => table.name === tableName
     );
     if (!table) {
-      return h(
-        Fragment,
-        null,
-        h(PageTitle, null, "Table not found"),
-        h(Container, null, "Table not found…")
-      );
+      return this.renderTableNotFound(tableName);
     }
     const relations = [].concat(
       ...this.state.schema.tables.map((otherTable) => {
@@ -271,7 +282,7 @@ class App extends Component {
       (table) => table.name === tableName
     );
     if (!table) {
-      return h(Container, null, "Table not found…");
+      return this.renderTableNotFound(tableName);
     }
     let rowId = null;
     try {
@@ -280,10 +291,10 @@ class App extends Component {
         rowId = JSON.parse(rowId);
       }
     } catch (exception) {
-      // ...
+      // do nothing
     }
     if (!rowId) {
-      // redirect
+      return h(Redirect, { to: this.props.urls.tableIndexUrl(table) });
     }
     return h(EditRow, {
       key: routeProps.location.key,
@@ -426,8 +437,15 @@ class App extends Component {
               path: this.props.urls.schemaPattern,
               render: this.renderSchema,
             }),
-            h(Route, { exact: true, path: "/", render: this.renderWelcome }),
-            h(Route, { path: "/", render: () => h(Redirect, { to: "/" }) })
+            h(Route, {
+              exact: true,
+              path: this.props.urls.homePattern,
+              render: this.renderWelcome,
+            }),
+            h(Route, {
+              path: "/",
+              render: () => h(Redirect, { to: this.props.urls.homeUrl() }),
+            })
           ),
           h(Notifications, {
             notifications: this.state.notifications,

@@ -19,6 +19,11 @@ const toUrl = (pattern, config) => {
 
 export default function urls(mountpath) {
   return {
+    homePattern: `${mountpath}/`,
+    homeUrl() {
+      return toUrl(this.homePattern, {});
+    },
+
     tableIndexPattern: `${mountpath}/table/:tableName`,
     tableIndexUrl(table) {
       return toUrl(this.tableIndexPattern, {

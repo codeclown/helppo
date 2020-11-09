@@ -12,6 +12,7 @@ import Code from "../components/Code";
 import Container from "../components/Container";
 import FormHelpMessage from "../components/FormHelpMessage";
 import HeadingBlock from "../components/HeadingBlock";
+import InlineLink from "../components/InlineLink";
 import LayoutColumns from "../components/LayoutColumns";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { NotificationStyles } from "../components/Notifications";
@@ -452,8 +453,17 @@ class EditRow extends Component {
       return h(
         Fragment,
         null,
-        h(PageTitle, null, "Row not found"),
-        h(Container, null, "Row not found…")
+        h(PageTitle, null, `Row ${doubleQuotes(this.props.rowId)} not found`),
+        h(
+          Container,
+          null,
+          `Row ${doubleQuotes(this.props.rowId)} not found. `,
+          h(
+            InlineLink,
+            { to: this.props.urls.tableIndexUrl(this.props.table) },
+            `Go back to ${niceifyName(this.props.table.name)}.`
+          )
+        )
       );
     }
 
