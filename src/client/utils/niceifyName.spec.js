@@ -13,5 +13,7 @@ describe("niceifyName", () => {
     expect(niceifyName("date_utc")).to.equal("Date UTC");
     expect(niceifyName("wp_posts")).to.equal("WP Posts");
     expect(niceifyName("posted_at_gmt")).to.equal("Posted At GMT");
+    expect(niceifyName("ab_goals")).to.equal("AB Goals");
+    expect(niceifyName("api_keys")).to.equal("API Keys");
   });
 });
