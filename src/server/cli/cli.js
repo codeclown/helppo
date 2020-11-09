@@ -3,9 +3,11 @@
 /* eslint-disable no-console */
 
 import express from "express";
+import path from "path";
 import readline from "readline";
+import connectionStringFromKnexfile from "./connectionStringFromKnexfile";
 import * as mysqlResolver from "./mysqlResolver";
-import parseArgs from "./parseArgs";
+import { parseArgs } from "./parseArgs";
 import * as pgResolver from "./pgResolver";
 
 // Expected user flows, in regards to prompting and errors:
@@ -91,32 +93,56 @@ async function prompt(message) {
 }
 
 async function main() {
-  const args = parseArgs(process.argv.slice(2));
+  const argv = parseArgs(process.argv.slice(2), {
+    booleans: ["help", "no-color", "dev"],
+    aliases: { help: "h" },
+  });
 
-  if (!args.showColors) {
+  if (argv.options["no-color"]) {
     for (let key in colors) {
       colors[key] = "";
     }
   }
 
-  if (args.showHelp) {
+  let connectionString = argv.args[0] || "";
+
+  if (argv.options.knexfile) {
+    const knexfilePath = argv.options.knexfile.startsWith("/")
+      ? argv.options.knexfile
+      : path.join(process.cwd(), argv.options.knexfile);
+    console.log(`Reading knexfile: ${knexfilePath}`);
+    try {
+      const knexConfig = require(knexfilePath);
+      connectionString = await connectionStringFromKnexfile(knexConfig);
+    } catch (exception) {
+      throw new Error(
+        `Reading knexfile failed with the following error:\n\n${exception.stack}`
+      );
+    }
+  }
+
+  if (argv.options.help || connectionString === "") {
     console.log(
       `
 ${colors.bold}helppo-cli${colors.reset} ${colors.dim}|${colors.reset} Instant database management interface in your browser
 
 ${colors.bold}USAGE${colors.reset}
   helppo-cli <connection_string>
+  helppo-cli --knexfile knexfile.js
 
 ${colors.bold}ARGUMENTS${colors.reset}
-  connection_string     A database connection string, see below for examples.
+  connection_string           A database connection string, see below for
+                              examples.
 
 ${colors.bold}OPTIONS${colors.reset}
-  -h, --help            Show this help message
-      --no-color        Disable colors in terminal output
+  -h, --help                  Show this help message
+      --knexfile knexfile.js  Parse connection details from a knexfile
+      --no-color              Disable colors in terminal output
 
 ${colors.bold}EXAMPLES${colors.reset}
   ${colors.dim}$${colors.reset} helppo-cli mysql://user:pass@localhost:3306/my_db
   ${colors.dim}$${colors.reset} helppo-cli postgres://user:pass@localhost:5432/my_db
+  ${colors.dim}$${colors.reset} helppo-cli --knexfile src/knexfile.js
 
 ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
   Copyright 2020 Martti Laine - Published under the GPLv3 license
@@ -128,7 +154,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
   }
 
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { default: helppo, PgDriver, MysqlDriver } = require(args.dev
+  const { default: helppo, PgDriver, MysqlDriver } = require(argv.options.dev
     ? "../helppo"
     : "helppo");
 
@@ -139,7 +165,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
     let resolver;
     let Driver;
 
-    if (args.connectionString.startsWith("postgres://")) {
+    if (connectionString.startsWith("postgres://")) {
       if (!availableDatabaseLibraries.pg) {
         const error = new Error("The package 'pg' is not installed.");
         error.pretty = true;
@@ -149,7 +175,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
       Driver = PgDriver;
     }
 
-    if (args.connectionString.startsWith("mysql://")) {
+    if (connectionString.startsWith("mysql://")) {
       if (!availableDatabaseLibraries.mysql) {
         const error = new Error("The package 'mysql' is not installed.");
         error.pretty = true;
@@ -170,7 +196,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
 
     let config;
     try {
-      config = await resolver.parseConnectionString(args.connectionString);
+      config = await resolver.parseConnectionString(connectionString);
     } catch (exception) {
       const error = new Error(connectionStringErrorMessage);
       error.pretty = true;

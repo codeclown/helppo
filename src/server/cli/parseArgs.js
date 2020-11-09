@@ -1,44 +1,56 @@
-export default function parseArgs(args) {
-  const defaults = {
-    showHelp: false,
-    showColors: true,
-    connectionString: "",
-    dev: false,
+/**
+ *
+ * @example parseArgs(process.argv.slice(2))
+ * @example parseArgs(['--check', '-o', 'file.txt'], { booleans: ['check'] })
+ * @example parseArgs(process.argv.slice(2), { aliases: { file: 'f' } })
+ * @example parseArgs(process.argv.slice(2), { aliases: { file: ['f'] } })
+ * @param {string[]} argv
+ * @param {undefined|{ aliases: { [key]: string|string[] }, booleans: string[] }} options
+ * @returns {{ options: { [key]: boolean|string }, args: string[] }}
+ */
+export function parseArgs(argv, options) {
+  options = Object.assign(
+    {
+      aliases: {},
+      booleans: [],
+    },
+    options
+  );
+  const aliasMap = Object.keys(options.aliases).reduce((obj, optionKey) => {
+    const aliasesForKey = Array.isArray(options.aliases[optionKey])
+      ? options.aliases[optionKey]
+      : [options.aliases[optionKey]];
+    for (let item of aliasesForKey) {
+      obj[item] = optionKey;
+    }
+    return obj;
+  }, {});
+  const parsed = {
+    options: {},
+    args: [],
   };
-
-  const connectionStrings = [];
-  const options = [];
-
-  for (let arg of args) {
-    if (arg === "-h" || arg === "--help") {
-      return Object.assign({}, defaults, {
-        showHelp: true,
-      });
-    }
-
-    if (arg === "--no-color") {
-      options.push(arg);
+  let captureNext;
+  for (let arg of argv) {
+    if (captureNext) {
+      parsed.options[captureNext] = arg;
+      captureNext = undefined;
       continue;
     }
-
-    // Internal flag for deciding which version of helppo to require()
-    if (arg === "--dev") {
-      options.push(arg);
+    if (arg.startsWith("-")) {
+      const cut = arg.startsWith("--") ? 2 : 1;
+      const key = arg.slice(cut);
+      const realKey = aliasMap[key] || key;
+      if (options.booleans.includes(realKey)) {
+        parsed.options[realKey] = true;
+      } else {
+        captureNext = realKey;
+      }
       continue;
     }
-
-    connectionStrings.push(arg);
+    parsed.args.push(arg);
   }
-
-  if (connectionStrings.length !== 1) {
-    return Object.assign({}, defaults, {
-      showHelp: true,
-    });
+  if (captureNext) {
+    parsed.options[captureNext] = "";
   }
-
-  return Object.assign({}, defaults, {
-    showColors: !options.includes("--no-color"),
-    dev: options.includes("--dev"),
-    connectionString: connectionStrings[0],
-  });
+  return parsed;
 }

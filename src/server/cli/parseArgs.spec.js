@@ -1,68 +1,62 @@
-import { expect } from "chai";
-import parseArgs from "./parseArgs";
+import assert from "assert";
+import { parseArgs } from "./parseArgs";
 
 describe("parseArgs", () => {
-  it("works", () => {
-    expect(parseArgs([])).to.deep.equal({
-      showHelp: true,
-      showColors: true,
-      connectionString: "",
-      dev: false,
+  it("parses args", () => {
+    assert.deepStrictEqual(parseArgs([]), { options: {}, args: [] });
+    assert.deepStrictEqual(parseArgs(["test"]), {
+      options: {},
+      args: ["test"],
     });
-    expect(parseArgs(["-h"])).to.deep.equal({
-      showHelp: true,
-      showColors: true,
-      connectionString: "",
-      dev: false,
+    assert.deepStrictEqual(parseArgs(["--test"]), {
+      options: { test: "" },
+      args: [],
     });
-    expect(parseArgs(["--help"])).to.deep.equal({
-      showHelp: true,
-      showColors: true,
-      connectionString: "",
-      dev: false,
+    assert.deepStrictEqual(parseArgs(["--test", "file"]), {
+      options: { test: "file" },
+      args: [],
     });
-    expect(
-      parseArgs(["--help", "mysql://user:pass@localhost:3306/my_db"])
-    ).to.deep.equal({
-      showHelp: true,
-      showColors: true,
-      connectionString: "",
-      dev: false,
+    assert.deepStrictEqual(parseArgs(["foobar", "--test", "file", "mango"]), {
+      options: { test: "file" },
+      args: ["foobar", "mango"],
     });
-    expect(
-      parseArgs([
-        "mysql://user:pass@localhost:3306/my_db",
-        "postgres://user:pass@localhost:5432/my_db",
-      ])
-    ).to.deep.equal({
-      showHelp: true,
-      showColors: true,
-      connectionString: "",
-      dev: false,
-    });
-    expect(parseArgs(["mysql://user:pass@localhost:3306/my_db"])).to.deep.equal(
+    assert.deepStrictEqual(
+      parseArgs(["foobar", "--test", "file", "-o", "stdout", "mango"]),
       {
-        showHelp: false,
-        showColors: true,
-        connectionString: "mysql://user:pass@localhost:3306/my_db",
-        dev: false,
+        options: { test: "file", o: "stdout" },
+        args: ["foobar", "mango"],
       }
     );
-    expect(
-      parseArgs(["mysql://user:pass@localhost:3306/my_db", "--no-color"])
-    ).to.deep.equal({
-      showHelp: false,
-      showColors: false,
-      connectionString: "mysql://user:pass@localhost:3306/my_db",
-      dev: false,
+  });
+
+  it("supports options.booleans", () => {
+    assert.deepStrictEqual(parseArgs(["--test"], { booleans: ["test"] }), {
+      options: { test: true },
+      args: [],
     });
-    expect(
-      parseArgs(["mysql://user:pass@localhost:3306/my_db", "--dev"])
-    ).to.deep.equal({
-      showHelp: false,
-      showColors: true,
-      connectionString: "mysql://user:pass@localhost:3306/my_db",
-      dev: true,
-    });
+    assert.deepStrictEqual(
+      parseArgs(["--test", "file"], { booleans: ["test"] }),
+      {
+        options: { test: true },
+        args: ["file"],
+      }
+    );
+  });
+
+  it("supports options.aliases", () => {
+    assert.deepStrictEqual(
+      parseArgs(["-t", "foobar"], { aliases: { test: "t" } }),
+      {
+        options: { test: "foobar" },
+        args: [],
+      }
+    );
+    assert.deepStrictEqual(
+      parseArgs(["-t", "foobar"], { aliases: { test: ["t"] } }),
+      {
+        options: { test: "foobar" },
+        args: [],
+      }
+    );
   });
 });
