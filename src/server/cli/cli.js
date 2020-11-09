@@ -104,7 +104,7 @@ async function main() {
     }
   }
 
-  let connectionString = argv.args[0] || "";
+  let connectionString = argv.args[0] || process.env.DATABASE_URL || "";
 
   if (argv.options.knexfile) {
     const knexfilePath = argv.options.knexfile.startsWith("/")
@@ -139,10 +139,14 @@ ${colors.bold}OPTIONS${colors.reset}
       --knexfile knexfile.js  Parse connection details from a knexfile
       --no-color              Disable colors in terminal output
 
+${colors.bold}ENVIRONMENT VARIABLES${colors.reset}
+  If DATABASE_URL is defined, it will be used.
+
 ${colors.bold}EXAMPLES${colors.reset}
   ${colors.dim}$${colors.reset} helppo-cli mysql://user:pass@localhost:3306/my_db
   ${colors.dim}$${colors.reset} helppo-cli postgres://user:pass@localhost:5432/my_db
   ${colors.dim}$${colors.reset} helppo-cli --knexfile src/knexfile.js
+  ${colors.dim}$${colors.reset} DATABASE_URL=mysql://user:pass@localhost:3306/my_db helppo-cli
 
 ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
   Copyright 2020 Martti Laine - Published under the GPLv3 license
