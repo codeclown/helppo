@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-console */
-
 import express from "express";
 import path from "path";
 import readline from "readline";
@@ -110,6 +108,7 @@ async function main() {
     const knexfilePath = argv.options.knexfile.startsWith("/")
       ? argv.options.knexfile
       : path.join(process.cwd(), argv.options.knexfile);
+    // eslint-disable-next-line no-console
     console.log(`Reading knexfile: ${knexfilePath}`);
     try {
       const knexConfig = require(knexfilePath);
@@ -122,6 +121,7 @@ async function main() {
   }
 
   if (argv.options.help || connectionString === "") {
+    // eslint-disable-next-line no-console
     console.log(
       `
 ${colors.bold}helppo-cli${colors.reset} ${colors.dim}|${colors.reset} Instant database management interface in your browser
@@ -239,24 +239,33 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
     })
   );
   const port = await listen(app, MIN_PORT, MAX_PORT);
+  // eslint-disable-next-line no-console
   console.log(
     `Helppo is ${colors.bold}running${colors.reset}. View it in your browser:`
   );
+  // eslint-disable-next-line no-console
   console.log(`  http://localhost:${port}`);
 }
 
 main().catch((error) => {
+  // eslint-disable-next-line no-console
   console.error("");
   if (error.pretty) {
+    // eslint-disable-next-line no-console
     console.error(error.message);
   } else {
+    // eslint-disable-next-line no-console
     console.error(
       `${colors.red}ERR${colors.reset} Helppo exited with an unexpected error. Stack trace:\n${error.stack}`
     );
+    // eslint-disable-next-line no-console
     console.error("");
+    // eslint-disable-next-line no-console
     console.error("If you think this is a bug, please file a bug report at:");
+    // eslint-disable-next-line no-console
     console.error("  https://github.com/codeclown/helppo/issues");
   }
+  // eslint-disable-next-line no-console
   console.error("");
   process.exit(1);
 });
