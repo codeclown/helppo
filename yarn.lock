@@ -1626,11 +1626,6 @@ boolbase@^1.0.0, boolbase@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
 
-boring-datepicker@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/boring-datepicker/-/boring-datepicker-1.0.1.tgz#a393b1114ea31ab7575e51e24e4019a287e54259"
-  integrity sha512-Gf1NlsrnR5YjS0WBqABHlWg6yHCnvY0cSOHXITlrhyIDN562UOccVlHmd5/dZe8zGw+7CPD4qwiJIVqN8JXXXA==
-
 boxen@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/boxen/-/boxen-4.2.0.tgz#e411b62357d6d6d36587c8ac3d5d974daa070e64"
@@ -4830,6 +4825,11 @@ nanomatch@^1.2.9:
 napi-build-utils@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/napi-build-utils/-/napi-build-utils-1.0.2.tgz#b1fddc0b2c46e380a0b7a76f984dd47c41a13806"
+
+native-datepicker@^1.1.0:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/native-datepicker/-/native-datepicker-1.1.1.tgz#cd2738373a891e8e51cb53d4a8870c01bff1ece3"
+  integrity sha512-QWcNX0iiF3rkvQLWdCcQFeDl+vwZX3Brw5+QCl+dH4wN0NNmrrtZQgnV9+H7e7NuQXtfxvzbuJCi/H0F/w069g==
 
 natural-compare@^1.4.0:
   version "1.4.0"
