@@ -16,8 +16,6 @@
     "helppo-cli-local": "dist/server/cli/cli.js"
   },
   "dependencies": {
-    "@types/mysql": "^2.15.15",
-    "@types/pg": "^7.14.5",
     "body-parser": "^1.19.0",
     "express": "^4.17.1"
   },
@@ -31,8 +29,14 @@
     "@babel/runtime": "^7.11.2",
     "@trivago/prettier-plugin-sort-imports": "^1.2.0",
     "@types/chai": "^4.2.14",
+    "@types/chai-as-promised": "^7.1.3",
+    "@types/classnames": "^2.2.11",
+    "@types/clipboard": "^2.0.1",
     "@types/express": "^4.17.8",
     "@types/mocha": "^8.0.3",
+    "@types/mysql": "^2.15.15",
+    "@types/pg": "^7.14.6",
+    "@types/react-router-dom": "^5.1.6",
     "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
@@ -76,6 +80,7 @@
     "svgo": "^1.3.2",
     "terser": "^4.6.7",
     "ts-mocha": "^8.0.0",
+    "tsify": "^5.0.2",
     "typescript": "^4.0.5",
     "watchify": "^3.11.1",
     "yea": "^1.3.0"
@@ -83,13 +88,13 @@
   "scripts": {
     "cli-package:prepare": "bash src/server/cli/scripts/prepare-cli-package.sh",
     "build:css": "mkdir -p dist/client && cat src/client/base.css src/client/components/*.css > dist/client/client.css",
-    "build:js": "mkdir -p dist/client && browserify src/client/client.js --debug -p [ browserify-plugin-license-notice --out LICENSE-3RD-PARTIES ] -t [ babelify --configFile ./.babelrc.js ] -g [ envify --NODE_ENV production ] -o dist/client/client.js && terser dist/client/client.js --compress --mangle -o dist/client/client.js --source-map \"filename='dist/client/client.js.map'\" --source-map \"content=inline\" --source-map \"url=client.js.map\" --comments=false",
+    "build:js": "mkdir -p dist/client && browserify src/client/client.ts -p [ tsify --files [] ] --debug -p [ browserify-plugin-license-notice --out LICENSE-3RD-PARTIES ] -t [ babelify --configFile ./.babelrc.js ] -g [ envify --NODE_ENV production ] -o dist/client/client.js && terser dist/client/client.js --compress --mangle -o dist/client/client.js --source-map \"filename='dist/client/client.js.map'\" --source-map \"content=inline\" --source-map \"url=client.js.map\" --comments=false",
     "build:static": "mkdir -p dist/client/static && svgo src/static/*.svg && cp src/static/* dist/client/static",
     "build:server": "mkdir -p dist/server && rm -rf dist/server/* && babel src/server -d dist/server --config-file ./.babelrc.js --extensions .js,.ts && cp src/server/helppo.d.ts dist/server/helppo.d.ts",
     "build:docs": "hohhoijaa {.,docs,packages/**}/*.md",
     "build": "rm -rf dist/ && mkdir -p dist/ && yarn build:css && yarn build:js && yarn build:static && yarn build:server",
     "watch:css": "chokidar 'src/**/*.css' -c 'yarn build:css'",
-    "watch:js": "mkdir -p dist/client && watchify src/client/client.js -t [ babelify --configFile ./.babelrc.js ] -o dist/client/client.js -d -v",
+    "watch:js": "mkdir -p dist/client && watchify src/client/client.ts -p [ tsify --files [] ] -t [ babelify --configFile ./.babelrc.js ] -o dist/client/client.js -d -v",
     "watch:server": "mkdir -p dist/server && babel src/server -w -d dist/server --config-file ./.babelrc.js --extensions .js,.ts",
     "watch:dev-server": "nodemon --delay 500ms --watch dist/server dist/server/cli/cli.js",
     "dev": "sh src/server/devServer/devServer.sh",

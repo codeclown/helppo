@@ -1,4 +1,4 @@
-import { HelppoSchema } from "./types";
+import { HelppoSchema } from "../sharedTypes";
 
 const secrecyRegex = /(password|token|pass$)/i;
 

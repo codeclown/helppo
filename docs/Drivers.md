@@ -28,25 +28,29 @@ These are the ones available currently:
 
 ```js
 import { PgDriver } from "helppo";
-import { Client } from 'pg';
-const connection = new Client(...);
-const driver = new PgDriver(connection);
+import { Pool } from "pg";
+const pool = new Pool({
+  max: 5 // control how many connections Helppo may create
+});
+const driver = new PgDriver(pool);
 ```
 
 `mysql`:
 
 ```js
 import { MysqlDriver } from "helppo";
-import { createConnection } from 'mysql';
-const connection = createConnection(...);
-const driver = new MysqlDriver(connection);
+import { createPool } from "mysql";
+const pool = createPool({
+  connectionLimit: 5 // control how many connections Helppo may create
+});
+const driver = new MysqlDriver(pool);
 ```
 
 See [Configuration.md](./Configuration.md#driver).
 
 ## How it works
 
-Helppo drivers are simple wrappers around NodeJS database libraries. Helppo does not connect to your database; it just uses a connection you provide.
+Helppo drivers are simple wrappers around NodeJS database libraries. Helppo does not connect to your database; it just uses a connection pool you provide.
 
 ### Why are drivers per-library and not per-engine?
 

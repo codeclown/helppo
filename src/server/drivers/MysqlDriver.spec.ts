@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { createConnection, Connection } from "mysql";
+import { createPool, Pool } from "mysql";
 import { HelppoDriver } from "../types";
 import MysqlDriver, { mysqlQueryFormatter } from "./MysqlDriver";
 import { driverSpec } from "./driverSpec";
@@ -53,7 +53,7 @@ describe("MysqlDriver", () => {
   });
 
   describe("driverSpec", () => {
-    let connection: Connection;
+    let pool: Pool;
     const refObject = {
       driver: undefined,
       createTestSchema: async () => {
@@ -79,7 +79,7 @@ describe("MysqlDriver", () => {
       },
     };
     before((done) => {
-      connection = createConnection({
+      pool = createPool({
         host: "127.0.0.1",
         port: 7810,
         user: "root",
@@ -87,30 +87,55 @@ describe("MysqlDriver", () => {
         database: "test_db",
         connectTimeout: 2000,
       });
-      connection.connect((err) => {
-        if (err) {
-          if (err.message.includes("ECONNREFUSED")) {
-            throw new Error(
-              "Could not connect to MySQL server. Did you start the docker containers (refer to `docs/Development.md`)?"
-            );
-          }
-          throw err;
-        }
-        refObject.driver = new MysqlDriver(connection);
-        done();
+      pool.on("error", (err) => {
+        // eslint-disable-next-line no-console
+        console.error("Unexpected error on idle client", err);
       });
+      refObject.driver = new MysqlDriver(pool);
+      done();
     });
-    beforeEach((done) => {
-      connection.query("drop database test_db", () => {
-        connection.query("create database test_db", () => {
-          connection.query("use test_db", () => {
-            done();
+    beforeEach(async () => {
+      const query = <T>(sql: string, params?: string[]): Promise<T[]> =>
+        new Promise((resolve, reject) => {
+          pool.query(sql, params, (err, results) => {
+            if (err) {
+              return reject(err);
+            }
+            resolve(results as T[]);
           });
         });
-      });
+
+      try {
+        await query("set foreign_key_checks = 0");
+        for (const { table_name } of await query<{
+          table_name: string;
+        }>(`
+          select table_name
+          from information_schema.tables
+          where table_schema = 'test_db';
+        `)) {
+          await query("drop table ??", [table_name]);
+        }
+        await query("set foreign_key_checks = 1");
+      } catch (err) {
+        if (err.message.includes("ECONNREFUSED")) {
+          throw new Error(
+            "Could not connect to MySQL server. Did you start the docker containers (refer to `docs/Development.md`)?"
+          );
+        }
+        throw err;
+      }
+
+      // pool.query("drop database test_db", () => {
+      //   pool.query("create database test_db", () => {
+      //     pool.query("use test_db", () => {
+      //       done();
+      //     });
+      //   });
+      // });
     });
     after((done) => {
-      connection.end((err) => {
+      pool.end((err) => {
         if (err) {
           throw err;
         }

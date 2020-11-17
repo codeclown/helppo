@@ -1,6 +1,6 @@
 import { expect } from "chai";
+import { HelppoColumn, HelppoSchema } from "../sharedTypes";
 import findSecretColumns from "./findSecretColumns";
-import { HelppoColumn, HelppoSchema } from "./types";
 
 describe("findSecretColumns", () => {
   const baseSchema: HelppoSchema = {

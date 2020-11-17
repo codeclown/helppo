@@ -1,4 +1,4 @@
-import { BrowseOptions } from "./types";
+import { BrowseOptions } from "../sharedTypes";
 
 const validateBrowseOptions = (
   columnNames: string[],

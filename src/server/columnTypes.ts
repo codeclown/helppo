@@ -1,5 +1,6 @@
+import { HelppoColumnType, QueryParam } from "../sharedTypes";
 import { formatDate, formatTime } from "./dateFormatting";
-import { ColumnType, HelppoColumnType, QueryParam } from "./types";
+import { ColumnType } from "./types";
 
 // The mapping of possible column types
 // ---

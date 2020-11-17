@@ -1,12 +1,10 @@
-import { Connection } from "mysql";
+import { Pool } from "mysql";
 import {
   HelppoColumn,
   HelppoColumnType,
-  HelppoDriver,
   HelppoSchema,
-  QueryFormatter,
-  QueryObject,
-} from "../types";
+} from "../../sharedTypes";
+import { HelppoDriver, QueryFormatter, QueryObject } from "../types";
 import { CommonSqlDriver, CommonSqlDriverQueryResult } from "./commonSql";
 
 type MysqlColumnType =
@@ -110,15 +108,15 @@ export const mysqlQueryFormatter: QueryFormatter = (
 export default class MysqlDriver
   extends CommonSqlDriver
   implements HelppoDriver {
-  connection: Connection;
+  pool: Pool;
 
-  constructor(connection: Connection) {
+  constructor(pool: Pool) {
     super(mysqlQueryFormatter);
-    this.connection = connection;
+    this.pool = pool;
   }
 
   __internalOnClose(callback: (err: Error) => void): void {
-    this.connection.on("error", function onConnectionClose(error) {
+    this.pool.on("error", function onPoolClose(error) {
       if (error.code === "PROTOCOL_CONNECTION_LOST") {
         callback(error);
       }
@@ -157,7 +155,7 @@ export default class MysqlDriver
     CommonSqlDriverQueryResult & { affectedRows?: number; insertId?: string }
   > {
     return new Promise((resolve, reject) => {
-      this.connection.query(sql, params || [], (error, results, fields) => {
+      this.pool.query(sql, params || [], (error, results, fields) => {
         if (error) {
           return reject(error);
         }

@@ -1,10 +1,6 @@
 import { expect } from "chai";
-import {
-  BrowseOptions,
-  HelppoDriver,
-  HelppoSchema,
-  HelppoTable,
-} from "../types";
+import { BrowseOptions, HelppoSchema, HelppoTable } from "../../sharedTypes";
+import { HelppoDriver } from "../types";
 
 const testSchema: HelppoSchema = {
   tables: [
@@ -131,23 +127,21 @@ export function driverSpec(
     updateQuery: string;
   }
 ): void {
-  const insertTestRows = (rows) => {
-    return Promise.all(
-      Object.keys(rows).map((tableName) => {
-        const table = testSchema.tables.find(
-          (table) => table.name === tableName
-        );
-        return Promise.all(
-          rows[tableName].map((row) => {
-            const asd = Object.assign({}, row);
-            // TODO getting really messy here, should clean this up, because later row.Id is used and it could in theory not be in sync
-            // Problem is that including Id desyncs sequence in postgres -> problems when inserting rows later
-            delete asd.Id;
-            return refObject.driver.saveRow(table, null, asd);
-          })
-        );
-      })
-    );
+  const insertTestRows = (
+    tableName: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rows: { [key: string]: any }[]
+  ): Promise<void> => {
+    const table = testSchema.tables.find((table) => table.name === tableName);
+    return rows.reduce((chain, row) => {
+      return chain.then(() => {
+        const asd = { ...row };
+        // TODO getting really messy here, should clean this up, because later row.Id is used and it could in theory not be in sync
+        // Problem is that including Id desyncs sequence in postgres -> problems when inserting rows later
+        delete asd.Id;
+        return refObject.driver.saveRow(table, null, asd);
+      });
+    }, Promise.resolve());
   };
 
   describe("interface", () => {
@@ -197,7 +191,7 @@ export function driverSpec(
     });
 
     it("returns all rows", async () => {
-      await insertTestRows(testRows);
+      await insertTestRows(teamsTable.name, testRows.Teams);
       const result = await refObject.driver.getRows(
         teamsTable,
         baseBrowseOptions
@@ -211,7 +205,7 @@ export function driverSpec(
 
     describe("browseOptions.perPage", () => {
       it("works", async () => {
-        await insertTestRows(testRows);
+        await insertTestRows(teamsTable.name, testRows.Teams);
 
         const getPerPage = (perPage) => {
           return refObject.driver.getRows(teamsTable, {
@@ -265,7 +259,7 @@ export function driverSpec(
       };
 
       it("supports type: equals, notEquals", async () => {
-        await insertTestRows(testRows);
+        await insertTestRows(teamsTable.name, testRows.Teams);
         expect(
           await filterRows(teamsTable, "Name", "equals", "Team A")
         ).to.deep.equal(["Team A"]);
@@ -275,7 +269,8 @@ export function driverSpec(
       });
 
       it("supports type: contains, notContains", async () => {
-        await insertTestRows(testRows);
+        await insertTestRows(teamsTable.name, testRows.Teams);
+        await insertTestRows(usersTable.name, testRows.Users);
         expect(
           await filterRows(usersTable, "Email", "contains", "rtti")
         ).to.deep.equal(["martti@example.com"]);
@@ -285,7 +280,7 @@ export function driverSpec(
       });
 
       it("supports type: null, notNull", async () => {
-        await insertTestRows(testRows);
+        await insertTestRows(teamsTable.name, testRows.Teams);
         expect(
           await filterRows(teamsTable, "Description", "null", "")
         ).to.deep.equal([null, null]);
@@ -295,7 +290,7 @@ export function driverSpec(
       });
 
       it("supports type: gt, gte, lt, lte", async () => {
-        await insertTestRows(testRows);
+        await insertTestRows(teamsTable.name, testRows.Teams);
         expect(await filterRows(teamsTable, "Id", "gt", 2)).to.deep.equal([3]);
         expect(await filterRows(teamsTable, "Id", "gte", 2)).to.deep.equal([
           2,
@@ -320,7 +315,8 @@ export function driverSpec(
       };
 
       it("searches from text columns", async () => {
-        await insertTestRows(testRows);
+        await insertTestRows(teamsTable.name, testRows.Teams);
+        await insertTestRows(usersTable.name, testRows.Users);
         expect(await searchRows(usersTable, "test", "Email")).to.deep.equal([]);
         expect(await searchRows(usersTable, "rtti", "Email")).to.deep.equal([
           "martti@example.com",
@@ -332,7 +328,7 @@ export function driverSpec(
       });
 
       it("does not search from secret columns", async () => {
-        await insertTestRows(testRows);
+        await insertTestRows(teamsTable.name, testRows.Teams);
         const withSecretEmail: HelppoTable = {
           ...usersTable,
           columns: usersTable.columns.map((column) => {
@@ -353,7 +349,8 @@ export function driverSpec(
 
     describe("browseOptions.orderByColumn and browseOptions.orderByDirection", () => {
       it("works", async () => {
-        await insertTestRows(testRows);
+        await insertTestRows(teamsTable.name, testRows.Teams);
+        await insertTestRows(usersTable.name, testRows.Users);
         const getRows = async (orderByDirection) => {
           return (
             await refObject.driver.getRows(usersTable, {
@@ -396,7 +393,7 @@ export function driverSpec(
     });
 
     it("does not overwrite existing row", async () => {
-      await insertTestRows(testRows);
+      await insertTestRows(teamsTable.name, testRows.Teams);
       const existingRow = {
         Id: testRows["Teams"][0].Id,
         Name: "Overwriting",
@@ -412,7 +409,7 @@ export function driverSpec(
     });
 
     it("updates existing row if rowId is present", async () => {
-      await insertTestRows(testRows);
+      await insertTestRows(teamsTable.name, testRows.Teams);
       const rowId = testRows["Teams"][0].Id;
       const updated = {
         Name: "Updating name",
@@ -428,35 +425,32 @@ export function driverSpec(
     });
 
     it("throws on foreign key constraint failure", async () => {
-      await insertTestRows(testRows);
+      await insertTestRows(teamsTable.name, testRows.Teams);
       const exampleRow = Object.assign({}, testRows["Users"][0]);
       delete exampleRow[teamsTable.primaryKey];
       exampleRow.Id = 345345;
       exampleRow.TeamId = 123123123;
       await expect(
         refObject.driver.saveRow(usersTable, null, exampleRow)
-      ).to.be.rejected.then((error) => {
-        expect(error.message).to.equal("Foreign key constraint failed");
-      });
+      ).to.be.rejectedWith("Foreign key constraint failed");
     });
 
     it("throws on null given to non-nullable columns", async () => {
-      await insertTestRows(testRows);
+      await insertTestRows(teamsTable.name, testRows.Teams);
       const exampleRow = Object.assign({}, testRows["Users"][0]);
       delete exampleRow[teamsTable.primaryKey];
       exampleRow.TeamId = null;
       await expect(
         refObject.driver.saveRow(usersTable, null, exampleRow)
-      ).to.be.rejected.then((error) => {
-        expect(error.message).to.equal("Column TeamId is not nullable");
-      });
+      ).to.be.rejectedWith("Column TeamId is not nullable");
     });
   });
 
   describe(".deleteRow", () => {
     beforeEach(async () => {
       await refObject.createTestSchema();
-      await insertTestRows(testRows);
+      await insertTestRows(teamsTable.name, testRows.Teams);
+      await insertTestRows(usersTable.name, testRows.Users);
     });
 
     it("deletes row", async () => {
@@ -488,7 +482,8 @@ export function driverSpec(
   describe(".executeRawSqlQuery", () => {
     beforeEach(async () => {
       await refObject.createTestSchema();
-      await insertTestRows(testRows);
+      await insertTestRows(teamsTable.name, testRows.Teams);
+      await insertTestRows(usersTable.name, testRows.Users);
     });
 
     it("throws SQL error", async () => {

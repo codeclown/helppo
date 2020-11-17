@@ -217,8 +217,8 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
         const error = new Error(result.error);
         error.pretty = true;
         throw error;
-      } else if (result.connection) {
-        driver = new Driver(result.connection);
+      } else if (result.pool) {
+        driver = new Driver(result.pool);
         break;
       } else {
         throw new Error("Unknown result from driver resolver");

@@ -1,4 +1,4 @@
-import { FilterType } from "./types";
+import { FilterType } from "../sharedTypes";
 
 const filterTypes: FilterType[] = [
   {

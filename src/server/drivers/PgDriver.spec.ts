@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { Client } from "pg";
+import { Pool } from "pg";
 import { HelppoDriver } from "../types";
 import PgDriver, { pgQueryFormatter } from "./PgDriver";
 import { driverSpec } from "./driverSpec";
@@ -87,7 +87,7 @@ describe("PgDriver", () => {
   });
 
   describe("driverSpec", () => {
-    let connection: Client;
+    let pool: Pool;
     const refObject = {
       driver: undefined,
       createTestSchema: async () => {
@@ -116,37 +116,36 @@ describe("PgDriver", () => {
       },
     };
     before((done) => {
-      connection = new Client({
+      pool = new Pool({
         user: "postgres",
         host: "127.0.0.1",
         database: "postgres",
         password: "secret",
         port: 7811,
       });
-      connection.connect((err) => {
-        if (err) {
-          if (err.message.includes("ECONNREFUSED")) {
-            throw new Error(
-              "Could not connect to Postgres server. Did you start the docker containers (refer to `docs/Development.md`)?"
-            );
-          }
-          throw err;
-        }
-        refObject.driver = new PgDriver(connection);
-        done();
+      pool.on("error", (err) => {
+        // eslint-disable-next-line no-console
+        console.error("Unexpected error on idle client", err);
       });
+      refObject.driver = new PgDriver(pool);
+      done();
     });
     beforeEach(async () => {
-      await connection.query("drop schema public cascade");
-      await connection.query("create schema public");
-      await connection.query("grant all on schema public to postgres");
-      await connection.query("grant all on schema public to public");
+      try {
+        await pool.query("drop schema public cascade");
+        await pool.query("create schema public");
+        await pool.query("grant all on schema public to postgres");
+        await pool.query("grant all on schema public to public");
+      } catch (err) {
+        if (err.message.includes("ECONNREFUSED")) {
+          throw new Error(
+            "Could not connect to Postgres server. Did you start the docker containers (refer to `docs/Development.md`)?"
+          );
+        }
+      }
     });
     after((done) => {
-      connection.end((err) => {
-        if (err) {
-          throw err;
-        }
+      pool.end(() => {
         done();
       });
     });

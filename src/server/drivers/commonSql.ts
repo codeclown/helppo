@@ -1,14 +1,13 @@
-import filterTypes from "../filterTypes";
 import {
-  QueryObject,
   BrowseFilter,
   BrowseFilterType,
   BrowseOptions,
-  QueryParam,
-  QueryFormatter,
   HelppoTable,
+  QueryParam,
   RowObject,
-} from "../types";
+} from "../../sharedTypes";
+import filterTypes from "../filterTypes";
+import { QueryObject, QueryFormatter } from "../types";
 
 function addFilter(
   query: QueryObject,

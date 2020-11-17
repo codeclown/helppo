@@ -2,16 +2,11 @@
 
 import { expect } from "chai";
 import supertest, { SuperTest, Test } from "supertest";
+import { FilterType, HelppoSchema } from "../sharedTypes";
 import columnTypes from "./columnTypes";
 import driverApi from "./driverApi";
 import filterTypes from "./filterTypes";
-import {
-  ColumnType,
-  FilterType,
-  HelppoConfig,
-  HelppoDriver,
-  HelppoSchema,
-} from "./types";
+import { ColumnType, HelppoConfig, HelppoDriver } from "./types";
 
 class MockDriver implements HelppoDriver {
   __internalOnClose: () => {
@@ -207,7 +202,9 @@ describe("driverApi", () => {
       );
       const request = supertest(app);
       const response = await request.get("/config-notice");
-      expect(response.body).to.equal(null);
+      expect(response.body).to.deep.equal({
+        suggestedFreshSchema: null,
+      });
     });
   });
 
@@ -524,13 +521,13 @@ describe("driverApi", () => {
       request = supertest(app);
     });
 
-    it("calls driver.deleteRow and returns empty object", async () => {
+    it("calls driver.deleteRow and returns null", async () => {
       const response = await request
         .delete("/table/teams/rows")
         .query({ rowId: JSON.stringify("id42") })
         .send();
       expect(calledDeleteRowWith).to.deep.equal([schema.tables[0], "id42"]);
-      expect(response.body).to.deep.equal({});
+      expect(response.body).to.equal(null);
     });
 
     it("returns 400 if rowId is missing", async () => {

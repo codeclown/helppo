@@ -2,13 +2,11 @@ import { Pool } from "pg";
 import {
   HelppoColumn,
   HelppoColumnType,
-  HelppoDriver,
   HelppoSchema,
   HelppoTable,
-  QueryFormatter,
-  QueryObject,
   RowObject,
-} from "../types";
+} from "../../sharedTypes";
+import { HelppoDriver, QueryFormatter, QueryObject } from "../types";
 import { CommonSqlDriver, CommonSqlDriverQueryResult } from "./commonSql";
 
 type PgColumnType =
@@ -152,15 +150,15 @@ export const pgQueryFormatter: QueryFormatter = (originalQuery, segments) => {
 };
 
 export default class PgDriver extends CommonSqlDriver implements HelppoDriver {
-  connection: Pool;
+  pool: Pool;
 
-  constructor(connection: Pool) {
+  constructor(pool: Pool) {
     super(pgQueryFormatter);
-    this.connection = connection;
+    this.pool = pool;
   }
 
   __internalOnClose(callback: (error: Error) => void): void {
-    this.connection.on(
+    this.pool.on(
       "error",
       (
         error: Error & {
@@ -203,7 +201,7 @@ export default class PgDriver extends CommonSqlDriver implements HelppoDriver {
     sql,
     params,
   }: QueryObject): Promise<CommonSqlDriverQueryResult> {
-    const result = await this.connection.query<RowObject>(sql, params || []);
+    const result = await this.pool.query<RowObject>(sql, params || []);
     return {
       results: result.rows,
       fields: result.fields,
@@ -218,7 +216,8 @@ export default class PgDriver extends CommonSqlDriver implements HelppoDriver {
         SELECT table_name
         FROM information_schema.tables
         WHERE table_type = 'BASE TABLE'
-        AND table_schema NOT IN ('pg_catalog', 'information_schema');
+        AND table_schema NOT IN ('pg_catalog', 'information_schema')
+        ORDER BY table_name
       `,
       params: [],
     });

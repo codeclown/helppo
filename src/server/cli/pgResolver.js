@@ -9,9 +9,9 @@ export async function parseConnectionString(
 
 export async function resolveConnection(config, localRequire = require) {
   const pg = localRequire("pg");
-  const client = new pg.Client(config);
+  const pool = new pg.Pool(config);
   try {
-    await client.connect();
+    await pool.query("SELECT NOW()");
   } catch (error) {
     if (error.message.includes("password authentication failed")) {
       return {
@@ -25,5 +25,5 @@ export async function resolveConnection(config, localRequire = require) {
       error: `Could not connect to database "${config.database}" at ${config.host}:${config.port} as "${config.user}" (${error.message})`,
     };
   }
-  return { connection: client };
+  return { pool };
 }

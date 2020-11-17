@@ -1,9 +1,22 @@
 import * as bodyParser from "body-parser";
 import express, { Router } from "express";
+import {
+  ApiResponseColumnTypes,
+  ApiResponseConfigNotice,
+  ApiResponseDeleteRow,
+  ApiResponseExecuteRawSql,
+  ApiResponseFilterTypes,
+  ApiResponseGetRows,
+  ApiResponseLicenseNotice,
+  ApiResponseSaveRow,
+  ApiResponseSchema,
+  FilterType,
+  HelppoSchema,
+} from "../sharedTypes";
 import findColumnRelations from "./findColumnRelations";
 import findSecretColumns from "./findSecretColumns";
 import readLicenseNotice from "./readLicenseNotice";
-import { ColumnType, FilterType, HelppoConfig, HelppoSchema } from "./types";
+import { ColumnType, HelppoConfig } from "./types";
 
 const emptySchema: HelppoSchema = {
   tables: [],
@@ -55,40 +68,46 @@ const driverApi = (
   app.use(bodyParser.json());
 
   app.get("/schema", (req, res) => {
-    res.json(schema && schema !== "auto" ? schema : emptySchema);
+    const response: ApiResponseSchema =
+      schema && schema !== "auto" ? schema : emptySchema;
+    res.json(response);
   });
 
   app.get("/column-types", (req, res) => {
-    const columnTypes = Object.keys(options.columnTypes).map((type) => {
+    const response: ApiResponseColumnTypes = Object.keys(
+      options.columnTypes
+    ).map((type) => {
       const { builtInReactComponentName } = options.columnTypes[type];
       return {
         type,
         builtInReactComponentName,
       };
     });
-    res.json(columnTypes);
+    res.json(response);
   });
 
   app.get("/filter-types", (req, res) => {
-    res.json(options.filterTypes);
+    const response: ApiResponseFilterTypes = options.filterTypes;
+    res.json(response);
   });
 
   app.get("/license-notice", (req, res) => {
-    res.json(readLicenseNotice());
+    const response: ApiResponseLicenseNotice = readLicenseNotice();
+    res.json(response);
   });
 
   app.get("/config-notice", (req, res, next) => {
     return config.driver
       .getSchema()
       .then((liveSchema) => {
-        if (typeof schema !== "object" || !Array.isArray(schema.tables)) {
-          const suggestedFreshSchema = prepareAutoSchema(liveSchema);
-          return res.json({
-            suggestedFreshSchema,
-          });
-        }
-        // TODO check specified columns for differences liveSchema vs schema
-        res.json(null);
+        const suggestedFreshSchema =
+          typeof schema !== "object" || !Array.isArray(schema.tables)
+            ? prepareAutoSchema(liveSchema)
+            : null;
+        const response: ApiResponseConfigNotice = {
+          suggestedFreshSchema,
+        };
+        res.json(response);
       })
       .catch(next);
   });
@@ -135,7 +154,7 @@ const driverApi = (
     return config.driver
       .getRows(table, browseOptions)
       .then(async (result) => {
-        res.json({
+        const response: ApiResponseGetRows = {
           rows: result.rows.map((row) => {
             return Object.keys(row).reduce((obj, columnName) => {
               const value = row[columnName];
@@ -149,7 +168,8 @@ const driverApi = (
           }),
           totalPages: result.totalPages,
           totalResults: result.totalResults,
-        });
+        };
+        res.json(response);
       })
       .catch(next);
   });
@@ -189,7 +209,8 @@ const driverApi = (
     return config.driver
       .saveRow(table, rowId, row)
       .then((savedRow) => {
-        res.json(savedRow);
+        const response: ApiResponseSaveRow = savedRow;
+        res.json(response);
       })
       .catch(next);
   });
@@ -213,7 +234,8 @@ const driverApi = (
     return config.driver
       .deleteRow(table, rowId)
       .then(() => {
-        res.json({});
+        const response: ApiResponseDeleteRow = null;
+        res.json(response);
       })
       .catch(next);
   });
@@ -226,12 +248,14 @@ const driverApi = (
     return config.driver
       .executeRawSqlQuery(sql)
       .then((result) => {
-        res.json(result);
+        const response: ApiResponseExecuteRawSql = result;
+        res.json(response);
       })
       .catch((error) => {
-        res.json({
+        const response: ApiResponseExecuteRawSql = {
           errorMessage: error.message,
-        });
+        };
+        res.json(response);
       })
       .catch(next);
   });

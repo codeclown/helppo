@@ -15,28 +15,28 @@ describe("mysqlResolver", () => {
       const localRequire = (lib) => {
         expect(lib).to.equal("mysql", "should require mysql");
         return {
-          createConnection: (config) => {
+          createPool: (config) => {
             expect(config).to.equal(fakeConfig);
-            const connection = {
-              connect: (callback) => callback(),
+            const pool = {
+              query: (sql, callback) => callback(),
             };
-            fakeConnection = connection;
-            return connection;
+            fakeConnection = pool;
+            return pool;
           },
         };
       };
       const result = await resolveConnection(fakeConfig, localRequire);
-      expect(result).to.have.property("connection");
-      expect(result.connection).to.equal(fakeConnection);
+      expect(result).to.have.property("pool");
+      expect(result.pool).to.equal(fakeConnection);
     });
 
     it("returns prompt if password authentication fails", async () => {
       const localRequire = (lib) => {
         expect(lib).to.equal("mysql", "should require mysql");
         return {
-          createConnection: () => {
+          createPool: () => {
             return {
-              connect: (callback) => {
+              query: (sql, callback) => {
                 const error = new Error(
                   'password authentication failed for user "postgres"'
                 );
@@ -62,9 +62,9 @@ describe("mysqlResolver", () => {
       const localRequire = (lib) => {
         expect(lib).to.equal("mysql", "should require mysql");
         return {
-          createConnection: () => {
+          createPool: () => {
             return {
-              connect: (callback) => {
+              query: (sql, callback) => {
                 callback(new Error("some unknown error"));
               },
             };

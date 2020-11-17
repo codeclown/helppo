@@ -1,6 +1,6 @@
 import { expect } from "chai";
+import { HelppoColumn, HelppoSchema } from "../sharedTypes";
 import findColumnRelations from "./findColumnRelations";
-import { HelppoColumn, HelppoSchema } from "./types";
 
 describe("findColumnRelations", () => {
   const baseSchema: HelppoSchema = {

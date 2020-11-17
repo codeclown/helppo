@@ -72,14 +72,12 @@ describe("BrowseTable", () => {
     <ForwardRef style="success" to="editRowUrl([{"name":"test_table","primaryKey":"id","columns":[{"name":"id","type":"integer"},{"name":"name","type":"string"}]}])">
       Create
     </ForwardRef>
-    <ContainerRight>
+    <Component>
       <ForwardRef placeholder="Search…" size={24} value="" onChange={[Function: onChange]} />
-    </ContainerRight>
+    </Component>
   </Container>
   <Container>
-    <Filters filterTypes={{...}} filters={{...}} columns={{...}} onChange={[Function: onChange]}>
-      Create
-    </Filters>
+    <Filters filterTypes={{...}} filters={{...}} columns={{...}} onChange={[Function: onChange]} />
   </Container>
   <Table columnTitles={{...}} rows={{...}} blankSlateContent={{...}} columnWidths={{...}} />
   <Container>

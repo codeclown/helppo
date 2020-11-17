@@ -1,4 +1,4 @@
-import { HelppoSchema } from "./types";
+import { HelppoSchema } from "../sharedTypes";
 
 const parseIdReference = (columnName: string): string => {
   const match = columnName.match(/^(.+)(id)$/i);

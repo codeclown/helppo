@@ -26,42 +26,4 @@ describe("App", () => {
   <Navigation />
 </MemoryRouter>`);
   });
-
-  it("renders config notice", async () => {
-    const configNoticePromise = Promise.resolve({
-      suggestedFreshSchema: {
-        tables: [
-          {
-            name: "foobar",
-            columns: [],
-          },
-        ],
-      },
-    });
-    const getSchemaPromise = Promise.resolve({
-      tables: [],
-    });
-    const getColumnTypesPromise = Promise.resolve([]);
-    const getFilterTypesPromise = Promise.resolve([]);
-    const wrapper = shallow(
-      h(App, {
-        Router,
-        api: {
-          getConfigNotice: () => configNoticePromise,
-          getSchema: () => getSchemaPromise,
-          getColumnTypes: () => getColumnTypesPromise,
-          getFilterTypes: () => getFilterTypesPromise,
-        },
-        mountpath: "/",
-      })
-    );
-    await Promise.all([
-      configNoticePromise,
-      getSchemaPromise,
-      getColumnTypesPromise,
-    ]);
-    expect(wrapper.debug({ verbose: true })).to.equal(
-      `<ConfigNotice suggestedFreshSchema={{ tables: [ { name: 'foobar', columns: [] } ] }} />`
-    );
-  });
 });
