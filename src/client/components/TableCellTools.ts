@@ -1,7 +1,22 @@
 import classNames from "classnames";
-import { createElement as h, Fragment, useState } from "react";
+import { createElement as h, Fragment, ReactElement, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
+import Images from "../Images";
+
+export type TableCellToolsImages = Pick<
+  Images,
+  | "primaryKey"
+  | "columnInfo"
+  | "sortAsc"
+  | "sortDesc"
+  | "sortAsc"
+  | "sortDesc"
+  | "magnifierArrow"
+  | "magnifierPlus"
+  | "collapseLeft"
+  | "collapseRight"
+>;
 
 const TableCellToolsItem = ({
   href,
@@ -10,7 +25,14 @@ const TableCellToolsItem = ({
   showOnHover,
   children,
   dropdownContainer,
-}) => {
+}: {
+  href?: string;
+  imageUrl: string;
+  title: string;
+  showOnHover?: boolean;
+  children?: ReactElement;
+  dropdownContainer?: Element;
+}): ReactElement => {
   const icon = h("img", { src: imageUrl });
 
   // This component does too many things
@@ -114,7 +136,19 @@ const TableCellTools = ({
   sortAscUrl,
   sortedDesc,
   sortDescUrl,
-}) => {
+}: {
+  images: TableCellToolsImages;
+  filterUrls?: { name: string; url: string }[];
+  dropdownContainer?: Element;
+  collapseColumnUrl?: string;
+  uncollapseColumnUrl?: string;
+  isPrimaryKey?: boolean;
+  columnComment?: string;
+  sortedAsc?: boolean;
+  sortAscUrl?: string;
+  sortedDesc?: boolean;
+  sortDescUrl?: string;
+}): ReactElement => {
   return h(
     "span",
     {

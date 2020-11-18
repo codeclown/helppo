@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { createElement as h } from "react";
+import { createElement as h, ReactElement } from "react";
 
 const Table = ({
   tiny,
@@ -11,21 +11,31 @@ const Table = ({
   blankSlateContent,
   marginTop,
   leftColumnIsTh,
-}) => {
-  const columnCountArray =
+}: {
+  tiny?: boolean;
+  noBorder?: boolean;
+  columnTitles: ReactElement[];
+  columnWidths?: number[];
+  columnVerticalAlignments?: string[];
+  rows: ReactElement[][];
+  blankSlateContent?: ReactElement;
+  marginTop?: number;
+  leftColumnIsTh?: boolean;
+}): ReactElement => {
+  const columnCountArray: unknown[] =
     columnTitles ||
     columnWidths ||
     columnVerticalAlignments ||
     Object.keys(rows[0]);
   const cellStyles = columnCountArray.map((column, index) => {
-    const styles = {};
-    if (columnWidths && columnWidths[index]) {
-      styles.width = columnWidths[index];
-    }
-    if (columnVerticalAlignments && columnVerticalAlignments[index]) {
-      styles.verticalAlign = columnVerticalAlignments[index];
-    }
-    return styles;
+    return {
+      width:
+        columnWidths && columnWidths[index] ? columnWidths[index] : undefined,
+      verticalAlign:
+        columnVerticalAlignments && columnVerticalAlignments[index]
+          ? columnVerticalAlignments[index]
+          : undefined,
+    };
   });
 
   let bodyContent = [];

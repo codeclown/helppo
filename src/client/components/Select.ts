@@ -2,7 +2,22 @@ import classNames from "classnames";
 import { createElement as h, forwardRef } from "react";
 
 const Select = forwardRef(
-  ({ options, value, placeholder, slim, onChange }, ref) => {
+  <T>(
+    {
+      options,
+      value,
+      placeholder,
+      slim,
+      onChange,
+    }: {
+      options: (T | { text: string; value: T; disabled?: boolean })[];
+      value: T;
+      placeholder?: string;
+      slim?: boolean;
+      onChange: (value: T) => void;
+    },
+    ref
+  ) => {
     return h(
       "select",
       {
@@ -15,7 +30,7 @@ const Select = forwardRef(
             index -= 1;
           }
           const option = options[index];
-          const value = typeof option === "object" ? option.value : option;
+          const value = "value" in option ? option.value : option;
           onChange(value);
         },
       },
@@ -30,11 +45,9 @@ const Select = forwardRef(
           placeholder
         ),
       options.map((option, index) => {
-        const text =
-          typeof option === "object" ? option.text : option.toString();
-        const value =
-          typeof option === "object" ? option.value : option.toString();
-        const disabled = option.disabled;
+        const text = "text" in option ? option.text : option.toString();
+        const value = "text" in option ? option.value : option.toString();
+        const disabled = "disabled" in option ? option.disabled : false;
         return h(
           "option",
           {

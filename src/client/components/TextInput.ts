@@ -1,11 +1,17 @@
 import classNames from "classnames";
-import { createElement as h, forwardRef } from "react";
+import {
+  createElement as h,
+  ForwardedRef,
+  forwardRef,
+  InputHTMLAttributes,
+  ReactElement,
+} from "react";
 
 const TextInput = forwardRef(
   (
     {
       value,
-      type,
+      type = "text",
       disabled,
       placeholder,
       slim,
@@ -17,11 +23,26 @@ const TextInput = forwardRef(
       onBlur,
       autoFocus,
       ...rest
+    }: {
+      value: string;
+      type?: "text" | "password";
+      disabled?: boolean;
+      placeholder?: string;
+      slim?: boolean;
+      size?: number;
+      multiLine?: boolean;
+      textAlignCenter?: boolean;
+      danger?: boolean;
+      onChange?: (value: string) => void;
+      onBlur?: (value: string) => void;
+      autoFocus?: boolean;
     },
     ref
-  ) => {
+  ): ReactElement => {
     const tagName = multiLine ? "textarea" : "input";
-    const props = {
+    const props: Partial<InputHTMLAttributes<HTMLInputElement>> & {
+      ref: ForwardedRef<unknown>;
+    } = {
       className: classNames(
         "TextInput",
         slim && "TextInput--slim",
@@ -33,7 +54,7 @@ const TextInput = forwardRef(
       autoFocus,
       defaultValue: value,
       placeholder: placeholder || "",
-      type: type || "text",
+      type,
       ...rest,
       ref,
     };

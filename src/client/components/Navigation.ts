@@ -1,43 +1,75 @@
 import classNames from "classnames";
-import { createElement as h, useState } from "react";
-import { NavLink } from "react-router-dom";
+import {
+  DOMAttributes,
+  createElement as h,
+  ReactElement,
+  useState,
+} from "react";
+import { NavLink, NavLinkProps } from "react-router-dom";
 
-const TopLevelLink = ({ icon, url, children, ...rest }) => {
-  let tagName = "button";
-  const props = {
-    className: classNames(
-      "Navigation-link",
-      url && "Navigation-link--clickable"
-    ),
-    to: url,
-    ...rest,
-  };
-  if (url) {
-    tagName = NavLink;
-    props.activeClassName = "active";
-  }
-  return h(
-    tagName,
-    props,
+const TopLevelLink = ({
+  icon,
+  url,
+  children,
+  ...rest
+}: {
+  icon: string;
+  url?: string;
+  children?: ReactElement;
+} & DOMAttributes<HTMLButtonElement>): ReactElement => {
+  const className = classNames(
+    "Navigation-link",
+    url && "Navigation-link--clickable"
+  );
+
+  const content = [
     icon && h("img", { className: "Navigation-link-icon", src: icon }),
-    h("span", null, children)
+    h("span", null, children),
+  ];
+
+  if (url) {
+    return h(
+      NavLink,
+      {
+        className,
+        to: url,
+        activeClassName: "active",
+      },
+      ...content
+    );
+  }
+
+  return h(
+    "button",
+    {
+      className,
+      ...rest,
+    },
+    ...content
   );
 };
 
-const DropdownLink = ({ url, onClick, children }) => {
+const DropdownLink = ({
+  url,
+  children,
+  ...rest
+}: {
+  url: string;
+  children?: ReactElement;
+} & Partial<NavLinkProps>): ReactElement => {
   return h(
     NavLink,
     {
       className: classNames("Navigation-dropdown-link"),
       activeClassName: "active",
       to: url,
-      onClick,
+      ...rest,
     },
     children
   );
 };
 
-const Dropdown = ({ icon, title, links }) => {
+const Dropdown = ({ icon, title, links }): ReactElement => {
   const [isOpen, setIsOpen] = useState(false);
 
   return h(
@@ -47,11 +79,12 @@ const Dropdown = ({ icon, title, links }) => {
         "Navigation-dropdown",
         isOpen && "Navigation-dropdown--open"
       ),
-      onBlur: (event) => {
+      onBlur: (event: FocusEvent) => {
+        const target = event.relatedTarget as HTMLDivElement;
         if (
           isOpen &&
           // Nasty
-          !event.relatedTarget.classList.contains("Navigation-dropdown-link")
+          !target.classList.contains("Navigation-dropdown-link")
         ) {
           setIsOpen(false);
         }
@@ -102,7 +135,15 @@ const Dropdown = ({ icon, title, links }) => {
   );
 };
 
-const Navigation = ({ linkGroups = [] }) => {
+const Navigation = ({
+  linkGroups = [],
+}: {
+  linkGroups: {
+    icon: string;
+    dropdownTitle: string;
+    links: { url: string; text: string; separator?: boolean }[];
+  }[];
+}): ReactElement => {
   return h(
     "div",
     { className: "Navigation" },

@@ -1,5 +1,6 @@
-import { createElement as h, useState } from "react";
+import { createElement as h, ReactElement, useState } from "react";
 import { createPortal } from "react-dom";
+import { RowObject } from "../../sharedTypes";
 import limitText from "../utils/limitText";
 import niceifyName from "../utils/niceifyName";
 import Code from "./Code";
@@ -7,11 +8,11 @@ import ErrorBoundary from "./ErrorBoundary";
 import LoadingSpinner from "./LoadingSpinner";
 import Table from "./Table";
 
-const STATUS = {
-  LOADING: "LOADING",
-  ERRORED: "ERRORED",
-  READY: "READY",
-};
+enum STATUS {
+  LOADING = "LOADING",
+  ERRORED = "ERRORED",
+  READY = "READY",
+}
 
 const RowPopupContent = ({ status, row }) => {
   return status === STATUS.LOADING
@@ -39,12 +40,20 @@ const RowPopupContent = ({ status, row }) => {
       });
 };
 
-const RowPopup = ({ popupContainer, getRow, children }) => {
-  const [status, setStatus] = useState(null);
-  const [row, setRow] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [x, setX] = useState(0);
-  const [y, setY] = useState(0);
+const RowPopup = ({
+  popupContainer,
+  getRow,
+  children,
+}: {
+  popupContainer: Element;
+  getRow: () => Promise<RowObject>;
+  children?: ReactElement;
+}): ReactElement => {
+  const [status, setStatus] = useState<STATUS>(null);
+  const [row, setRow] = useState<RowObject>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [x, setX] = useState<number>(0);
+  const [y, setY] = useState<number>(0);
 
   return h(
     "span",

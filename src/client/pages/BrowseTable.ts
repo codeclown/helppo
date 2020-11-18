@@ -22,7 +22,6 @@ import {
   RememberDeletedRow,
   ShowNotification,
 } from "../App";
-import Images from "../Images";
 import Urls from "../Urls";
 import Button, { ButtonStyles } from "../components/Button";
 import Code from "../components/Code";
@@ -41,7 +40,9 @@ import Pagination from "../components/Pagination";
 import RowPopup from "../components/RowPopup";
 import Select from "../components/Select";
 import Table from "../components/Table";
-import TableCellTools from "../components/TableCellTools";
+import TableCellTools, {
+  TableCellToolsImages,
+} from "../components/TableCellTools";
 import TableLink, { TableLinkStyles } from "../components/TableLink";
 import TextInput from "../components/TextInput";
 import TotalResults from "../components/TotalResults";
@@ -56,8 +57,8 @@ interface PresentationOptions {
 
 interface ColumnTitleProps {
   presentationOptions: PresentationOptions;
-  images: Images;
-  urls: Urls;
+  images: TableCellToolsImages;
+  urls: Pick<Urls, "browseTableUrl">;
   table: HelppoTable;
   browseOptions: BrowseOptions;
   column: HelppoColumn;
@@ -318,9 +319,9 @@ const RelatedTableLinks = ({ relations, row, urls }) => {
 
 interface BrowseTableProps {
   locationKey: string;
-  api: Api;
-  urls: Urls;
-  images: Images;
+  api: Pick<Api, "getTableRows" | "deleteRow" | "getTableRows">;
+  urls: Pick<Urls, "browseTableUrl" | "editRowUrl">;
+  images: TableCellToolsImages;
   columnTypeComponents: ColumnTypeComponents;
   filterTypes: FilterType[];
   catchApiError: CatchApiError;

@@ -9,7 +9,7 @@ const Datepicker = ({
 }: {
   value: string;
   onChange: (value: string) => void;
-  images: Images;
+  images: Pick<Images, "calendar">;
 }): ReactElement => {
   return h(
     NativeDatepicker,

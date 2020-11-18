@@ -1,7 +1,7 @@
 // SIMPLE
 
 export interface FilterType {
-  key: string;
+  key: BrowseFilterType;
   name: string;
   columnTypes: string[];
 }

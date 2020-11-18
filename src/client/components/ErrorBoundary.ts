@@ -1,10 +1,15 @@
-import { createElement as h, Component } from "react";
+import { createElement as h, Component, ErrorInfo } from "react";
 import { mapStackTrace } from "sourcemapped-stacktrace";
 import CodeBlock from "./CodeBlock";
 import Container from "./Container";
 
-class ErrorBoundary extends Component {
-  constructor(props) {
+class ErrorBoundary extends Component<
+  unknown,
+  { error: Error; sourcemapped: string | null; errorInfo: ErrorInfo }
+> {
+  mapStackTracePromise?: Promise<void>;
+
+  constructor(props: unknown) {
     super(props);
     this.state = {
       error: null,
@@ -14,11 +19,11 @@ class ErrorBoundary extends Component {
     this.mapStackTracePromise = null;
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error): { error: Error } {
     return { error };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     if (this.mapStackTracePromise) {
       return;
     }
@@ -35,13 +40,13 @@ class ErrorBoundary extends Component {
         }
       });
     });
-    this.setState({ componentInfo: errorInfo });
+    this.setState({ errorInfo });
   }
 
   render() {
     if (this.state.error) {
       const stack = `${this.state.sourcemapped || this.state.error.stack}${
-        this.state.componentInfo ? this.state.componentInfo.componentStack : ""
+        this.state.errorInfo ? this.state.errorInfo.componentStack : ""
       }`;
       return h(
         "div",
