@@ -14,6 +14,10 @@ import {
   RowObject,
 } from "../sharedTypes";
 
+export type ApiResponseGetRowsWithBrowseOptions = ApiResponseGetRows & {
+  browseOptions: BrowseOptions;
+};
+
 export default class Api {
   ajax: typeof yea;
 
@@ -52,7 +56,7 @@ export default class Api {
   async getTableRows(
     tableName: string,
     browseOptions: BrowseOptions
-  ): Promise<ApiResponseGetRows & { browseOptions: BrowseOptions }> {
+  ): Promise<ApiResponseGetRowsWithBrowseOptions> {
     const response = ((await this.ajax
       .get(`/api/table/${tableName}/rows`)
       .query({

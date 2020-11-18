@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { createElement as h, ReactElement } from "react";
+import { createElement as h, ReactElement, ReactNode } from "react";
 
 const Table = ({
   tiny,
@@ -14,12 +14,12 @@ const Table = ({
 }: {
   tiny?: boolean;
   noBorder?: boolean;
-  columnTitles: ReactElement[];
-  columnWidths?: number[];
+  columnTitles?: ReactNode[];
+  columnWidths?: (number | string)[];
   columnVerticalAlignments?: string[];
-  rows: ReactElement[][];
-  blankSlateContent?: ReactElement;
-  marginTop?: number;
+  rows: ReactNode[][];
+  blankSlateContent?: ReactNode;
+  marginTop?: boolean;
   leftColumnIsTh?: boolean;
 }): ReactElement => {
   const columnCountArray: unknown[] =

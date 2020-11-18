@@ -1,19 +1,12 @@
 import {
   createElement as h,
-  Component,
-  createRef,
   useState,
   useRef,
   useCallback,
   ReactElement,
   useEffect,
 } from "react";
-import {
-  BrowseFilter,
-  BrowseFilterType,
-  FilterType,
-  HelppoColumn,
-} from "../../sharedTypes";
+import { BrowseFilter, FilterType, HelppoColumn } from "../../sharedTypes";
 import niceifyName from "../utils/niceifyName";
 import Button, { ButtonStyles } from "./Button";
 import Select from "./Select";
@@ -54,7 +47,7 @@ const Filters = ({
   columns: HelppoColumn[];
   onChange: (filters: BrowseFilter[]) => void;
 }): ReactElement => {
-  const [dirtyFilters, setDirtyFilters] = useState<BrowseFilter[]>(
+  const [dirtyFilters, setDirtyFilters] = useState<BrowseFilter[]>(() =>
     filters.map((filter) => ({ ...filter }))
   );
   const [focusLastSelect, setFocusLastSelect] = useState<boolean>(false);
@@ -79,7 +72,7 @@ const Filters = ({
       },
     ]);
     setFocusLastSelect(true);
-  }, [columns, dirtyFilters]);
+  }, [columns, dirtyFilters, filterTypes]);
 
   const clearAllFilters = useCallback(() => {
     setDirtyFilters([]);

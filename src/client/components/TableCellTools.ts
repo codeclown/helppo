@@ -10,8 +10,6 @@ export type TableCellToolsImages = Pick<
   | "columnInfo"
   | "sortAsc"
   | "sortDesc"
-  | "sortAsc"
-  | "sortDesc"
   | "magnifierArrow"
   | "magnifierPlus"
   | "collapseLeft"

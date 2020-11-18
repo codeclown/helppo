@@ -6,7 +6,7 @@ import Container from "../components/Container";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 interface LicenseNoticeProps {
-  api: Api;
+  api: Pick<Api, "getLicenseNotice">;
   catchApiError: CatchApiError;
 }
 
@@ -20,7 +20,7 @@ const LicenseNotice = ({
     catchApiError(api.getLicenseNotice()).then((notice) => {
       setLicenseNotice(notice);
     });
-  }, []);
+  }, [api, catchApiError]);
 
   return h(
     Container,

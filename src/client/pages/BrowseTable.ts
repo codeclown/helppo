@@ -317,9 +317,9 @@ const RelatedTableLinks = ({ relations, row, urls }) => {
   });
 };
 
-interface BrowseTableProps {
+export interface BrowseTableProps {
   locationKey: string;
-  api: Pick<Api, "getTableRows" | "deleteRow" | "getTableRows">;
+  api: Pick<Api, "getTableRows" | "deleteRow">;
   urls: Pick<Urls, "browseTableUrl" | "editRowUrl">;
   images: TableCellToolsImages;
   columnTypeComponents: ColumnTypeComponents;
@@ -362,6 +362,15 @@ const BrowseTable = ({
   const [wildcardSearch, setWildcardSearch] = useState(
     browseOptions.wildcardSearch
   );
+
+  const getRows = useCallback(async () => {
+    const { rows, totalPages, totalResults } = await catchApiError(
+      api.getTableRows(table.name, browseOptions)
+    );
+    setTotalPages(totalPages);
+    setTotalResults(totalResults);
+    setRows(rows);
+  }, [table, browseOptions, api, catchApiError]);
 
   const deleteSelectedRows = useCallback(async () => {
     // Safe guard limiting only to a subset of visible rows, as it should be,
@@ -406,16 +415,15 @@ const BrowseTable = ({
       stillVisibleRowIds.includes(rowId)
     );
     setSelectedRows(selectedRowIdsToRemain);
-  }, [rows, table, selectedRows, browseOptions]);
-
-  const getRows = useCallback(async () => {
-    const { rows, totalPages, totalResults } = await catchApiError(
-      api.getTableRows(table.name, browseOptions)
-    );
-    setTotalPages(totalPages);
-    setTotalResults(totalResults);
-    setRows(rows);
-  }, [table, browseOptions]);
+  }, [
+    rows,
+    table,
+    selectedRows,
+    api,
+    getRows,
+    rememberDeletedRow,
+    showNotification,
+  ]);
 
   const updateBrowseOptions = useCallback(
     (updated, push = true) => {
@@ -426,26 +434,29 @@ const BrowseTable = ({
       );
       setRedirectTo({ to, push });
     },
-    [table, browseOptions, presentationOptions]
+    [table, browseOptions, presentationOptions, urls]
   );
 
   const debouncedWildcardSearch = useCallback(
-    debounce(
-      (newValue) =>
-        updateBrowseOptions(
-          { wildcardSearch: newValue },
-          browseOptions.wildcardSearch !== ""
-        ),
-      500
-    ),
-    [browseOptions]
+    (newValue: string) => {
+      const debounced = debounce(
+        (newValue: string) =>
+          updateBrowseOptions(
+            { wildcardSearch: newValue },
+            browseOptions.wildcardSearch !== ""
+          ),
+        500
+      );
+      debounced(newValue);
+    },
+    [updateBrowseOptions, browseOptions, debounce]
   );
 
   useEffect(() => {
     setRedirectTo(null);
     setWildcardSearch(browseOptions.wildcardSearch);
     getRows();
-  }, [locationKey, table, browseOptions]);
+  }, [locationKey, table, browseOptions, getRows]);
 
   const title = niceifyName(table.name);
 

@@ -140,8 +140,8 @@ const Navigation = ({
 }: {
   linkGroups: {
     icon: string;
-    dropdownTitle: string;
-    links: { url: string; text: string; separator?: boolean }[];
+    dropdownTitle?: string;
+    links: ({ url: string; text: string } | { separator: true })[];
   }[];
 }): ReactElement => {
   return h(
@@ -156,8 +156,12 @@ const Navigation = ({
           links,
         });
       }
-      return links.map(({ text, url }, index) =>
-        h(
+      return links.map((link, index) => {
+        if ("separator" in link) {
+          return null;
+        }
+        const { text, url } = link;
+        return h(
           TopLevelLink,
           {
             key: index,
@@ -165,8 +169,8 @@ const Navigation = ({
             url,
           },
           text
-        )
-      );
+        );
+      });
     })
   );
 };

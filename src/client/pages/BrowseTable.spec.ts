@@ -2,20 +2,42 @@ import { expect } from "chai";
 import { shallow } from "enzyme";
 import { createElement as h } from "react";
 import { Redirect } from "react-router-dom";
+import { ApiResponseDeleteRow } from "../../sharedTypes";
+import { ApiResponseGetRowsWithBrowseOptions } from "../Api";
 import Filters from "../components/Filters";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Table from "../components/Table";
 import TableCellTools from "../components/TableCellTools";
-import BrowseTable, { ColumnTitle } from "./BrowseTable";
+import BrowseTable, { BrowseTableProps, ColumnTitle } from "./BrowseTable";
 
-const baseProps = {
+const baseProps: BrowseTableProps = {
   locationKey: "",
-  api: {},
+  api: {
+    async getTableRows(): Promise<ApiResponseGetRowsWithBrowseOptions> {
+      return new Promise(() => {
+        // do nothing
+      });
+    },
+    async deleteRow(): Promise<ApiResponseDeleteRow> {
+      return new Promise(() => {
+        // do nothing
+      });
+    },
+  },
   urls: {
     editRowUrl: (...args) => `editRowUrl(${JSON.stringify(args)})`,
     browseTableUrl: (...args) => `browseTableUrl(${JSON.stringify(args)})`,
   },
-  images: {},
+  images: {
+    primaryKey: "images.primaryKey",
+    columnInfo: "images.columnInfo",
+    sortAsc: "images.sortAsc",
+    sortDesc: "images.sortDesc",
+    magnifierArrow: "images.magnifierArrow",
+    magnifierPlus: "images.magnifierPlus",
+    collapseLeft: "images.collapseLeft",
+    collapseRight: "images.collapseRight",
+  },
   columnTypeComponents: {},
   filterTypes: [
     {
@@ -29,9 +51,17 @@ const baseProps = {
       columnTypes: ["integer", "string", "text", "date", "datetime"],
     },
   ],
-  catchApiError: () => {},
-  showNotification: () => {},
-  rememberDeletedRow: () => {},
+  catchApiError: async () => {
+    return new Promise(() => {
+      // do nothing
+    });
+  },
+  showNotification: () => {
+    // do nothing
+  },
+  rememberDeletedRow: () => {
+    // do nothing
+  },
   table: {
     name: "test_table",
     primaryKey: "id",
@@ -52,6 +82,8 @@ const baseProps = {
     currentPage: 1,
     filters: [],
     wildcardSearch: "",
+    orderByColumn: null,
+    orderByDirection: "asc",
   },
   presentationOptions: {
     collapsedColumns: [],
@@ -145,7 +177,7 @@ describe("BrowseTable", () => {
       expect(wrapper.find(Redirect).props()).to.deep.equal({
         push: true,
         to:
-          'browseTableUrl(["test_table",{"perPage":20,"currentPage":1,"filters":[{"type":"equals","columnName":"name","value":"test"}],"wildcardSearch":""},{"collapsedColumns":[]}])',
+          'browseTableUrl(["test_table",{"perPage":20,"currentPage":1,"filters":[{"type":"equals","columnName":"name","value":"test"}],"wildcardSearch":"","orderByColumn":null,"orderByDirection":"asc"},{"collapsedColumns":[]}])',
       });
     });
   });
@@ -238,7 +270,9 @@ describe("BrowseTable", () => {
       const mockDebounce = (fn, timeout) => {
         expect(timeout).to.equal(500);
         callback = fn;
-        return () => {};
+        return () => {
+          // do nothing
+        };
       };
       const wrapper = shallow(
         h(BrowseTable, {
@@ -255,7 +289,7 @@ describe("BrowseTable", () => {
       callback("test 123");
       expect(wrapper.find(Redirect)).to.have.length(1);
       expect(wrapper.find(Redirect).props().to).to.equal(
-        'browseTableUrl(["test_table",{"perPage":20,"currentPage":1,"filters":[],"wildcardSearch":"test 123"},{"collapsedColumns":[]}])'
+        'browseTableUrl(["test_table",{"perPage":20,"currentPage":1,"filters":[],"wildcardSearch":"test 123","orderByColumn":null,"orderByDirection":"asc"},{"collapsedColumns":[]}])'
       );
     });
   });
@@ -277,7 +311,7 @@ describe("ColumnTitle", () => {
     expect(tools.type()).to.equal(TableCellTools);
     expect(tools.props().isPrimaryKey).to.equal(true);
     expect(tools.props().collapseColumnUrl).to.equal(
-      'browseTableUrl(["test_table",{"perPage":20,"currentPage":1,"filters":[],"wildcardSearch":""},{"collapsedColumns":["id"]}])'
+      'browseTableUrl(["test_table",{"perPage":20,"currentPage":1,"filters":[],"wildcardSearch":"","orderByColumn":null,"orderByDirection":"asc"},{"collapsedColumns":["id"]}])'
     );
     expect(tools.props().sortedAsc).to.equal(false);
     expect(tools.props().sortAscUrl).to.equal(

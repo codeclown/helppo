@@ -154,7 +154,7 @@ const App = ({
       setFilterTypes(filterTypes);
       setStatus(STATUS.DEFAULT);
     });
-  }, []);
+  }, [STATUS, api]);
 
   // Callbacks
 
@@ -234,7 +234,15 @@ const App = ({
         );
       }
     },
-    [schema, recentlyDeletedRows, api, showNotification, setRecentlyDeletedRows]
+    [
+      schema,
+      recentlyDeletedRows,
+      api,
+      showNotification,
+      setRecentlyDeletedRows,
+      STATUS,
+      catchApiError,
+    ]
   );
 
   // Route callbacks
@@ -391,7 +399,6 @@ const App = ({
       catchApiError,
       showNotification,
       rememberDeletedRow,
-      schema,
     ]
   );
 

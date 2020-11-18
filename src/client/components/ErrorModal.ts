@@ -1,4 +1,4 @@
-import { createElement as h, Component, Fragment, ReactElement } from "react";
+import { createElement as h, Fragment, ReactElement } from "react";
 import { YeaRequestError } from "yea";
 import Button, { ButtonStyles } from "./Button";
 import CodeBlock from "./CodeBlock";

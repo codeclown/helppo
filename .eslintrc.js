@@ -19,12 +19,13 @@ module.exports = {
     es6: true,
     node: true,
   },
-  plugins: ["filenames", "@typescript-eslint"],
+  plugins: ["filenames", "@typescript-eslint", "react-hooks"],
   rules: {
     "filenames/match-exported": "error",
     "filenames/no-index": "error",
     "import/extensions": "error",
     "no-console": "warn",
+    "react-hooks/exhaustive-deps": "warn",
   },
   overrides: [
     {

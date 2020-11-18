@@ -44,8 +44,8 @@ import limitText from "../utils/limitText";
 import niceifyName from "../utils/niceifyName";
 
 interface RelatedRowsProps {
-  api: Api;
-  urls: Urls;
+  api: Pick<Api, "getTableRows">;
+  urls: Pick<Urls, "browseTableUrl">;
   schema: HelppoSchema;
   table: HelppoTable;
   row: RowObject;
@@ -136,7 +136,7 @@ const RelatedRows = ({
         console.error(error);
         setStatus(errored);
       });
-  }, []);
+  }, [api, row, schema, table]);
 
   if (status === loading) {
     return h(Container, null, h(LoadingSpinner, { height: 16 }));
@@ -236,8 +236,8 @@ enum STATUS {
 }
 
 interface EditRowProps {
-  api: Api;
-  urls: Urls;
+  api: Pick<Api, "getTableRows" | "saveRow" | "deleteRow">;
+  urls: Pick<Urls, "editRowUrl" | "browseTableUrl" | "tableIndexUrl">;
   images: Images;
   columnTypeComponents: ColumnTypeComponents;
   catchApiError: CatchApiError;

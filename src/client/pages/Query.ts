@@ -17,8 +17,11 @@ const textareaMinHeight = 80;
 interface QueryProps {
   initialSql: string;
   replaceSqlInUrl: (sql: string) => void;
-  api: Api;
-  userDefaults: UserDefaults;
+  api: Pick<Api, "runSqlQuery">;
+  userDefaults: Pick<
+    UserDefaults,
+    "getQueryTextareaHeight" | "setQueryTextareaHeight"
+  >;
   catchApiError: CatchApiError;
 }
 

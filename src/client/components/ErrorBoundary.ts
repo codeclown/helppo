@@ -1,4 +1,10 @@
-import { createElement as h, Component, ErrorInfo } from "react";
+import {
+  createElement as h,
+  Component,
+  ErrorInfo,
+  ReactElement,
+  Fragment,
+} from "react";
 import { mapStackTrace } from "sourcemapped-stacktrace";
 import CodeBlock from "./CodeBlock";
 import Container from "./Container";
@@ -43,7 +49,7 @@ class ErrorBoundary extends Component<
     this.setState({ errorInfo });
   }
 
-  render() {
+  render(): ReactElement {
     if (this.state.error) {
       const stack = `${this.state.sourcemapped || this.state.error.stack}${
         this.state.errorInfo ? this.state.errorInfo.componentStack : ""
@@ -56,7 +62,7 @@ class ErrorBoundary extends Component<
       );
     }
 
-    return this.props.children;
+    return h(Fragment, null, this.props.children);
   }
 }
 
