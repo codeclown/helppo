@@ -76,7 +76,10 @@ async function prompt(message) {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-  });
+  }) as readline.Interface & {
+    output: NodeJS.WritableStream;
+    _writeToOutput: (string: string) => void;
+  };
   const text = message.trim() + " ";
   rl._writeToOutput = function _writeToOutput(string) {
     rl.output.write(string.includes("\n") ? "\n" : "");
@@ -90,6 +93,13 @@ async function prompt(message) {
   });
 }
 
+class PrettyError extends Error {
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, PrettyError.prototype);
+  }
+}
+
 async function main() {
   const argv = parseArgs(process.argv.slice(2), {
     booleans: ["help", "no-color", "dev"],
@@ -97,20 +107,21 @@ async function main() {
   });
 
   if (argv.options["no-color"]) {
-    for (let key in colors) {
+    for (const key in colors) {
       colors[key] = "";
     }
   }
 
   let connectionString = argv.args[0] || process.env.DATABASE_URL || "";
 
-  if (argv.options.knexfile) {
+  if (typeof argv.options.knexfile === "string") {
     const knexfilePath = argv.options.knexfile.startsWith("/")
       ? argv.options.knexfile
       : path.join(process.cwd(), argv.options.knexfile);
     // eslint-disable-next-line no-console
     console.log(`Reading knexfile: ${knexfilePath}`);
     try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const knexConfig = require(knexfilePath);
       connectionString = await connectionStringFromKnexfile(knexConfig);
     } catch (exception) {
@@ -171,8 +182,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
 
     if (connectionString.startsWith("postgres://")) {
       if (!availableDatabaseLibraries.pg) {
-        const error = new Error("The package 'pg' is not installed.");
-        error.pretty = true;
+        const error = new PrettyError("The package 'pg' is not installed.");
         throw error;
       }
       resolver = pgResolver;
@@ -181,8 +191,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
 
     if (connectionString.startsWith("mysql://")) {
       if (!availableDatabaseLibraries.mysql) {
-        const error = new Error("The package 'mysql' is not installed.");
-        error.pretty = true;
+        const error = new PrettyError("The package 'mysql' is not installed.");
         throw error;
       }
       resolver = mysqlResolver;
@@ -193,8 +202,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
       "Please check your connection string. Currently supported formats:\n\n  - postgres://[user]:[password]@[host]:[port]/[database]\n  - mysql://[user]:[password]@[host]:[port]/[database]";
 
     if (!resolver) {
-      const error = new Error(connectionStringErrorMessage);
-      error.pretty = true;
+      const error = new PrettyError(connectionStringErrorMessage);
       throw error;
     }
 
@@ -202,8 +210,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
     try {
       config = await resolver.parseConnectionString(connectionString);
     } catch (exception) {
-      const error = new Error(connectionStringErrorMessage);
-      error.pretty = true;
+      const error = new PrettyError(connectionStringErrorMessage);
       throw error;
     }
 
@@ -214,8 +221,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
         const value = await prompt(result.prompt.message);
         config[result.prompt.field] = value;
       } else if (result.error) {
-        const error = new Error(result.error);
-        error.pretty = true;
+        const error = new PrettyError(result.error);
         throw error;
       } else if (result.pool) {
         driver = new Driver(result.pool);
@@ -225,7 +231,7 @@ ${colors.bold}COPYRIGHT AND LICENSE${colors.reset}
       }
     }
   } catch (error) {
-    if (error.pretty) {
+    if (error instanceof PrettyError) {
       error.message = `Connecting to database ${colors.red}failed${colors.reset}:\n  ${error.message}`;
     }
     throw error;

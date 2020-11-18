@@ -1,4 +1,18 @@
-export default async function connectionStringFromKnexfile(knexConfig) {
+interface KnexConfig {
+  client?: string;
+  connection?: {
+    host?: string;
+    port?: number;
+    user?: string;
+    password?: string;
+    database?: string;
+    socketPath?: string;
+  };
+}
+
+export default async function connectionStringFromKnexfile(
+  knexConfig: KnexConfig | (() => Promise<KnexConfig>)
+): Promise<string> {
   if (typeof knexConfig === "function") {
     knexConfig = await knexConfig();
   }
