@@ -79,12 +79,17 @@ const Dropdown = ({ icon, title, links }): ReactElement => {
         "Navigation-dropdown",
         isOpen && "Navigation-dropdown--open"
       ),
+      onFocus: () => {
+        if (!isOpen) {
+          setIsOpen(true);
+        }
+      },
       onBlur: (event: FocusEvent) => {
-        const target = event.relatedTarget as HTMLDivElement;
+        const target = event.relatedTarget;
         if (
-          isOpen &&
-          // Nasty
-          !target.classList.contains("Navigation-dropdown-link")
+          target === document ||
+          (isOpen &&
+            !(target as Element).classList.contains("Navigation-dropdown-link"))
         ) {
           setIsOpen(false);
         }

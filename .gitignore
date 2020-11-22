@@ -1,3 +1,4 @@
 dist
+smoke-test
 node_modules
 yarn-error.log

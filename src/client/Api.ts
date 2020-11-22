@@ -109,3 +109,59 @@ export default class Api {
     return response as ApiResponseColumnTypes;
   }
 }
+
+export class MockApi extends Api {
+  async getConfigNotice(): Promise<ApiResponseConfigNotice> {
+    return new Promise(() => {
+      // never resolve
+    });
+  }
+
+  async getSchema(): Promise<ApiResponseSchema> {
+    return new Promise(() => {
+      // never resolve
+    });
+  }
+
+  async getColumnTypes(): Promise<ApiResponseColumnTypes> {
+    return new Promise(() => {
+      // never resolve
+    });
+  }
+
+  async getFilterTypes(): Promise<ApiResponseFilterTypes> {
+    return new Promise(() => {
+      // never resolve
+    });
+  }
+
+  async getTableRows(): Promise<ApiResponseGetRowsWithBrowseOptions> {
+    return new Promise(() => {
+      // never resolve
+    });
+  }
+
+  async saveRow(): Promise<ApiResponseSaveRow> {
+    return new Promise(() => {
+      // never resolve
+    });
+  }
+
+  async deleteRow(): Promise<ApiResponseDeleteRow> {
+    return new Promise(() => {
+      // never resolve
+    });
+  }
+
+  async runSqlQuery(): Promise<ApiResponseExecuteRawSql> {
+    return new Promise(() => {
+      // never resolve
+    });
+  }
+
+  async getLicenseNotice(): Promise<ApiResponseColumnTypes> {
+    return new Promise(() => {
+      // never resolve
+    });
+  }
+}

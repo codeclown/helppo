@@ -6,14 +6,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import {
-  Switch,
-  Route,
-  Redirect,
-  BrowserRouter,
-  BrowserRouterProps,
-  RouteComponentProps,
-} from "react-router-dom";
+import { Switch, Route, Redirect, RouteComponentProps } from "react-router-dom";
 import {
   ApiResponseConfigNotice,
   ApiResponseFilterTypes,
@@ -87,13 +80,18 @@ export type ShowNotification = (
 
 // Main component
 
-interface AppProps {
+export interface AppProps {
+  Router: ({ children }) => ReactElement;
   api: Api;
   urls: Urls;
   images: Images;
   userDefaults: UserDefaults;
-  Router: typeof BrowserRouter;
-  routerProps?: BrowserRouterProps;
+  // Adding internal state handling functions to this object so they
+  // can be called in tests
+  testingUtilities?: {
+    catchApiError?: CatchApiError;
+    showNotification?: ShowNotification;
+  };
 }
 
 const App = ({
@@ -102,7 +100,7 @@ const App = ({
   images,
   userDefaults,
   Router,
-  routerProps,
+  testingUtilities,
 }: AppProps): ReactElement => {
   enum STATUS {
     LOADING = "LOADING",
@@ -121,6 +119,7 @@ const App = ({
   const [schema, setSchema] = useState<HelppoSchema>({
     tables: [],
   });
+  const [timeoutIds, setTimeoutIds] = useState<NodeJS.Timeout[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [recentlyDeletedRows, setRecentlyDeletedRows] = useState<
     RecentlyDeletedRow[]
@@ -154,7 +153,14 @@ const App = ({
       setFilterTypes(filterTypes);
       setStatus(STATUS.DEFAULT);
     });
-  }, [STATUS, api]);
+  }, [STATUS.DEFAULT, STATUS.LOADING, api]);
+
+  useEffect(() => {
+    return () =>
+      timeoutIds.forEach((timeoutId) => {
+        clearTimeout(timeoutId);
+      });
+  }, [timeoutIds]);
 
   // Callbacks
 
@@ -164,6 +170,9 @@ const App = ({
       throw error;
     });
   }, []);
+  if (testingUtilities) {
+    testingUtilities.catchApiError = catchApiError;
+  }
 
   const hideNotification = useCallback(
     (notification) => {
@@ -184,10 +193,17 @@ const App = ({
         },
       };
       setNotifications([...notifications, notification]);
-      setTimeout(() => hideNotification(notification), options.clearAfter);
+      const timeoutId = setTimeout(
+        () => hideNotification(notification),
+        notification.options.clearAfter
+      );
+      setTimeoutIds([...timeoutIds, timeoutId]);
     },
-    [notifications, hideNotification]
+    [notifications, timeoutIds, hideNotification]
   );
+  if (testingUtilities) {
+    testingUtilities.showNotification = showNotification;
+  }
 
   const rememberDeletedRow = useCallback<RememberDeletedRow>(
     (table, row) => {
@@ -235,13 +251,12 @@ const App = ({
       }
     },
     [
-      schema,
+      schema.tables,
       recentlyDeletedRows,
+      catchApiError,
       api,
       showNotification,
-      setRecentlyDeletedRows,
-      STATUS,
-      catchApiError,
+      STATUS.DEFAULT,
     ]
   );
 
@@ -426,7 +441,7 @@ const App = ({
   // Return value
 
   if (status === STATUS.LOADING) {
-    return h(Router, routerProps, h(Navigation));
+    return h(Router, null, h(Navigation));
   }
 
   if (configNotice.suggestedFreshSchema) {
@@ -440,7 +455,7 @@ const App = ({
     null,
     h(
       Router,
-      routerProps,
+      null,
       h(Navigation, {
         linkGroups: [
           {
