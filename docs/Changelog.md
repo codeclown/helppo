@@ -10,6 +10,20 @@ Changes to be released in an upcoming release:
 
 -
 
+## 0.4.0 - 2020-11-24
+
+### Added
+
+- Wildcard search of any text-based column (see [#9](https://github.com/codeclown/helppo/issues/9) for screenshot)
+- CLI: New `--knexfile` option
+- CLI: Support `DATABASE_URL` environment variable
+- Better 404-views
+
+### Fixed
+
+- Switched to using connection pools instead of single connections. This allows for better performance and control for users of the middleware, and the possibility of using transactions in the future if needed.
+- Improved future maintainability by converting most of the JavaScript codebase to TypeScript.
+
 ## 0.3.1 - 2020-11-01
 
 ### Fixed
