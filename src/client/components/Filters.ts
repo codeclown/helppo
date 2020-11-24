@@ -51,7 +51,7 @@ const Filters = ({
     filters.map((filter) => ({ ...filter }))
   );
   const [focusLastSelect, setFocusLastSelect] = useState<boolean>(false);
-  const lastColumnSelectRef = useRef<HTMLSelectElement>();
+  const lastColumnSelectRef = useRef<HTMLSelectElement>(null);
 
   const triggerOnChange = useCallback(() => {
     onChange(dirtyFilters);
@@ -75,9 +75,8 @@ const Filters = ({
   }, [columns, dirtyFilters, filterTypes]);
 
   const clearAllFilters = useCallback(() => {
-    setDirtyFilters([]);
-    setTimeout(triggerOnChange);
-  }, [triggerOnChange]);
+    onChange([]);
+  }, [onChange]);
 
   const removeFilter = useCallback(
     (filter: BrowseFilter) => {
@@ -199,7 +198,7 @@ const Filters = ({
             h(Select, {
               slim: true,
               placeholder: "Column",
-              ref: isLast && lastColumnSelectRef,
+              ref: isLast ? lastColumnSelectRef : null,
               options: columns
                 .filter((column) => {
                   return (

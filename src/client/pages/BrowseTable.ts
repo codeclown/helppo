@@ -1,4 +1,3 @@
-import { debounce as debounceLib } from "debounce";
 import {
   createElement as h,
   useState,
@@ -8,12 +7,13 @@ import {
   useCallback,
   ReactElement,
 } from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, useLocation } from "react-router-dom";
 import {
   BrowseOptions,
   FilterType,
   HelppoColumn,
   HelppoTable,
+  PresentationOptions,
 } from "../../sharedTypes";
 import Api from "../Api";
 import {
@@ -49,11 +49,11 @@ import TotalResults from "../components/TotalResults";
 import limitText from "../utils/limitText";
 import naiveCsvStringify from "../utils/naiveCsvStringify";
 import niceifyName from "../utils/niceifyName";
+import {
+  parseBrowseOptions,
+  parsePresentationOptions,
+} from "../utils/queryString";
 import range from "../utils/range";
-
-interface PresentationOptions {
-  collapsedColumns: string[];
-}
 
 interface ColumnTitleProps {
   presentationOptions: PresentationOptions;
@@ -318,7 +318,6 @@ const RelatedTableLinks = ({ relations, row, urls }) => {
 };
 
 export interface BrowseTableProps {
-  locationKey: string;
   api: Pick<Api, "getTableRows" | "deleteRow">;
   urls: Pick<Urls, "browseTableUrl" | "editRowUrl">;
   images: TableCellToolsImages;
@@ -332,13 +331,9 @@ export interface BrowseTableProps {
     table: HelppoTable;
     column: HelppoColumn;
   }[];
-  browseOptions: BrowseOptions;
-  presentationOptions: PresentationOptions;
-  debounce?: typeof debounceLib;
 }
 
 const BrowseTable = ({
-  locationKey,
   api,
   urls,
   images,
@@ -349,28 +344,29 @@ const BrowseTable = ({
   rememberDeletedRow,
   table,
   relations,
-  browseOptions,
-  presentationOptions,
-  debounce = debounceLib,
 }: BrowseTableProps): ReactElement => {
+  const location = useLocation();
   const containerRef = useRef();
   const [rows, setRows] = useState(null);
   const [totalResults, setTotalResults] = useState(null);
   const [totalPages, setTotalPages] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]);
   const [redirectTo, setRedirectTo] = useState(null);
-  const [wildcardSearch, setWildcardSearch] = useState(
-    browseOptions.wildcardSearch
-  );
+  const [browseOptions, setBrowseOptions] = useState(null);
+  const [presentationOptions, setPresentationOptions] = useState(null);
+  const [wildcardSearch, setWildcardSearch] = useState("");
 
-  const getRows = useCallback(async () => {
-    const { rows, totalPages, totalResults } = await catchApiError(
-      api.getTableRows(table.name, browseOptions)
-    );
-    setTotalPages(totalPages);
-    setTotalResults(totalResults);
-    setRows(rows);
-  }, [table, browseOptions, api, catchApiError]);
+  const getRows = useCallback(
+    async (browseOptions: BrowseOptions) => {
+      const { rows, totalPages, totalResults } = await catchApiError(
+        api.getTableRows(table.name, browseOptions)
+      );
+      setTotalPages(totalPages);
+      setTotalResults(totalResults);
+      setRows(rows);
+    },
+    [table, api, catchApiError]
+  );
 
   const deleteSelectedRows = useCallback(async () => {
     // Safe guard limiting only to a subset of visible rows, as it should be,
@@ -409,7 +405,7 @@ const BrowseTable = ({
         } deleted`
       );
     }
-    await getRows();
+    await getRows(browseOptions);
     const stillVisibleRowIds = rows.map((row) => row[table.primaryKey]);
     const selectedRowIdsToRemain = selectedRows.filter((rowId) =>
       stillVisibleRowIds.includes(rowId)
@@ -417,10 +413,11 @@ const BrowseTable = ({
     setSelectedRows(selectedRowIdsToRemain);
   }, [
     rows,
-    table,
     selectedRows,
-    api,
     getRows,
+    browseOptions,
+    table,
+    api,
     rememberDeletedRow,
     showNotification,
   ]);
@@ -437,28 +434,27 @@ const BrowseTable = ({
     [table, browseOptions, presentationOptions, urls]
   );
 
-  const debouncedWildcardSearch = useCallback(
-    (newValue: string) => {
-      const debounced = debounce(
-        (newValue: string) =>
-          updateBrowseOptions(
-            { wildcardSearch: newValue },
-            browseOptions.wildcardSearch !== ""
-          ),
-        500
-      );
-      debounced(newValue);
-    },
-    [updateBrowseOptions, browseOptions, debounce]
-  );
-
+  const [locationKey, setLocationKey] = useState("");
   useEffect(() => {
-    setRedirectTo(null);
-    setWildcardSearch(browseOptions.wildcardSearch);
-    getRows();
-  }, [locationKey, table, browseOptions, getRows]);
+    if (location.key !== locationKey) {
+      const searchParams = new URLSearchParams(location.search);
+      const browseOptions = parseBrowseOptions(searchParams);
+      const presentationOptions = parsePresentationOptions(searchParams);
+      setWildcardSearch(browseOptions.wildcardSearch);
+      // TODO should probably pass from query as-is to server, and utilize returned browseOptions
+      setBrowseOptions(browseOptions);
+      setPresentationOptions(presentationOptions);
+      getRows(browseOptions);
+      setRedirectTo(null);
+      setLocationKey(location.key);
+    }
+  }, [location.key, location.search, getRows, locationKey]);
 
   const title = niceifyName(table.name);
+
+  if (!browseOptions) {
+    return h("div");
+  }
 
   return h(
     "div",
@@ -545,7 +541,14 @@ const BrowseTable = ({
           value: wildcardSearch,
           onChange: (value) => {
             setWildcardSearch(value);
-            debouncedWildcardSearch(value);
+          },
+          onKeyUp: (event) => {
+            if (event.key === "Enter") {
+              updateBrowseOptions(
+                { wildcardSearch, currentPage: 1 },
+                browseOptions.wildcardSearch !== ""
+              );
+            }
           },
         })
       )

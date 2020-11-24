@@ -1,12 +1,9 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect } from "chai";
 import { createElement as h } from "react";
 import { StaticRouter as Router } from "react-router-dom";
-import { useDom, doneWithDom, Screen } from "../../../test/domSetup";
 import Navigation from "./Navigation";
-
-let screen: Screen;
 
 function getTopLevelItem(text: string): HTMLAnchorElement {
   const span = screen.getByText(text) as HTMLSpanElement;
@@ -23,9 +20,6 @@ function getDropdownItem(text: string): HTMLAnchorElement {
 }
 
 describe("Navigation", () => {
-  beforeEach(() => (screen = useDom()));
-  after(() => doneWithDom());
-
   it("renders without props", () => {
     render(h(Router, null, h(Navigation)));
     expect(document.querySelector(".Navigation")).to.not.equal(null);

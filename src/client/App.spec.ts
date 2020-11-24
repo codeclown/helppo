@@ -1,10 +1,9 @@
-import { render, waitFor } from "@testing-library/react";
+import { render, waitFor, screen } from "@testing-library/react";
 import { expect } from "chai";
 import { History, createMemoryHistory } from "history";
 import { createElement as h, ReactElement } from "react";
 import { Router as ReactRouter } from "react-router";
 import sinon from "sinon";
-import { useDom, doneWithDom, Screen } from "../../test/domSetup";
 import {
   ApiResponseColumnTypes,
   ApiResponseConfigNotice,
@@ -19,8 +18,6 @@ import Images from "./Images";
 import Urls from "./Urls";
 import UserDefaults from "./UserDefaults";
 
-let screen: Screen;
-
 const routerWithHistory = (history: History) => ({ children }): ReactElement =>
   h(ReactRouter, { history }, children);
 
@@ -33,9 +30,6 @@ const baseProps: AppProps = {
 };
 
 describe("App", () => {
-  beforeEach(() => (screen = useDom()));
-  after(() => doneWithDom());
-
   it("renders loading state", () => {
     const api = new MockApi("/<mountpath>");
     render(h(App, { ...baseProps, api }));

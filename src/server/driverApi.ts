@@ -122,6 +122,7 @@ const driverApi = (
     if (!table) {
       throw new Error(`Unknown table: ${JSON.stringify(req.params.tableName)}`);
     }
+    // TODO should utilize parseBrowseOptions
     let browseOptions;
     try {
       browseOptions = JSON.parse(req.query.browseOptions.toString());

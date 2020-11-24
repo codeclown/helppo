@@ -119,13 +119,6 @@ SOFTWARE.
 
 -----
 
-Package: debounce
-Source: https://npmjs.com/package/debounce
-License: MIT
-
-
------
-
 Package: dom-helpers
 Source: https://npmjs.com/package/dom-helpers
 License: MIT

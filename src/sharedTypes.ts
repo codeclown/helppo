@@ -15,17 +15,19 @@ export interface RowObject {
 
 // BROWSEOPTIONS
 
-export type BrowseFilterType =
-  | "equals"
-  | "notEquals"
-  | "contains"
-  | "notContains"
-  | "null"
-  | "notNull"
-  | "gt"
-  | "gte"
-  | "lt"
-  | "lte";
+export const browseFilterTypes = [
+  "equals",
+  "notEquals",
+  "contains",
+  "notContains",
+  "null",
+  "notNull",
+  "gt",
+  "gte",
+  "lt",
+  "lte",
+] as const;
+type BrowseFilterType = typeof browseFilterTypes[number];
 
 export interface BrowseFilter {
   type: BrowseFilterType;
@@ -33,13 +35,20 @@ export interface BrowseFilter {
   value: QueryParam;
 }
 
+export const orderByDirections = ["asc", "desc"] as const;
+export type OrderByDirection = typeof orderByDirections[number];
+
 export interface BrowseOptions {
   perPage: number;
   currentPage: number;
   filters: BrowseFilter[];
   orderByColumn: string | null;
-  orderByDirection: "asc" | "desc";
+  orderByDirection: OrderByDirection;
   wildcardSearch: string;
+}
+
+export interface PresentationOptions {
+  collapsedColumns: string[];
 }
 
 // SCHEMA

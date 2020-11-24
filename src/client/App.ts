@@ -317,23 +317,7 @@ const App = ({
           });
         })
       );
-      const searchParams = new URLSearchParams(routeProps.location.search);
-      let browseOptions = {};
-      try {
-        browseOptions = JSON.parse(searchParams.get("browseOptions"));
-      } catch (exception) {
-        // do nothing
-      }
-      let presentationOptions = {};
-      try {
-        presentationOptions = JSON.parse(
-          searchParams.get("presentationOptions")
-        );
-      } catch (exception) {
-        // do nothing
-      }
       return h(BrowseTable, {
-        locationKey: routeProps.location.key,
         api,
         urls,
         images,
@@ -344,19 +328,6 @@ const App = ({
         rememberDeletedRow,
         table,
         relations,
-        browseOptions: {
-          perPage: 20,
-          currentPage: 1,
-          filters: [],
-          orderByColumn: null,
-          orderByDirection: "asc",
-          wildcardSearch: "",
-          ...browseOptions,
-        },
-        presentationOptions: {
-          collapsedColumns: [],
-          ...presentationOptions,
-        },
       });
     },
     [

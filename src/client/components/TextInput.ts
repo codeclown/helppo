@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import {
+  KeyboardEvent,
   createElement as h,
   ForwardedRef,
   forwardRef,
@@ -20,6 +21,7 @@ const TextInput = forwardRef(
       textAlignCenter,
       danger,
       onChange,
+      onKeyUp,
       onBlur,
       autoFocus,
       ...rest
@@ -34,6 +36,7 @@ const TextInput = forwardRef(
       textAlignCenter?: boolean;
       danger?: boolean;
       onChange?: (value: string) => void;
+      onKeyUp?: (event: KeyboardEvent<HTMLInputElement>) => void;
       onBlur?: (value: string) => void;
       autoFocus?: boolean;
     },
@@ -64,6 +67,12 @@ const TextInput = forwardRef(
       props.value = value;
       props.onChange = (event) => {
         onChange(event.target.value);
+      };
+    }
+
+    if (onKeyUp) {
+      props.onKeyUp = (event) => {
+        onKeyUp(event);
       };
     }
 
