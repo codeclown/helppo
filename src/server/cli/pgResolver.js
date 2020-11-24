@@ -9,7 +9,7 @@ export async function parseConnectionString(
 
 export async function resolveConnection(config, localRequire = require) {
   const pg = localRequire("pg");
-  const pool = new pg.Pool(config);
+  const pool = new pg.Pool({ ...config, max: 1 });
   try {
     await pool.query("SELECT NOW()");
   } catch (error) {

@@ -13,13 +13,13 @@ describe("pgResolver", () => {
   describe("resolveConnection", () => {
     it("uses given config and returns successful pool", async () => {
       let fakeConnection;
-      const fakeConfig = {};
+      const fakeConfig = { foo: "bar" };
       const localRequire = (lib) => {
         expect(lib).to.equal("pg", "should require pg");
         return {
           Pool: class FakePgPool {
-            constructor(config) {
-              expect(config).to.equal(fakeConfig);
+            constructor(poolConfig) {
+              expect(poolConfig).to.deep.equal({ foo: "bar", max: 1 });
               fakeConnection = this;
             }
             query() {

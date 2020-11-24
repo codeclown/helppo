@@ -10,7 +10,7 @@ export async function parseConnectionString(
 export async function resolveConnection(config, localRequire = require) {
   const mysql = localRequire("mysql");
 
-  const pool = mysql.createPool(config);
+  const pool = mysql.createPool({ ...config, connectionLimit: 1 });
 
   const connect = new Promise((resolve, reject) => {
     pool.query("SELECT NOW()", (error) => {

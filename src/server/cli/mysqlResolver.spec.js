@@ -11,12 +11,15 @@ describe("mysqlResolver", () => {
   describe("resolveConnection", () => {
     it("uses given config and returns successful connection", async () => {
       let fakeConnection;
-      const fakeConfig = {};
+      const fakeConfig = { foo: "bar" };
       const localRequire = (lib) => {
         expect(lib).to.equal("mysql", "should require mysql");
         return {
-          createPool: (config) => {
-            expect(config).to.equal(fakeConfig);
+          createPool: (poolConfig) => {
+            expect(poolConfig).to.deep.equal({
+              foo: "bar",
+              connectionLimit: 1,
+            });
             const pool = {
               query: (sql, callback) => callback(),
             };
