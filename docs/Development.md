@@ -6,6 +6,7 @@
 
 - [Table of Contents](#table-of-contents)
 - [Read this first!](#read-this-first)
+- [Code style, linting, etc.](#code-style-linting-etc)
 - [Set up a local development environment](#set-up-a-local-development-environment)
   - [Starting databases via docker](#starting-databases-via-docker)
 - [Local development server](#local-development-server)
@@ -18,6 +19,9 @@
   - [Prerequisites](#prerequisites-1)
   - [Run tests](#run-tests-1)
   - [Lint](#lint)
+- [Dependencies and their licenses](#dependencies-and-their-licenses)
+  - [Allowed licenses for third-party dependencies](#allowed-licenses-for-third-party-dependencies)
+  - [Third-party license notice](#third-party-license-notice)
 - [Managing documentation](#managing-documentation)
 - [Release process](#release-process)
 
@@ -29,7 +33,7 @@ The following paragraphs answer questions you might have when getting started.
 
 **JavaScript** files are contained inside `src/`. They are linted via eslint (run `yarn lint:js`). Only standard ES syntax is allowed. Upon build-time the files are compiled via babel into `build/` to ensure compatibility with `require`.
 
-**Tests** are contained inside `src/` adjacent to the source files (e.g. `App.js` and `App.spec.js`). Some tests use **snapshots**, which are stored in `<repository_root>/__snapshots__`.
+**Tests** are contained inside `src/` adjacent to the source files (e.g. `App.js` and `App.spec.js`).
 
 **CSS** files are contained inside `src/` adjacent to the source files (e.g. `Navigation.js` and `Navigation.css`). Upon build-time they are concatenated into one large CSS file. They are also linted (run `yarn lint:css`). There is also `base.css` which defines global styles and CSS variables.
 
@@ -38,6 +42,17 @@ The following paragraphs answer questions you might have when getting started.
 **Dependencies** for the client bundle are listed under `devDependencies`. Only server-side dependencies are needed under `dependencies`.
 
 **Do I need X?** You need _git_ for version control, _yarn_ for running stuff and _Docker_ for running tests. That should be it.
+
+## Code style, linting, etc.
+
+Code style and formatting is automatically ensured via:
+
+- eslint
+- Prettier
+
+It's recommended to take advantage of this automation by installing the appropriate plugins in your editor of choice, if you haven't already.
+
+Optionally, install an IDE plugin (such as https://github.com/frigus02/vscode-sql-tagged-template-literals) to take advantage of `/*sql*/` comments scattered around the driver code.
 
 ## Set up a local development environment
 
@@ -135,12 +150,6 @@ Limit the tests to run via usual mocha grepping:
 yarn test -g "full schema"
 ```
 
-Many tests rely on snapshots. If you want to update a conflicting snapshot, run:
-
-```bash
-yarn test:update
-```
-
 ### Lint
 
 The following command lints the codebase.
@@ -148,6 +157,44 @@ The following command lints the codebase.
 ```bash
 yarn lint
 ```
+
+## Dependencies and their licenses
+
+### Allowed licenses for third-party dependencies
+
+Because certain derivatives of the Helppo codebase may be released under proprietary and copyleft licenses in the future (see [From v1.0 onwards](../README.md#from-v10-onwards)), special care should be taken when including third-party dependencies, to ensure that no third-party licenses are violated.
+
+The following licenses are known to be compliant, and dependencies under these licenses can be included in Helppo:
+
+- MIT
+- ISC
+- Zlib
+- BSD-0-Clause
+- BSD-2-Clause
+- BSD-3-Clause
+- Apache-2.0
+- CC0-1.0
+- CC-BY-3.0
+- CC-BY-4.0
+- WTFPL
+
+### Third-party license notice
+
+Additionally, care must be taken that appropriate third-party license notices are present in distributed software.
+
+For when a dependency is `require()`'d or `import()`'ed (i.e. linking) directly from node_modules, there is no need for extra measures. Packages under node_modules/ include their own license notice inside each package sub-directory.
+
+For when a dependency is bundled, using browserify, into one of the front-end bundles that are then distributed as part of Helppo, it must be ensured that their license notices are included in the file `LICENSE-3RD-PARTIES`.
+
+Keeping the file up-to-date is automated, via `browserify-plugin-license-notice`. Running `yarn build` should update the file with the latest dependencies, if any new were added.
+
+The previously mentioned browserify plugin also includes a CLI tool to update the file. For when needed:
+
+```shell
+$ ./node_modules/.bin/browserify-bundle-license-notice dist/client/client.js > LICENSE-3RD-PARTIES
+```
+
+As an added measure, in the CI steps the same binary is ran in "CI mode", which means that if the file is out-dated, the build shall fail.
 
 ## Managing documentation
 

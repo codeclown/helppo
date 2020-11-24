@@ -1,6 +1,13 @@
 module.exports = {
-  extends: ["eslint:recommended", "prettier", "plugin:import/recommended"],
-  ignorePatterns: ["dist/", "__snapshots__"],
+  root: true,
+  parser: "@typescript-eslint/parser",
+  extends: [
+    "eslint:recommended",
+    "prettier",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+  ],
+  ignorePatterns: ["dist/"],
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: "module",
@@ -12,16 +19,21 @@ module.exports = {
     es6: true,
     node: true,
   },
-  plugins: ["filenames"],
+  plugins: ["filenames", "@typescript-eslint", "react-hooks"],
   rules: {
     "filenames/match-exported": "error",
     "filenames/no-index": "error",
     "import/extensions": "error",
     "no-console": "warn",
+    "react-hooks/exhaustive-deps": "warn",
   },
   overrides: [
     {
-      files: ["**/*.spec.js", "src/server/drivers/driverSpec.js"],
+      files: ["**/*.ts"],
+      extends: ["plugin:@typescript-eslint/recommended"],
+    },
+    {
+      files: ["**/*.spec.*", "src/server/drivers/driverSpec.*"],
       env: {
         mocha: true,
       },

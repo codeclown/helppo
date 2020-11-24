@@ -10,14 +10,14 @@ export async function parseConnectionString(
 export async function resolveConnection(config, localRequire = require) {
   const mysql = localRequire("mysql");
 
-  const connection = mysql.createConnection(config);
+  const pool = mysql.createPool(config);
 
   const connect = new Promise((resolve, reject) => {
-    connection.connect((error) => {
+    pool.query("SELECT NOW()", (error) => {
       if (error) {
         return reject(error);
       }
-      resolve(connection);
+      resolve(pool);
     });
   });
 
@@ -36,5 +36,5 @@ export async function resolveConnection(config, localRequire = require) {
       error: `Could not connect to database "${config.database}" at ${config.host}:${config.port} as "${config.user}" (${error.message})`,
     };
   }
-  return { connection };
+  return { pool };
 }

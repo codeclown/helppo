@@ -1,6 +1,6 @@
 import { createElement as h, Fragment } from "react";
 import BaseColumnType from "./BaseColumnType";
-import DatePicker from "./DatePicker";
+import Datepicker from "./Datepicker";
 import TextInput from "./TextInput";
 
 export default class ColumnTypeDateTime extends BaseColumnType {
@@ -22,7 +22,7 @@ export default class ColumnTypeDateTime extends BaseColumnType {
         onChange,
       }),
       " ",
-      h(DatePicker, { value, onChange, images })
+      h(Datepicker, { value, onChange, images })
     );
   }
 }

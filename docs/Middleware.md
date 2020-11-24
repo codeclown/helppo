@@ -65,22 +65,26 @@ Helppo works with your existing database connection. You don't pass database cre
 Example for Postgres:
 
 ```js
-import { PgDriver } from 'helppo';
-import { Client } from 'pg';
-const connection = new Client(...);
+import { PgDriver } from "helppo";
+import { Pool } from "pg";
+const pool = new Pool({
+  max: 5 // control how many connections Helppo may create
+});
 app.use("/admin", helppo({
-  driver: new PgDriver(connection),
+  driver: new PgDriver(pool),
 }));
 ```
 
 Example for MySQL:
 
 ```js
-import { MysqlDriver } from 'helppo';
-import mysql from 'mysql';
-const connection = mysql.createConnection(...);
+import { MysqlDriver } from "helppo";
+import { createPool } from "mysql";
+const pool = createPool({
+  connectionLimit: 5 // control how many connections Helppo may create
+});
 app.use("/admin", helppo({
-  driver: new MysqlDriver(connection),
+  driver: new MysqlDriver(pool),
 }));
 ```
 

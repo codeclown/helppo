@@ -11,6 +11,7 @@ module.exports = {
             },
           },
         ],
+        "@babel/preset-typescript",
       ],
     },
     {
@@ -22,6 +23,7 @@ module.exports = {
             targets: "> 0.25%, not dead",
           },
         ],
+        "@babel/preset-typescript",
       ],
       plugins: [
         [

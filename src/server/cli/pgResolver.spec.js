@@ -11,34 +11,34 @@ describe("pgResolver", () => {
   });
 
   describe("resolveConnection", () => {
-    it("uses given config and returns successful connection", async () => {
+    it("uses given config and returns successful pool", async () => {
       let fakeConnection;
       const fakeConfig = {};
       const localRequire = (lib) => {
         expect(lib).to.equal("pg", "should require pg");
         return {
-          Client: class FakePgClient {
+          Pool: class FakePgPool {
             constructor(config) {
               expect(config).to.equal(fakeConfig);
               fakeConnection = this;
             }
-            connect() {
+            query() {
               return Promise.resolve();
             }
           },
         };
       };
       const result = await resolveConnection(fakeConfig, localRequire);
-      expect(result).to.have.property("connection");
-      expect(result.connection).to.equal(fakeConnection);
+      expect(result).to.have.property("pool");
+      expect(result.pool).to.equal(fakeConnection);
     });
 
     it("returns prompt if password authentication fails", async () => {
       const localRequire = (lib) => {
         expect(lib).to.equal("pg", "should require pg");
         return {
-          Client: class FakePgClient {
-            connect() {
+          Pool: class FakePgPool {
+            query() {
               return Promise.reject(
                 new Error('password authentication failed for user "postgres"')
               );
@@ -54,12 +54,12 @@ describe("pgResolver", () => {
       });
     });
 
-    it("returns error if connection fails", async () => {
+    it("returns error if pool fails", async () => {
       const localRequire = (lib) => {
         expect(lib).to.equal("pg", "should require pg");
         return {
-          Client: class FakePgClient {
-            connect() {
+          Pool: class FakePgPool {
+            query() {
               return Promise.reject(new Error("some unknown error"));
             }
           },

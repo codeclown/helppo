@@ -1,11 +1,17 @@
-import { Router } from "express";
-import MysqlDriver from "./drivers/MysqlDriver";
-import PgDriver from "./drivers/PgDriver";
+/* eslint-disable filenames/match-exported */
 
-export = HelppoMiddleware;
+import { Router } from "express";
+import { Pool as MysqlPool } from "mysql";
+import { Pool as PgPool } from "pg";
+
+// This is the public type declaration which is shipped with the npm package.
+// Shouldn't import definitions from other files, because they won't be shipped
+// with this one.
+
+export default HelppoMiddleware;
 
 declare function HelppoMiddleware(config: {
-  driver: typeof MysqlDriver | typeof PgDriver;
+  driver: PgDriver | MysqlDriver;
   schema?:
     | "auto"
     | {
@@ -45,3 +51,37 @@ declare function HelppoMiddleware(config: {
         }[];
       };
 }): Router;
+
+/**
+ * Helppo driver for the `pg` library
+ *
+ * @example
+ *  ```js
+ *  import { Pool } from 'pg';
+ *  const pool = new Pool(...);
+ *  const driver = new PgDriver(pool);
+ *  ```
+ */
+export class PgDriver {
+  /**
+   * @param pool
+   */
+  constructor(pool: PgPool);
+}
+
+/**
+ * Helppo driver for the `mysql` library
+ *
+ * @example
+ *  ```js
+ *  import { createPool } from 'mysql';
+ *  const pool = createPool(...);
+ *  const driver = new MysqlDriver(pool);
+ *  ```
+ */
+export class MysqlDriver {
+  /**
+   * @param pool
+   */
+  constructor(pool: MysqlPool);
+}

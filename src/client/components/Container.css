@@ -10,3 +10,12 @@
 .Container--spaceInBetween > * {
   margin-right: var(--spacing-slim);
 }
+
+.Container--horizontal {
+  display: flex;
+  align-items: center;
+}
+
+.ContainerRight {
+  margin-left: auto;
+}

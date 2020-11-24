@@ -13,4 +13,6 @@ if [[ ! $args ]]; then
   args="mysql://root:secret@127.0.0.1:7812/dev_db"
 fi
 
+yarn build
+
 concurrently "yarn watch:css" "yarn watch:js" "yarn watch:server" "yarn watch:dev-server --dev $args"
