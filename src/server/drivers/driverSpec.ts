@@ -203,6 +203,41 @@ export function driverSpec(
       });
     });
 
+    it("respects getRowsTimeout", async () => {
+      await refObject.driver.executeRawSqlQuery(/*sql*/ `
+        CREATE TABLE very_slow_table (
+          foobar TEXT
+        );
+      `);
+      for (let i = 0; i < 10; i++) {
+        await refObject.driver.executeRawSqlQuery(/*sql*/ `
+          INSERT INTO very_slow_table (foobar)
+          VALUES ${Array.from({ length: 10 })
+            .map(() => `('${".".repeat(64000)}')`)
+            .join(", ")};
+        `);
+      }
+      try {
+        refObject.driver.setGetRowsTimeout(1); // 1ms
+        await expect(
+          refObject.driver.getRows(
+            {
+              name: "very_slow_table",
+              columns: [{ name: "foobar", type: "text" }],
+            },
+            {
+              ...baseBrowseOptions,
+              filters: [{ type: "contains", columnName: "foobar", value: "1" }],
+            }
+          )
+        ).to.be.rejectedWith("Query timeout (1ms) reached");
+        refObject.driver.resetDefaultGetRowsTimeout();
+      } catch (error) {
+        refObject.driver.resetDefaultGetRowsTimeout();
+        throw error;
+      }
+    });
+
     describe("browseOptions.perPage", () => {
       it("works", async () => {
         await insertTestRows(teamsTable.name, testRows.Teams);

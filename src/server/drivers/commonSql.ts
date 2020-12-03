@@ -281,6 +281,15 @@ export abstract class CommonSqlDriver {
     params,
   }: QueryObject): Promise<CommonSqlDriverQueryResult>;
 
+  abstract timeoutTransaction<T>(
+    callback: (
+      query: ({
+        sql,
+        params,
+      }: QueryObject) => Promise<CommonSqlDriverQueryResult>
+    ) => Promise<T>
+  ): Promise<T>;
+
   async getRows(
     table: HelppoTable,
     browseOptions: BrowseOptions
@@ -301,25 +310,30 @@ export abstract class CommonSqlDriver {
         );
       })
       .map((column) => column.name);
-    const [rowsQuery, countQuery] = await Promise.all([
-      this.query(
-        selectRows(
-          table.name,
-          table.columns.map((column) => column.name),
-          wildcardSearchableColumns,
-          browseOptions,
-          this.queryFormatter
-        )
-      ),
-      this.query(
-        countRows(
-          table.name,
-          wildcardSearchableColumns,
-          browseOptions,
-          this.queryFormatter
-        )
-      ),
-    ]);
+    const [rowsQuery, countQuery] = await this.timeoutTransaction(
+      async (query) => {
+        const [rowsQuery, countQuery] = await Promise.all([
+          query(
+            selectRows(
+              table.name,
+              table.columns.map((column) => column.name),
+              wildcardSearchableColumns,
+              browseOptions,
+              this.queryFormatter
+            )
+          ),
+          query(
+            countRows(
+              table.name,
+              wildcardSearchableColumns,
+              browseOptions,
+              this.queryFormatter
+            )
+          ),
+        ]);
+        return [rowsQuery, countQuery];
+      }
+    );
     const rows: RowObject[] = rowsQuery.results.map((result) => {
       const obj = {};
       rowsQuery.fields.forEach((field) => {

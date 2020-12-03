@@ -105,14 +105,18 @@ export const mysqlQueryFormatter: QueryFormatter = (
   }, originalQuery);
 };
 
+const defaultGetRowsTimeoutMs = 10000;
+
 export default class MysqlDriver
   extends CommonSqlDriver
   implements HelppoDriver {
   pool: Pool;
+  getRowsTimeoutMs: number;
 
   constructor(pool: Pool) {
     super(mysqlQueryFormatter);
     this.pool = pool;
+    this.getRowsTimeoutMs = defaultGetRowsTimeoutMs;
   }
 
   __internalOnClose(callback: (err: Error) => void): void {
@@ -121,6 +125,47 @@ export default class MysqlDriver
         callback(error);
       }
     });
+  }
+
+  setGetRowsTimeout(ms: number): void {
+    this.getRowsTimeoutMs = ms;
+  }
+
+  resetDefaultGetRowsTimeout(): void {
+    this.getRowsTimeoutMs = defaultGetRowsTimeoutMs;
+  }
+
+  async timeoutTransaction<T>(
+    callback: (
+      query: ({
+        sql,
+        params,
+      }: QueryObject) => Promise<CommonSqlDriverQueryResult>
+    ) => Promise<T>
+  ): Promise<T> {
+    try {
+      return await callback(async (queryObject) => {
+        // Runtime sanitization just to be sure, because this needs
+        // to be passed into the query string raw
+        if (typeof this.getRowsTimeoutMs !== "number") {
+          throw new Error();
+        }
+        // This is a bit nasty, but there is no way to create a transaction-level timeout in mysql
+        const sql = queryObject.sql.replace(
+          /\b(select)\b/i,
+          `$1 /*+ MAX_EXECUTION_TIME(${this.getRowsTimeoutMs}) */`
+        );
+        return await this.query({
+          ...queryObject,
+          sql,
+        });
+      });
+    } catch (err) {
+      if (err.message.includes("ER_QUERY_TIMEOUT")) {
+        throw new Error(`Query timeout (${this.getRowsTimeoutMs}ms) reached`);
+      }
+      throw err;
+    }
   }
 
   getAffectedRowsAmount(queryResult: { affectedRows?: number }): number {

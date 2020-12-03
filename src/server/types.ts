@@ -33,6 +33,10 @@ export abstract class HelppoDriver {
 
   abstract getSchema(): Promise<HelppoSchema>;
 
+  abstract setGetRowsTimeout(ms: number): void;
+
+  abstract resetDefaultGetRowsTimeout(): void;
+
   abstract getRows(
     table: HelppoTable,
     browseOptions: BrowseOptions

@@ -27,7 +27,7 @@ export const browseFilterTypes = [
   "lt",
   "lte",
 ] as const;
-type BrowseFilterType = typeof browseFilterTypes[number];
+export type BrowseFilterType = typeof browseFilterTypes[number];
 
 export interface BrowseFilter {
   type: BrowseFilterType;

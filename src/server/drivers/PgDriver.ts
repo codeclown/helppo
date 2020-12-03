@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import { Pool, PoolClient } from "pg";
 import {
   HelppoColumn,
   HelppoColumnType,
@@ -149,12 +149,16 @@ export const pgQueryFormatter: QueryFormatter = (originalQuery, segments) => {
   }, originalQuery);
 };
 
+const defaultGetRowsTimeoutMs = 10000;
+
 export default class PgDriver extends CommonSqlDriver implements HelppoDriver {
   pool: Pool;
+  getRowsTimeoutMs: number;
 
   constructor(pool: Pool) {
     super(pgQueryFormatter);
     this.pool = pool;
+    this.getRowsTimeoutMs = defaultGetRowsTimeoutMs;
   }
 
   __internalOnClose(callback: (error: Error) => void): void {
@@ -172,7 +176,51 @@ export default class PgDriver extends CommonSqlDriver implements HelppoDriver {
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setGetRowsTimeout(ms: number): void {
+    this.getRowsTimeoutMs = ms;
+  }
+
+  resetDefaultGetRowsTimeout(): void {
+    this.getRowsTimeoutMs = defaultGetRowsTimeoutMs;
+  }
+
+  async timeoutTransaction<T>(
+    callback: (
+      query: ({
+        sql,
+        params,
+      }: QueryObject) => Promise<CommonSqlDriverQueryResult>
+    ) => Promise<T>
+  ): Promise<T> {
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN");
+      // Runtime sanitization just to be sure, because this needs
+      // to be passed into the query string raw
+      if (typeof this.getRowsTimeoutMs !== "number") {
+        throw new Error();
+      }
+      await client.query(
+        `SET LOCAL statement_timeout = ${this.getRowsTimeoutMs}`
+      );
+      const result: T = await callback(async (queryObject) => {
+        return await this.query(queryObject, client);
+      });
+      await client.query("COMMIT");
+      return result;
+    } catch (err) {
+      await client.query("ROLLBACK");
+      if (
+        err.message.includes("canceling statement due to statement timeout")
+      ) {
+        throw new Error(`Query timeout (${this.getRowsTimeoutMs}ms) reached`);
+      }
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
   getAffectedRowsAmount(queryResult: CommonSqlDriverQueryResult): number {
     return queryResult.affectedRowCount || 0;
   }
@@ -197,11 +245,11 @@ export default class PgDriver extends CommonSqlDriver implements HelppoDriver {
     }
   }
 
-  async query({
-    sql,
-    params,
-  }: QueryObject): Promise<CommonSqlDriverQueryResult> {
-    const result = await this.pool.query<RowObject>(sql, params || []);
+  async query(
+    { sql, params }: QueryObject,
+    client: Pool | PoolClient = this.pool
+  ): Promise<CommonSqlDriverQueryResult> {
+    const result = await client.query<RowObject>(sql, params || []);
     return {
       results: result.rows,
       fields: result.fields,
