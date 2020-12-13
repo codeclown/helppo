@@ -9,7 +9,18 @@ export async function parseConnectionString(
 
 export async function resolveConnection(config, localRequire = require) {
   const pg = localRequire("pg");
-  const pool = new pg.Pool({ ...config, max: 1 });
+  const options = {
+    ...config,
+    max: 1,
+  };
+  // Include non-enumerable properties which would be ignored by the rest spread
+  if (config.password) {
+    options.password = config.password;
+  }
+  if (typeof config.ssl === "object") {
+    options.ssl.key = config.ssl.key;
+  }
+  const pool = new pg.Pool(options);
   try {
     await pool.query("SELECT NOW()");
   } catch (error) {
