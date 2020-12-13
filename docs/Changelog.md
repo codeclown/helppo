@@ -10,6 +10,12 @@ Changes to be released in an upcoming release:
 
 -
 
+## 0.4.2 - 2020-12-13
+
+### Fixed
+
+- Fixed a bug where Postgres would return password authentication failure if password was present in the connection string (2b5da77)
+
 ## 0.4.0 - 2020-11-24
 
 ### Added
