@@ -4,12 +4,6 @@ All notable changes to this project will be documented in this file.
 
 For a complete list of changes refer to the commit history between versions. Internal changes and refactorings are not mentioned in this document.
 
-## Unreleased
-
-Changes to be released in an upcoming release:
-
--
-
 ## 0.4.3 - 2020-12-14
 
 ### Fixed
