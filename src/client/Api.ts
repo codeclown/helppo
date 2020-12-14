@@ -78,7 +78,7 @@ export default class Api {
   ): Promise<ApiResponseSaveRow> {
     const response = (await this.ajax
       .post(`/api/table/${table.name}/rows`)
-      .query({ rowId })
+      .query({ rowId: JSON.stringify(rowId) })
       .json(row)
       .prop("data")) as unknown;
     return response as ApiResponseSaveRow;
@@ -90,7 +90,7 @@ export default class Api {
   ): Promise<ApiResponseDeleteRow> {
     const response = (await this.ajax
       .delete(`/api/table/${table.name}/rows`)
-      .query({ rowId })) as unknown;
+      .query({ rowId: JSON.stringify(rowId) })) as unknown;
     return response as ApiResponseDeleteRow;
   }
 
