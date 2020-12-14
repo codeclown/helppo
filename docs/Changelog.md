@@ -10,6 +10,12 @@ Changes to be released in an upcoming release:
 
 -
 
+## 0.4.3 - 2020-12-14
+
+### Fixed
+
+- Fixed a bug where saving a row in a table with a non-integer primary key failed (4e1427e)
+
 ## 0.4.2 - 2020-12-13
 
 ### Fixed
