@@ -1,9 +1,11 @@
 import { Pool } from "mysql";
 import {
+  FilterType,
   HelppoColumn,
   HelppoColumnType,
   HelppoSchema,
 } from "../../sharedTypes";
+import filterNames from "../filterNames";
 import { HelppoDriver, QueryFormatter, QueryObject } from "../types";
 import { CommonSqlDriver, CommonSqlDriverQueryResult } from "./commonSql";
 
@@ -341,5 +343,54 @@ export default class MysqlDriver
         };
       }),
     };
+  }
+
+  async getFilterTypes(): Promise<FilterType[]> {
+    const tableNames = await this.listTableNames();
+    const columns = await this.listColumns(tableNames);
+    const filterTypeKeys = Object.keys(filterNames);
+    const filterTypes: FilterType[] = filterTypeKeys.map((key) => {
+      return {
+        key,
+        name: filterNames[key],
+        columnNames: [],
+      };
+    });
+    for (const column of columns) {
+      const keys: string[] = [];
+      keys.push("equals");
+      keys.push("notEquals");
+      if (column.IS_NULLABLE === "YES") {
+        keys.push("null");
+        keys.push("notNull");
+      }
+      if (
+        ["varchar", "text", "tinytext", "mediumtext", "longtext"].includes(
+          column.DATA_TYPE
+        )
+      ) {
+        keys.push("contains");
+        keys.push("notContains");
+      }
+      if (
+        ["integer", "date", "datetime"].includes(
+          mysqlTypeToHelppoType[column.DATA_TYPE]
+        )
+      ) {
+        keys.push("gt");
+        keys.push("gte");
+        keys.push("lt");
+        keys.push("lte");
+      }
+      for (const filterType of keys) {
+        filterTypes
+          .find((type) => type.key === filterType)
+          .columnNames.push({
+            tableName: column.TABLE_NAME,
+            columnName: column.COLUMN_NAME,
+          });
+      }
+    }
+    return filterTypes;
   }
 }

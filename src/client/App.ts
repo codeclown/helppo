@@ -111,7 +111,7 @@ const App = ({
   const [configNotice, setConfigNotice] = useState<ApiResponseConfigNotice>(
     null
   );
-  const [errorModal, setErrorModal] = useState<Error>(null);
+  const [errorModalError, setErrorModalError] = useState<Error>(null);
   const [columnTypeComponents, setColumnTypeComponents] = useState<
     ColumnTypeComponents
   >({});
@@ -125,48 +125,11 @@ const App = ({
     RecentlyDeletedRow[]
   >([]);
 
-  // Effects
-
-  useEffect(() => {
-    setStatus(STATUS.LOADING);
-    Promise.all([
-      api.getConfigNotice(),
-      api.getSchema(),
-      api.getColumnTypes(),
-      api.getFilterTypes(),
-    ]).then(([configNotice, schema, columnTypes, filterTypes]) => {
-      const columnTypeComponents: ColumnTypeComponents = columnTypes.reduce(
-        (obj, { type, builtInReactComponentName }) => {
-          if (!builtInColumnTypeComponents[builtInReactComponentName]) {
-            throw new Error(
-              `Component name ${builtInReactComponentName} is not present in builtInColumnTypeComponents`
-            );
-          }
-          obj[type] = builtInColumnTypeComponents[builtInReactComponentName];
-          return obj;
-        },
-        {}
-      );
-      setConfigNotice(configNotice);
-      setSchema(schema);
-      setColumnTypeComponents(columnTypeComponents);
-      setFilterTypes(filterTypes);
-      setStatus(STATUS.DEFAULT);
-    });
-  }, [STATUS.DEFAULT, STATUS.LOADING, api]);
-
-  useEffect(() => {
-    return () =>
-      timeoutIds.forEach((timeoutId) => {
-        clearTimeout(timeoutId);
-      });
-  }, [timeoutIds]);
-
   // Callbacks
 
-  const catchApiError = useCallback<CatchApiError>((promise) => {
+  const catchApiError: CatchApiError = useCallback<CatchApiError>((promise) => {
     return promise.catch((error: Error) => {
-      setErrorModal(error);
+      setErrorModalError(error);
       throw error;
     });
   }, []);
@@ -259,6 +222,45 @@ const App = ({
       STATUS.DEFAULT,
     ]
   );
+
+  // Effects
+
+  useEffect(() => {
+    setStatus(STATUS.LOADING);
+    catchApiError(
+      Promise.all([
+        api.getConfigNotice(),
+        api.getSchema(),
+        api.getColumnTypes(),
+        api.getFilterTypes(),
+      ]).then(([configNotice, schema, columnTypes, filterTypes]) => {
+        const columnTypeComponents: ColumnTypeComponents = columnTypes.reduce(
+          (obj, { type, builtInReactComponentName }) => {
+            if (!builtInColumnTypeComponents[builtInReactComponentName]) {
+              throw new Error(
+                `Component name ${builtInReactComponentName} is not present in builtInColumnTypeComponents`
+              );
+            }
+            obj[type] = builtInColumnTypeComponents[builtInReactComponentName];
+            return obj;
+          },
+          {}
+        );
+        setConfigNotice(configNotice);
+        setSchema(schema);
+        setColumnTypeComponents(columnTypeComponents);
+        setFilterTypes(filterTypes);
+        setStatus(STATUS.DEFAULT);
+      })
+    );
+  }, [STATUS.DEFAULT, STATUS.LOADING, api, catchApiError]);
+
+  useEffect(() => {
+    return () =>
+      timeoutIds.forEach((timeoutId) => {
+        clearTimeout(timeoutId);
+      });
+  }, [timeoutIds]);
 
   // Route callbacks
 
@@ -411,8 +413,15 @@ const App = ({
 
   // Return value
 
+  const errorModal =
+    errorModalError &&
+    h(ErrorModal, {
+      error: errorModalError,
+      close: () => setErrorModalError(null),
+    });
+
   if (status === STATUS.LOADING) {
-    return h(Router, null, h(Navigation));
+    return h(Router, null, h(Navigation), errorModal);
   }
 
   if (configNotice.suggestedFreshSchema) {
@@ -500,11 +509,7 @@ const App = ({
           notifications: notifications,
           hideNotification,
         }),
-        errorModal &&
-          h(ErrorModal, {
-            error: errorModal,
-            close: () => setErrorModal(null),
-          })
+        errorModal
       )
     )
   );

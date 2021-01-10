@@ -5,7 +5,6 @@ import supertest, { SuperTest, Test } from "supertest";
 import { FilterType, HelppoSchema } from "../sharedTypes";
 import columnTypes from "./columnTypes";
 import driverApi from "./driverApi";
-import filterTypes from "./filterTypes";
 import { ColumnType, HelppoConfig, HelppoDriver } from "./types";
 
 class MockDriver implements HelppoDriver {
@@ -16,6 +15,9 @@ class MockDriver implements HelppoDriver {
     return {
       tables: [],
     };
+  }
+  async getFilterTypes() {
+    return [];
   }
   async getRows() {
     return {
@@ -46,7 +48,6 @@ const baseConfig: HelppoConfig = {
 
 const baseOptions = {
   formatError: (error: Error) => error.message,
-  filterTypes,
   columnTypes,
 };
 
@@ -235,10 +236,17 @@ describe("driverApi", () => {
         {
           key: "equals",
           name: "equals",
-          columnTypes: ["integer", "string", "text", "date", "datetime"],
+          columnNames: [{ tableName: "foobar", columnName: "example" }],
+        },
+        {
+          key: "notequals",
+          name: "does not equal",
+          columnNames: [],
         },
       ];
-      const app = driverApi(baseConfig, { ...baseOptions, filterTypes });
+      const driver = new MockDriver();
+      driver.getFilterTypes = async () => filterTypes;
+      const app = driverApi({ ...baseConfig, driver }, baseOptions);
       const request = supertest(app);
       const response = await request.get("/filter-types");
       expect(response.body).to.deep.equal(filterTypes);
@@ -301,6 +309,7 @@ describe("driverApi", () => {
           perPage: 20,
           wildcardSearch: "",
         },
+        { filterTypes: [] },
       ]);
       expect(response.body).to.deep.equal(mockedReturnValue);
     });
@@ -320,6 +329,7 @@ describe("driverApi", () => {
       expect(calledGetRowsWith).to.deep.equal([
         schema.tables[0],
         browseOptions,
+        { filterTypes: [] },
       ]);
       expect(response.body).to.deep.equal(mockedReturnValue);
     });
@@ -342,6 +352,7 @@ describe("driverApi", () => {
           ...browseOptions,
           orderByColumn: null,
         },
+        { filterTypes: [] },
       ]);
       expect(response.body).to.deep.equal(mockedReturnValue);
     });

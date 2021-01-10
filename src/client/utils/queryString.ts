@@ -1,6 +1,6 @@
 import {
-  browseFilterTypes,
   BrowseOptions,
+  FilterType,
   OrderByDirection,
   orderByDirections,
   PresentationOptions,
@@ -20,7 +20,8 @@ const defaultPresentationOptions: PresentationOptions = {
 };
 
 export function parseBrowseOptions(
-  searchParams: URLSearchParams
+  searchParams: URLSearchParams,
+  filterTypes: FilterType[]
 ): BrowseOptions {
   const browseOptions: BrowseOptions = {
     ...defaultBrowseOptions,
@@ -35,7 +36,9 @@ export function parseBrowseOptions(
     }
     if (Array.isArray(obj.filters)) {
       browseOptions.filters = obj.filters
-        .filter((item) => browseFilterTypes.includes(item.type))
+        .filter((item) =>
+          filterTypes.some((filterType) => filterType.key === item.type)
+        )
         .map((item) => {
           return {
             type: item.type,

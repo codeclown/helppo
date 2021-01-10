@@ -2,11 +2,11 @@ import {
   BrowseFilter,
   BrowseFilterType,
   BrowseOptions,
+  FilterType,
   HelppoTable,
   QueryParam,
   RowObject,
 } from "../../sharedTypes";
-import filterTypes from "../filterTypes";
 import { QueryObject, QueryFormatter } from "../types";
 
 function addFilter(
@@ -283,13 +283,16 @@ export abstract class CommonSqlDriver {
 
   async getRows(
     table: HelppoTable,
-    browseOptions: BrowseOptions
+    browseOptions: BrowseOptions,
+    options: {
+      filterTypes: FilterType[];
+    } = { filterTypes: [] }
   ): Promise<{
     rows: RowObject[];
     totalPages: number;
     totalResults: number;
   }> {
-    const containsFilter = filterTypes.find(
+    const containsFilter = options.filterTypes.find(
       (filterType) => filterType.key === "contains"
     );
     const wildcardSearchableColumns: string[] = table.columns
@@ -297,7 +300,10 @@ export abstract class CommonSqlDriver {
         return (
           !column.secret &&
           containsFilter &&
-          containsFilter.columnTypes.includes(column.type)
+          containsFilter.columnNames.some(
+            (item) =>
+              item.tableName === table.name && item.columnName === column.name
+          )
         );
       })
       .map((column) => column.name);

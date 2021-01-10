@@ -6,6 +6,7 @@ import {
   useEffect,
   useCallback,
   ReactElement,
+  MutableRefObject,
 } from "react";
 import { Redirect, useLocation } from "react-router-dom";
 import {
@@ -14,6 +15,7 @@ import {
   HelppoColumn,
   HelppoTable,
   PresentationOptions,
+  RowObject,
 } from "../../sharedTypes";
 import Api from "../Api";
 import {
@@ -157,7 +159,19 @@ const Cell = ({
   images,
   containerRef,
   api,
-}) => {
+}: {
+  row: RowObject;
+  column: HelppoColumn;
+  columnTypeComponents: ColumnTypeComponents;
+  presentationOptions: PresentationOptions;
+  filterTypes: FilterType[];
+  urls: BrowseTableProps["urls"];
+  table: HelppoTable;
+  browseOptions: BrowseOptions;
+  images: TableCellToolsImages;
+  containerRef: MutableRefObject<HTMLDivElement>;
+  api: BrowseTableProps["api"];
+}): ReactElement => {
   const value = row[column.name];
   const ColumnTypeComponent = columnTypeComponents[column.type];
 
@@ -175,7 +189,10 @@ const Cell = ({
   const availableFilterTypes = column.secret
     ? []
     : filterTypes.filter((filterType) => {
-        return filterType.columnTypes.includes(column.type);
+        return filterType.columnNames.some(
+          (item) =>
+            item.tableName === table.name && item.columnName === column.name
+        );
       });
 
   const filterUrls = availableFilterTypes.map((filterType) => {
@@ -346,8 +363,8 @@ const BrowseTable = ({
   relations,
 }: BrowseTableProps): ReactElement => {
   const location = useLocation();
-  const containerRef = useRef();
-  const [rows, setRows] = useState(null);
+  const containerRef = useRef<HTMLDivElement>();
+  const [rows, setRows] = useState<RowObject[]>(null);
   const [totalResults, setTotalResults] = useState(null);
   const [totalPages, setTotalPages] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -438,7 +455,7 @@ const BrowseTable = ({
   useEffect(() => {
     if (location.key !== locationKey) {
       const searchParams = new URLSearchParams(location.search);
-      const browseOptions = parseBrowseOptions(searchParams);
+      const browseOptions = parseBrowseOptions(searchParams, filterTypes);
       const presentationOptions = parsePresentationOptions(searchParams);
       setWildcardSearch(browseOptions.wildcardSearch);
       // TODO should probably pass from query as-is to server, and utilize returned browseOptions
@@ -448,7 +465,7 @@ const BrowseTable = ({
       setRedirectTo(null);
       setLocationKey(location.key);
     }
-  }, [location.key, location.search, getRows, locationKey]);
+  }, [location.key, location.search, getRows, locationKey, filterTypes]);
 
   const title = niceifyName(table.name);
 
@@ -546,7 +563,7 @@ const BrowseTable = ({
             if (event.key === "Enter") {
               updateBrowseOptions(
                 { wildcardSearch, currentPage: 1 },
-                browseOptions.wildcardSearch !== ""
+                browseOptions.wildcardSearch !== wildcardSearch
               );
             }
           },
@@ -560,7 +577,7 @@ const BrowseTable = ({
         key: locationKey,
         filterTypes: filterTypes,
         filters: browseOptions.filters,
-        columns: table.columns,
+        table,
         onChange: (filters) => updateBrowseOptions({ filters }),
       })
     ),

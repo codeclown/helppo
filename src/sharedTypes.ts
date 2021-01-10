@@ -1,9 +1,9 @@
 // SIMPLE
 
 export interface FilterType {
-  key: BrowseFilterType;
+  key: string;
   name: string;
-  columnTypes: string[];
+  columnNames: { tableName: string; columnName: string }[];
 }
 
 // TODO this is poorly named
@@ -15,22 +15,8 @@ export interface RowObject {
 
 // BROWSEOPTIONS
 
-export const browseFilterTypes = [
-  "equals",
-  "notEquals",
-  "contains",
-  "notContains",
-  "null",
-  "notNull",
-  "gt",
-  "gte",
-  "lt",
-  "lte",
-] as const;
-type BrowseFilterType = typeof browseFilterTypes[number];
-
 export interface BrowseFilter {
-  type: BrowseFilterType;
+  type: string;
   columnName: string;
   value: QueryParam;
 }

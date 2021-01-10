@@ -1,5 +1,6 @@
 import {
   BrowseOptions,
+  FilterType,
   HelppoSchema,
   HelppoTable,
   QueryParam,
@@ -33,9 +34,14 @@ export abstract class HelppoDriver {
 
   abstract getSchema(): Promise<HelppoSchema>;
 
+  abstract getFilterTypes(): Promise<FilterType[]>;
+
   abstract getRows(
     table: HelppoTable,
-    browseOptions: BrowseOptions
+    browseOptions: BrowseOptions,
+    options: {
+      filterTypes: FilterType[];
+    }
   ): Promise<{
     rows: RowObject[];
     totalPages: number;

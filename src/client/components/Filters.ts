@@ -6,18 +6,35 @@ import {
   ReactElement,
   useEffect,
 } from "react";
-import { BrowseFilter, FilterType, HelppoColumn } from "../../sharedTypes";
+import {
+  BrowseFilter,
+  FilterType,
+  HelppoColumn,
+  HelppoTable,
+} from "../../sharedTypes";
 import niceifyName from "../utils/niceifyName";
 import Button, { ButtonStyles } from "./Button";
 import Select from "./Select";
 import TextInput from "./TextInput";
 
+function matchTableColumn(
+  tableName: string,
+  columnName: string
+): (item: FilterType["columnNames"][number]) => boolean {
+  return (item: FilterType["columnNames"][number]) => {
+    return item.tableName === tableName && item.columnName === columnName;
+  };
+}
+
 function getFirstCompatibleFilterType(
+  tableName: string,
   filterTypes: FilterType[],
   column: HelppoColumn
 ): FilterType {
   return filterTypes.find((filterType) => {
-    return filterType.columnTypes.includes(column.type);
+    return filterType.columnNames.some(
+      matchTableColumn(tableName, column.name)
+    );
   });
 }
 
@@ -39,12 +56,12 @@ function getColumnByName(columns: HelppoColumn[], name: string): HelppoColumn {
 const Filters = ({
   filters,
   filterTypes,
-  columns,
+  table,
   onChange,
 }: {
   filters: BrowseFilter[];
   filterTypes: FilterType[];
-  columns: HelppoColumn[];
+  table: HelppoTable;
   onChange: (filters: BrowseFilter[]) => void;
 }): ReactElement => {
   const [dirtyFilters, setDirtyFilters] = useState<BrowseFilter[]>(() =>
@@ -58,8 +75,9 @@ const Filters = ({
   }, [onChange, dirtyFilters]);
 
   const addFilter = useCallback(() => {
-    const firstColumn = columns[0];
+    const firstColumn = table.columns[0];
     const firstCompatibleFilterType = getFirstCompatibleFilterType(
+      table.name,
       filterTypes,
       firstColumn
     );
@@ -72,7 +90,7 @@ const Filters = ({
       },
     ]);
     setFocusLastSelect(true);
-  }, [columns, dirtyFilters, filterTypes]);
+  }, [table, dirtyFilters, filterTypes]);
 
   const clearAllFilters = useCallback(() => {
     onChange([]);
@@ -97,11 +115,15 @@ const Filters = ({
           if (item === filter) {
             if (newColumn !== undefined) {
               const filterType = getFilterTypeByKey(filterTypes, item.type);
-              const compatibleFilterType = filterType.columnTypes.includes(
-                newColumn.type
+              const compatibleFilterType = filterType.columnNames.find(
+                matchTableColumn(table.name, newColumn.name)
               )
                 ? filterType
-                : getFirstCompatibleFilterType(filterTypes, newColumn);
+                : getFirstCompatibleFilterType(
+                    table.name,
+                    filterTypes,
+                    newColumn
+                  );
               return {
                 ...item,
                 type: compatibleFilterType.key,
@@ -126,7 +148,7 @@ const Filters = ({
         })
       );
     },
-    [dirtyFilters, filterTypes]
+    [table, dirtyFilters, filterTypes]
   );
 
   useEffect(() => {
@@ -187,7 +209,7 @@ const Filters = ({
         { className: "filter-boxes" },
         dirtyFilters.map((dirtyFilter, index) => {
           const { columnName, type, value } = dirtyFilter;
-          const column = getColumnByName(columns, columnName);
+          const column = getColumnByName(table.columns, columnName);
           const isLast = index === dirtyFilters.length - 1;
           return h(
             "div",
@@ -199,11 +221,14 @@ const Filters = ({
               slim: true,
               placeholder: "Column",
               ref: isLast ? lastColumnSelectRef : null,
-              options: columns
+              options: table.columns
                 .filter((column) => {
                   return (
-                    getFirstCompatibleFilterType(filterTypes, column) &&
-                    !column.secret
+                    getFirstCompatibleFilterType(
+                      table.name,
+                      filterTypes,
+                      column
+                    ) && !column.secret
                   );
                 })
                 .map((column) => {
@@ -214,7 +239,7 @@ const Filters = ({
                 }),
               value: columnName,
               onChange: (value: string) => {
-                const newColumn = getColumnByName(columns, value);
+                const newColumn = getColumnByName(table.columns, value);
                 updateFilter(dirtyFilter, newColumn);
               },
             }),
@@ -224,7 +249,9 @@ const Filters = ({
                 return {
                   text: filterType.name,
                   value: filterType.key,
-                  disabled: !filterType.columnTypes.includes(column.type),
+                  disabled: !filterType.columnNames.some(
+                    matchTableColumn(table.name, column.name)
+                  ),
                 };
               }),
               value: type,
@@ -233,12 +260,13 @@ const Filters = ({
                 updateFilter(dirtyFilter, undefined, newFilterType);
               },
             }),
-            h(TextInput, {
-              slim: true,
-              value: value.toString(),
-              onChange: (newValue) =>
-                updateFilter(dirtyFilter, undefined, undefined, newValue),
-            }),
+            !["null", "notNull"].includes(type) &&
+              h(TextInput, {
+                slim: true,
+                value: value === null ? "" : value.toString(),
+                onChange: (newValue) =>
+                  updateFilter(dirtyFilter, undefined, undefined, newValue),
+              }),
             h(
               "button",
               {

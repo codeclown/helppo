@@ -181,7 +181,8 @@ export function driverSpec(
     it("returns empty array", async () => {
       const result = await refObject.driver.getRows(
         teamsTable,
-        baseBrowseOptions
+        baseBrowseOptions,
+        { filterTypes: [] }
       );
       expect(result).to.deep.equal({
         rows: [],
@@ -194,7 +195,8 @@ export function driverSpec(
       await insertTestRows(teamsTable.name, testRows.Teams);
       const result = await refObject.driver.getRows(
         teamsTable,
-        baseBrowseOptions
+        baseBrowseOptions,
+        { filterTypes: [] }
       );
       expect(result).to.deep.equal({
         rows: testRows["Teams"],
@@ -208,10 +210,14 @@ export function driverSpec(
         await insertTestRows(teamsTable.name, testRows.Teams);
 
         const getPerPage = (perPage) => {
-          return refObject.driver.getRows(teamsTable, {
-            ...baseBrowseOptions,
-            perPage,
-          });
+          return refObject.driver.getRows(
+            teamsTable,
+            {
+              ...baseBrowseOptions,
+              perPage,
+            },
+            { filterTypes: [] }
+          );
         };
 
         expect(await getPerPage(0)).to.deep.equal({
@@ -245,16 +251,30 @@ export function driverSpec(
     describe("browseOptions.filters", () => {
       const filterRows = async (table, columnName, type, value) => {
         return (
-          await refObject.driver.getRows(table, {
-            ...baseBrowseOptions,
-            filters: [
-              {
-                type,
-                columnName,
-                value,
-              },
-            ],
-          })
+          await refObject.driver.getRows(
+            table,
+            {
+              ...baseBrowseOptions,
+              filters: [
+                {
+                  type,
+                  columnName,
+                  value,
+                },
+              ],
+            },
+            {
+              filterTypes: [
+                {
+                  key: type,
+                  name: "",
+                  columnNames: [
+                    { tableName: table.name, columnName: columnName },
+                  ],
+                },
+              ],
+            }
+          )
         ).rows.map((row) => row[columnName]);
       };
 
@@ -307,10 +327,24 @@ export function driverSpec(
     describe("browseOptions.wildcardSearch", () => {
       const searchRows = async (table, wildcardSearch, returnColumnName) => {
         return (
-          await refObject.driver.getRows(table, {
-            ...baseBrowseOptions,
-            wildcardSearch,
-          })
+          await refObject.driver.getRows(
+            table,
+            {
+              ...baseBrowseOptions,
+              wildcardSearch,
+            },
+            {
+              filterTypes: [
+                {
+                  key: "contains",
+                  name: "",
+                  columnNames: [
+                    { tableName: table.name, columnName: returnColumnName },
+                  ],
+                },
+              ],
+            }
+          )
         ).rows.map((row) => row[returnColumnName]);
       };
 
@@ -353,11 +387,15 @@ export function driverSpec(
         await insertTestRows(usersTable.name, testRows.Users);
         const getRows = async (orderByDirection) => {
           return (
-            await refObject.driver.getRows(usersTable, {
-              ...baseBrowseOptions,
-              orderByColumn: "TeamId",
-              orderByDirection,
-            })
+            await refObject.driver.getRows(
+              usersTable,
+              {
+                ...baseBrowseOptions,
+                orderByColumn: "TeamId",
+                orderByDirection,
+              },
+              { filterTypes: [] }
+            )
           ).rows.map((row) => row.TeamId);
         };
         expect(await getRows("asc")).to.deep.equal([1, 2, 2]);
@@ -456,7 +494,8 @@ export function driverSpec(
     it("deletes row", async () => {
       const rowsBefore = await refObject.driver.getRows(
         usersTable,
-        baseBrowseOptions
+        baseBrowseOptions,
+        { filterTypes: [] }
       );
 
       const exampleRow = testRows["Users"][0];
@@ -465,7 +504,8 @@ export function driverSpec(
 
       const rowsAfter = await refObject.driver.getRows(
         usersTable,
-        baseBrowseOptions
+        baseBrowseOptions,
+        { filterTypes: [] }
       );
 
       expect(rowsAfter.totalResults).to.be.above(0);

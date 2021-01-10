@@ -1,11 +1,13 @@
 import { Pool } from "pg";
 import {
+  FilterType,
   HelppoColumn,
   HelppoColumnType,
   HelppoSchema,
   HelppoTable,
   RowObject,
 } from "../../sharedTypes";
+import filterNames from "../filterNames";
 import { HelppoDriver, QueryFormatter, QueryObject } from "../types";
 import { CommonSqlDriver, CommonSqlDriverQueryResult } from "./commonSql";
 
@@ -451,5 +453,52 @@ export default class PgDriver extends CommonSqlDriver implements HelppoDriver {
         };
       }),
     };
+  }
+
+  async getFilterTypes(): Promise<FilterType[]> {
+    const tableNames = await this.listTableNames();
+    const columns = await this.listColumns(tableNames);
+    const filterTypeKeys = Object.keys(filterNames);
+    const filterTypes: FilterType[] = filterTypeKeys.map((key) => {
+      return {
+        key,
+        name: filterNames[key],
+        columnNames: [],
+      };
+    });
+    for (const column of columns) {
+      const keys: string[] = [];
+      keys.push("equals");
+      keys.push("notEquals");
+      if (column.is_nullable === "YES") {
+        keys.push("null");
+        keys.push("notNull");
+      }
+      if (
+        ["character", "character varying", "text"].includes(column.data_type)
+      ) {
+        keys.push("contains");
+        keys.push("notContains");
+      }
+      if (
+        ["integer", "date", "datetime"].includes(
+          pgTypeToHelppoType[column.data_type]
+        )
+      ) {
+        keys.push("gt");
+        keys.push("gte");
+        keys.push("lt");
+        keys.push("lte");
+      }
+      for (const filterType of keys) {
+        filterTypes
+          .find((type) => type.key === filterType)
+          .columnNames.push({
+            tableName: column.table_name,
+            columnName: column.column_name,
+          });
+      }
+    }
+    return filterTypes;
   }
 }

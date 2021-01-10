@@ -36,7 +36,6 @@ const driverApi = (
   options: {
     formatError: (error: Error) => string;
     throwErrorOnPurpose?: boolean;
-    filterTypes: FilterType[];
     columnTypes: { [key: string]: ColumnType };
   }
 ): Router => {
@@ -65,6 +64,18 @@ const driverApi = (
     app.use((req, res, next) => loadSchema.then(() => next()));
   }
 
+  let filterTypes: FilterType[] = [];
+  config.driver
+    // TODO should pass schema to this and limit queries only to schema tables and columns
+    .getFilterTypes()
+    .then((_filterTypes) => {
+      filterTypes = _filterTypes;
+    })
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(`getFilterTypes failed with error: ${error.stack}`);
+    });
+
   app.use(bodyParser.json());
 
   app.get("/schema", (req, res) => {
@@ -87,7 +98,7 @@ const driverApi = (
   });
 
   app.get("/filter-types", (req, res) => {
-    const response: ApiResponseFilterTypes = options.filterTypes;
+    const response: ApiResponseFilterTypes = filterTypes;
     res.json(response);
   });
 
@@ -153,7 +164,7 @@ const driverApi = (
       browseOptions.wildcardSearch = "";
     }
     return config.driver
-      .getRows(table, browseOptions)
+      .getRows(table, browseOptions, { filterTypes })
       .then(async (result) => {
         const response: ApiResponseGetRows = {
           rows: result.rows.map((row) => {
