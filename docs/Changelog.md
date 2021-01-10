@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 For a complete list of changes refer to the commit history between versions. Internal changes and refactorings are not mentioned in this document.
 
+## 0.4.4 - 2021-01-10
+
+### Fixed
+
+- Fixed a bug where wildcard search causes an error if Postgres table contains uuid columns (#12)
+
 ## 0.4.3 - 2020-12-14
 
 ### Fixed
