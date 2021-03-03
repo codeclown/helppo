@@ -9,14 +9,24 @@ Plug-n-play database management interface (CRUD)
 <a href="https://www.npmjs.com/package/helppo"><img src="https://img.shields.io/badge/npm-helppo-blue" alt="helppo on npm"></a>
 <a href="https://github.com/codeclown/helppo"><img src="https://img.shields.io/badge/github-codeclown%2Fhelppo-lightgrey" alt="Helppo on GitHub"></a>
 </p>
+
+---
+
 <p align="center">
-<a href="#what-is-it">What is it</a>   
-<a href="#screenshots">Screenshots</a>   
-<a href="#subscribe-to-helppo-news">Mailing list</a>   
-<a href="#license">License</a>
+Run <code>helppo-cli &lt;connection_string&gt;</code> and get this:
 </p>
 <p align="center">
 <img src="docs/screenshots/readme_intro.gif" alt="Gif of helppo on the command line" />
+</p>
+
+<p>
+Jump to:   
+<a href="#quickstart">Quickstart</a>   
+<a href="#what-is-it">What is it</a>   
+<a href="#screenshots">Screenshots</a>   
+<a href="#docs">Docs</a>   
+<a href="#subscribe-to-helppo-news">Mailing list</a>   
+<a href="#license">License</a>
 </p>
 
 ## Quickstart
@@ -46,7 +56,7 @@ For more examples, see [Usage](./docs/CLI.md#usage).
 
 Helppo is a **CLI tool** to _instantly_ (`helppo-cli <connection_string>`) spin up a graphical in-browser CRUD interface from a database connection string. Currently supported databases are Postgres and MySQL.
 
-Helppo is also an **Express.js middleware**. In fact, the command-line interface is simply a wrapper around it. You can mount Helppo in your own Express-project.
+Helppo is also an **Express.js middleware**. In fact, the command-line interface is simply a wrapper around it. You can mount Helppo in your own NodeJS Express-project.
 
 See the documentation for each flavour:
 
@@ -69,21 +79,30 @@ Also see [`docs/README.md`](./docs/README.md) for the remaining documentation.
 
 ### Screenshots
 
-#### Browse database tables
+| –                                                                   | –                                                                     |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Browse database tables:                                             | Perform bulk actions:                                                 |
+| ![Browse database tables](docs/screenshots/readme_browse_table.png) | ![Perform bulk actions](docs/screenshots/readme_batch_operations.png) |
+| Edit database rows:                                                 | Run raw SQL queries:                                                  |
+| ![Edit database rows](docs/screenshots/readme_edit_row.png)         | ![Run raw SQL queries](docs/screenshots/readme_raw_query.png)         |
 
-![Browse database tables](docs/screenshots/readme_browse_table.png)
+## Docs
 
-#### Perform bulk actions
+Documentation table of contents:
 
-![Perform bulk actions](docs/screenshots/readme_batch_operations.png)
+- [`docs/README.md`](/docs/README.md)
 
-#### Edit database rows
+Quick links to sub-pages:
 
-![Edit database rows](docs/screenshots/readme_edit_row.png)
-
-#### Run raw SQL queries
-
-![Run raw SQL queries](docs/screenshots/readme_raw_query.png)
+- [CLI](docs/CLI.md)
+- [Middleware](docs/Middleware.md)
+- [Configuration](docs/Configuration.md)
+- [Drivers](docs/Drivers.md)
+- [Changelog](docs/Changelog.md)
+- [Contributing](docs/Contributing.md)
+- [Development](docs/Development.md)
+- [Release process](docs/Release-process.md)
+- [Writing a driver](docs/Writing-a-driver.md)
 
 ## Subscribe to Helppo news
 
@@ -93,7 +112,7 @@ If you'd like to receive periodic updates about the status of Helppo, subscribe 
 
 Versions 0.X of Helppo are published under the GPLv3 license.
 
-Paraphrased, it means that you can use Helppo in any project for free, as long as you retain the license text in the source code (in the case of a server-side npm package like Helppo, this requirement is automatically fulfilled when installing it via npm, as the license text is always included in the node_modules subfolder). Additionally, if you modify Helppo itself and publish the modified software, it must be published under the same license.
+Paraphrased, it means that **you can use Helppo in any project for free, as long as you retain the license text in the source code** (in the case of a server-side npm package like Helppo, this requirement is automatically fulfilled when installing it via npm, as the license text is always included in the node_modules subfolder). Additionally, if you modify Helppo itself and publish the modified software, it must be published under the same license.
 
 For full license terms, see [LICENSE](./LICENSE).
 

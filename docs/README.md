@@ -1,5 +1,7 @@
 # Helppo Documentation
 
+<!-- Keep the following in sync with README.md in project root -->
+
 **Command-Line Interface:**
 
 - [CLI](CLI.md)<br>
