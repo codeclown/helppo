@@ -1,13 +1,11 @@
 # Helppo Documentation
 
-<!-- Keep the following in sync with README.md in project root -->
-
 **Command-Line Interface:**
 
-- [CLI](CLI.md)<br>
-  How to use the command line utility `helppo-cli`
+- [../README](../README.md)<br>
+  Refer to the project README for how to use the command line utility `helppo-cli`
 
-**Middleware:**
+**Express.js middleware:**
 
 - [Middleware](Middleware.md)<br>
   How to get started with the Express.js middleware

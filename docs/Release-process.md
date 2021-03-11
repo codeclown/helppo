@@ -18,6 +18,7 @@
   - [Prepare package files](#prepare-package-files)
   - [Publish the package](#publish-the-package-1)
 - [Push changes to repository](#push-changes-to-repository)
+- [Publish the docker image](#publish-the-docker-image)
 
 <!-- /hohhoijaa -->
 
@@ -102,3 +103,22 @@ Don't forget to push w/ tags.
 ```bash
 git push --follow-tags
 ```
+
+## Publish the docker image
+
+Run the following script which outputs all the commands preformatted. The script does not build or push any images, it just prints instructions.
+
+```bash
+yarn docker-build-info
+```
+
+Output will be similar to this:
+
+```
+Run the following commands in order:
+  docker build -t codeclown/helppo:0.4.4 -t codeclown/helppo:latest --build-arg HELPPO_CLI_VERSION=0.4.4 .
+  docker run --rm codeclown/helppo:0.4.4 --help # should see help message
+  docker push codeclown/helppo:0.4.4 && docker push codeclown/helppo:latest
+```
+
+Follow the commands one by one.
